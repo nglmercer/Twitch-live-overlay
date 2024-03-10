@@ -302,9 +302,9 @@ function handleEvent(eventType, tags, message) {
         .replace('playername', playerName || '')
         .replace('username', tags.username || '')
         .replace('message', message || '')
-        .replace('bits ', tags.bits || '')
+        .replace('bits', tags.bits || '')
         .replace('comment', message || '')
-        .replace('gift ', tags.bits || '')
+        .replace('giftName', tags.bits || '')
         .replace('uniqueId', tags.username || '')
 
       if (eventType !== 'bits' && replacedCommand === lastCommand) {
