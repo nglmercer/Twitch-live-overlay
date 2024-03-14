@@ -1,7 +1,6 @@
 # Twitch-TTS
 speechchat chat de voz y conexion con minecraft
 ![image](https://github.com/nglmercer/Twitch-MineTTS/assets/128845117/3ea9f9d0-153b-4e59-8751-31447ea91470)
-![image](https://github.com/nglmercer/Twitch-MineTTS/assets/128845117/a8a4392e-e656-4b08-a544-89b6b4418a91)
 
 #reemplaza valores
 equivalencias y hay buen soporta puede usar gift como bits --- username o uniqueId
