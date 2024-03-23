@@ -19,11 +19,7 @@ app.on('ready', () => {
     console.log('OSC Server is listening.');
   });
   const app12 = express();
-  // CONFIGURACION DE EJEMPLO
-  //let keyBOT = null; // BOT MINECRAFT DAR OP
-  //let keySERVER = null; // IP SERVER
-  //const keySERVERPORT = '25565'; // PUERTO SERVER
-  
+
   let bot;
   let botStatus = false;
   let disconnect = false;
@@ -113,8 +109,41 @@ app.on('ready', () => {
       res.json({ message: 'Datos recibidos' });
     }
   });
+  const overlayWindows = [];
 
+  app12.post('/crear-overlay', (req, res) => {
+    const { url, width, height } = req.body;
   
+    // Configuración de la ventana de overlay con el tamaño especificado
+    const overlayWindow = new BrowserWindow({
+      width: parseInt(width),
+      height: parseInt(height),
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      webPreferences: {
+        nodeIntegration: true
+      }
+    });
+    overlayWindows.push(overlayWindow);
+
+    // Cargar la URL recibida en la ventana de overlay
+    overlayWindow.loadURL(url);
+      //
+    overlayWindow.on('focus', () => {
+      overlayWindow.setIgnoreMouseEvents(false, { forward: false });
+    });
+
+    overlayWindow.on('blur', () => {
+      overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+    });
+    //*///
+    globalShortcut.register('F11', () => {
+      overlayWindows.forEach(window => window.close());
+    });
+  
+    res.status(200).json({ message: 'Overlay creado correctamente' });
+  });
   function sendChatMessage(text) {
     client.send('/chatbox/input', text, true);
   }

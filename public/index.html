@@ -488,7 +488,44 @@ keywordToMob:
     const defaultTab = document.querySelector('.tab:checked');
 
   </script>
-
+    <form id="overlayForm">
+      <label for="urlInput">URL:</label><br>
+      <input type="text" id="urlInput" value="http://localhost:8111/overlay/" name="url" required><br><br>
+      <label for="widthInput">Ancho:</label><br>
+      <input type="number" id="widthInput" value="800" name="width" required><br><br>
+      <label for="heightInput">Alto:</label><br>
+      <input type="number" id="heightInput" value="800" name="height" required><br><br>
+      <button type="submit">Crear Overlay</button>
+    </form>
+  
+    <script>
+      document.getElementById('overlayForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+  
+        const url = document.getElementById('urlInput').value;
+        const width = document.getElementById('widthInput').value;
+        const height = document.getElementById('heightInput').value;
+  
+        try {
+          const response = await fetch('http://localhost:3001/crear-overlay', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url, width, height })
+          });
+  
+          if (response.ok) {
+            alert('Overlay creado correctamente');
+          } else {
+            throw new Error('Error al crear el overlay');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('Ocurrió un error al crear el overlay');
+        }
+      });
+    </script>
 </body>
 <script src="tmi.min.js"></script>
 <script src="app.js"></script>

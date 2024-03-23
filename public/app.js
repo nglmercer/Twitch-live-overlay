@@ -304,7 +304,7 @@ function handleEvent(eventType, tags, message) {
         .replace('message', message || '')
         .replace('bits', tags.bits || '')
         .replace('comment', message || '')
-        .replace('giftName', tags.bits || '')
+        .replace('gift', tags.bits || '')
         .replace('uniqueId', tags.username || '')
 
       if (eventType !== 'bits' && replacedCommand === lastCommand) {
