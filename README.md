@@ -36,6 +36,14 @@ bits:
     - "/execute at {playername} run playsound minecraft:entity.player.levelup ambient @p"
     - "/execute at {playername} run give @a minecraft:golden_apple 1"
     - "/title @a title {\"text\":\"{uniqueId} \"}"
+  10:
+    - "/tellraw @a {\"text\":\"{uniqueId}  sent a {giftName} x{repeatCount} \", \"color\":\"gold\"}"
+    - "/title @a subtitle {\"text\":\"ENVIO {giftName} x{repeatCount} \",\"bold\":true,\"color\":\"gold\"}"
+    - "/execute at {playername} run summon minecraft:zombie ~ ~ ~ {CustomName:'{\"text\":\"{uniqueId} \"}', CustomNameVisible:1}"
+    - "/execute at {playername} run playsound minecraft:entity.player.levelup ambient @p"
+    - "/execute at {playername} run give @a minecraft:golden_apple 1"
+    - "/title @a title {\"text\":\"{uniqueId} \"}"
+    - "/say este es un comando por 10bits"
    ```
 
 ### Ejemplo
