@@ -2,7 +2,7 @@
 speechchat chat de voz y conexion con minecraft
 - este proyecto fue desarrollado con codigo de mi otro proyecto igual para tiktok revise documentacion
 - link de documentacion general [TikLiveapp docs](https://nglmercer.github.io/TikLiveApp/)
-- link de docuemtacion de minecraft [minecraftlive docs]([https://nglmercer.github.io/TikLiveApp/](https://nglmercer.github.io/TikLiveApp/docs/MinecraftLive/Minecraft%20Live))
+- link de docuemtacion de minecraft [minecraftlive docs](https://nglmercer.github.io/TikLiveApp/docs/MinecraftLive/Minecraft%20Live)
 ## Requerimientos
 - Si utiliza minecraft interactivo usa Aplicacion de escritorio 
 - Si solo quiere un speechchat utilize la version web
