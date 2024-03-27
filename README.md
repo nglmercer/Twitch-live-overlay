@@ -1,8 +1,11 @@
 # Twitch-TTS
 speechchat chat de voz y conexion con minecraft
+- este proyecto fue desarrollado con codigo de mi otro proyecto igual para tiktok revise documentacion
+- link de documentacion general  ![TikLiveapp docs](https://nglmercer.github.io/TikLiveApp/)
+- link de docuemtacion de minecraft ![minecraftlive docs]([https://nglmercer.github.io/TikLiveApp/](https://nglmercer.github.io/TikLiveApp/docs/MinecraftLive/Minecraft%20Live))
 ## Requerimientos
--Si utiliza minecraft interactivo usa Aplicacion de escritorio 
--Si solo quiere un speechchat utilize la version web
+- Si utiliza minecraft interactivo usa Aplicacion de escritorio 
+- Si solo quiere un speechchat utilize la version web
 ## Instalación y Configuración Inicial
 Crea un bot para interactuar en un servidor
 ## Minecraft interactivo
@@ -12,7 +15,6 @@ Puede configurar el bot para definir su:
 - Su nombre del jugador minecraft
 - comando inicial
 
-
 Aqui le muestro la sintaxis de minecraft :
 - Eventos como:
 1. chat 
@@ -20,7 +22,9 @@ Aqui le muestro la sintaxis de minecraft :
 3. follow 
 4. share
 - Para los comando coloque:
-ESTE ES UN EJEMPLO PARA Minecraft TNT 
+ESTE ES UN EJEMPLO PARA Minecraft TNT
+```
+
 chat:
   - "/tellraw @a {\"text\":\"{uniqueId} : {comment} \", \"color\":\"green\"}"
   - "/tellraw @a {\"text\":\"{uniqueId} : {message} \", \"color\":\"green\"}"
@@ -32,9 +36,11 @@ bits:
     - "/execute at {playername} run playsound minecraft:entity.player.levelup ambient @p"
     - "/execute at {playername} run give @a minecraft:golden_apple 1"
     - "/title @a title {\"text\":\"{uniqueId} \"}"
-   
+   ```
+
 ### Ejemplo
 si quiere por cada bit entonces
+
 ```
 
 bits:
