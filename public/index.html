@@ -1,595 +1,536 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok LIVE</title>
-    <meta name="description" content="A chat reader for TikTok LIVE utilizing TikTok-Live-Connector and Socket.IO to forward the data to the client. This demo project uses the unofficial TikTok API to retrieve chat comments, gifts and other events from TikTok LIVE.">
-    <!-- Content-Security
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://tiktok-chat-reader.zerody.one/ https://tiktok-chat-reader.zerody.one/ wss://irc-ws.chat.twitch.tv http://localhost:3001 http://localhost:3000 https://p16-pu-sign-useast8.tiktokcdn-us.com/ https://p77-sign-va.tiktokcdn.com/ https://p19-pu-sign-useast8.tiktokcdn-us.com/ https://p16-sign-useast2a.tiktokcdn.com/ http://localhost:8081 https://api.streamelements.com https://p16-pu-sign-useast8.tiktokcdn-us.com/ https://p16-sign-va.tiktokcdn.com/ http://localhost:8911; img-src 'self' https://p16-sign-va.tiktokcdn.com/ https://p16-pu-sign-useast8.tiktokcdn-us.com/; media-src 'self' blob:;"> 
-meta
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com;
-  connect-src 'self' https://localhost https://unpkg.com https://tiktok-chat-reader.zerody.one wss://irc-ws.chat.twitch.tv wss://tiktok-chat-reader.zerody.one http://localhost:3001 https://api.streamelements.com;
-  style-src 'self' 'unsafe-inline';
-">
- -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitch Chat TTS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js" integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css" type="text/css">
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Twitch Chat TTS" />
+  
+  <meta property="og:description"
+    content="Please enter a channel -- text to speech." />
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-JT0GEBW5MK');
+  </script>
 
 </head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js" integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="connection.js"></script>
-<script src="app.js"></script>
-<script src="tmi.min.js"></script>
-<script src="TTSmain.js"></script>
-<style>
-    .error {
-        color: red;
-        font-weight: bold;
-    }
-</style>
-<link rel="stylesheet" href="styles.css">
-</head>
-<div class="title-bar">
-    <button class="button close" onclick="closeWindow()">x</button>
-    <script>
-        // Funciones para cerrar, minimizar y maximizar la ventana
-        function closeWindow() {
-            window.close();
-        }
-    </script>
-</div>
-<table class="splitstatetable">
-    <div id="stateText"></div>
-    <div id="roomStats"></div>
-</table>
 
 <body>
-
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'Tab1')">chat</button>
-        <button class="tablinks" onclick="openTab(event, 'Tab2')">Minecraft</button>
-        <button class="tablinks" onclick="openTab(event, 'Tab3')">Sonidos</button>
-        <button class="tablinks" onclick="openTab(event, 'Tab4')">Config y otros</button>
-        <button class="tablinks" onclick="openTab(event, 'Tab5')">prox...</button>
-        <div class="toggleWrapper">
-            <input type="checkbox" class="dn" id="dn" checked>
-            <label for="dn" class="toggle">
-              <span class="toggle__handler">
-              </span>
-          </label>
-        </div>
-    </div>
-
-    <div id="overlayEventContainer" style="border: transparent; width: 100%; pointer-events: none; height: 100%; position: absolute; background: transparent;"></div>
-
-    <input type="text" placeholder="tu usuario @uniqueid" id="uniqueIdInput">
-    <input type="button" id="connectButton" value="Conectar">
-    <audio id="audio" controls autoplay>
-    </audio>
-    <audio id="audio" autoplay></audio>
-    <audio id="soundPlayer" type="audio/mp3"></audio>
-    <input id="skip-button" type="button" value="SKIP"> </button>
-    <div id="durationDisplay"></div>
-
-    </div>
-
-    <div>
-        <label class="cyberpunk-checkbox-label">
-            <input type="checkbox" class="cyberpunk-checkbox" id="sendDataCheckbox" checked>
-            mixitupAlerts</label>
-        <!-- Contenido de las pestañas -->
-        <div id="Tab1" class="tabcontent">
-            <div class="inputFields">
-                <div class="splitchattable">
-                    <div class="chatcontainer">
-                        <h3 class="containerheader">Chats</h3>
+  <div class="tab-container">
+    <input type="radio" name="tab" id="tab1" class="tab tab--1" />
+    <label class="tab_label" for="tab1">Twitch Chat</label>
+  
+    <input type="radio" name="tab" id="tab2" class="tab tab--2" />
+    <label class="tab_label" for="tab2">Settings</label>
+  
+    <input type="radio" name="tab" id="tab3" class="tab tab--3" />
+    <label class="tab_label" for="tab3">Notifications</label>
+  
+    <div class="indicator"></div>
+  </div>
+  <div class="tab-content">
+    <div id="content1" class="tab-pane active">
+      <div class="jumbotron">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12">
+              <h1>TTS de chat de Twitch</h1>
+              <p>Ingrese un canal a continuación y luego haga clic en "Comenzar a escuchar" para texto a voz.</p>
+              <form action="#">
+                <div class="row">
+                  <div class="col-lg-8 col-md-8 col-sm-8 col">
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">twitch.tv/</span>
+                      </div>
+                      <input id="channelname" name="channel" type="text" class="form-control" />
                     </div>
-                    <div class="giftcontainer">
-                        <h3 class="containerheader">Gifts</h3>
+                  </div>
+                  <div class="col-lg-4 col-md-4 4 col-sm-4 col">
+                    <button class="btn btn-primary" onclick="startListening()" id="listenBtn" type="submit"> Start
+                      Listening</button>
+                  </div>
+                </div>
+              </form>
+              <p></p>
+              <div id="status" class="alert alert-info">
+                Esperando el nombre del canal...
+              </div>
+              <p></p>
+              <div id="options-container" class="container">
+                <div class="row">
+                  <div class="col-6">
+                    <label for="volume"><small>Speech Volume</small></label>
+                  </div>
+                  <div class="col-6">
+                    <i class="bi bi-volume-up-fill"></i>
+                    <input id="volume" type="range" min="0" max="1" value="1" step="0.1" onchange="volumeChange()">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
+                  </div>
+                  <div class="col-5">
+                    <input id="cheersonly" type="checkbox" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <label for="voiceSelect"><small>Voz (no aplicable a Polly)</small></label>
+                  </div>
+                  <div class="col-6">
+                    <select id="voiceSelect" class="form-control"></select>
+                  </div>
+                </div> 
+                <div class="row">
+                  <div class="col-6">
+                    <label for="hqspeech"><small>Use <a href="https://aws.amazon.com/polly/" target="_blank">Amazon Polly</a> (Beta)</small></label>
+                  </div>
+                  <div class="col-6">
+                    <input id="hqspeech" type="checkbox" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
+                  </div>
+                  <div class="col-5">
+                    <input id="modsonly" type="checkbox" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>
+                  </div>
+                  <div class="col-6">
+                    <input id="announcechatter" type="checkbox" />
+                  </div>
+                </div>   
+                <div class="row">
+                  <div class="col-6">
+                    <label for="exclude"><small>Excluir ciertos usuarios de Chat</small></label>
+                  </div>
+                  <div class="col-6">
+                    <input id="exclude-toggle" type="checkbox" />
+                  </div>
+                </div>    
+                <div class="row d-none" id="exclude-options">
+                  <div clase="col-6">
+                    <small>Ingrese los usuarios del chat que desea excluir en el cuadro de la derecha, creando una nueva línea para cada chat.</small>
+                    <button class="btn btn-outline-primary" onclick="fillInBots()">Empiece con Bots conocidos</button>
+                  </div>
+                  <div class="col-6">
+                    <textarea id="excluded-chatters" rows="10" class="form-control" placeholder="XQC&#10;BagofChaos"></textarea>
+                  </div>
+                </div>                    
+                <div class="row">
+                  <div class="col-12">
+                  <small></small>
                     </div>
                 </div>
+                <div class="row">
+                  <audio id="audiotrack"></audio>
+                </div>
+                <div class="row">
+                  <button class="btn btn-dark mt-3 ml-2" data-toggle="modal" data-target="#settingsModal" onclick="exportSettings()">Export Channel to URL</button>
+                </div>
+                <div class="row">
+                  <button class="btn btn-danger mt-3 ml-2" onclick="skipMessage()">Skip Message</button>
+                </div>            
+              </div>
             </div>
-            <div>
-                <div id="voiceSelectContainer"></div>
-
-                <label for="filter-words">filtrar (palabras separadas):</label>
-                <input type="text" id="filter-words">
+            <div class="col-lg-4 col-md-4 col-sm-12 pt-3">
+              <div class="card">
+                <a href="https://www.tiktok.com/@melserng">
+                  <img class="card-img-top" src="images/Rose.webp" alt="Rose">
+                </a>
+                <div class="card-body">
+                  <h5 class="card-title">una monedita</h5>
+                  <p class="card-text">con una rosita me apoyas :D!</p>
+                </div>
+              </div>
             </div>
-            <label for="filter-users">WitheList:</label>
-            <input type="text" id="filter-users">
-            <script>
-                function setupLocalStorage(inputElement, storageKey, callback) {
-                    const storedValue = localStorage.getItem(storageKey);
-                    if (storedValue) {
-                        inputElement.value = storedValue;
-                    }
-
-                    inputElement.addEventListener('change', () => {
-                        const currentValue = inputElement.value;
-                        if (currentValue) {
-                            localStorage.setItem(storageKey, currentValue);
-                            if (typeof callback === 'function') {
-                                callback(currentValue);
-                            }
-                        }
-                        console.log('Valor actualizado:', currentValue);
-
-                    });
-                }
-
-                // Ejemplo de uso
-                const filterWordsInput = document.getElementById('filter-words');
-                setupLocalStorage(filterWordsInput, 'lastFilterWords');
-
-                const filterUsersInput = document.getElementById('filter-users');
-                setupLocalStorage(filterUsersInput, 'lastfilterUsers');
-            </script>
+          </div>
         </div>
-
-        <div id="Tab2" class="tabcontent">
-
-            <form id="createBotForm">
-                <label for="keyBOT">-MinecraftBOT:</label>
-                <input type="text" id="keyBOT" name="keyBOT" value="" required>
-                <br>
-                <label for="keySERVER">--IP del Server:</label>
-                <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
-                <br>
-                <button type="submit">--Conectar Bot</button>
-                <button id="disconnectButton">-Desconectar Bot</button>
-            </form>
-
-            <script>
-                // Obtener el formulario y los inputs
-                const form = document.getElementById('createBotForm');
-                const keyBOTInput = document.getElementById('keyBOT');
-                const keySERVERInput = document.getElementById('keySERVER');
-
-                // Cargar datos guardados del formulario si existen
-                if (localStorage.getItem('botFormData')) {
-                    const formData = JSON.parse(localStorage.getItem('botFormData'));
-                    keyBOTInput.value = formData.keyBOT;
-                    keySERVERInput.value = formData.keySERVER;
-                }
-
-                // Escuchar el evento de envío del formulario
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Evitar que se envíe el formulario
-
-                    // Obtener el valor del campo "keySERVER"
-                    const keySERVER = keySERVERInput.value;
-
-                    // Extraer el número de puerto utilizando split(':')
-                    const serverParts = keySERVER.split(':');
-                    const serverAddress = serverParts[0];
-                    const serverPort = serverParts[1] || ''; // Si no hay puerto, asignar una cadena vacía
-
-                    // Guardar los datos en el localStorage
-                    const formData = {
-                        keyBOT: keyBOTInput.value,
-                        keySERVER: keySERVER,
-                        serverPort: serverPort
-                    };
-                    localStorage.setItem('botFormData', JSON.stringify(formData));
-
-                    // Enviar el número de puerto como parámetro adicional
-                    console.log('Dirección del servidor:', serverAddress);
-                    console.log('Puerto del servidor:', serverPort);
-                });
-            </script>
-            <div id="resultMessage"></div>
-
-            <script>
-                let disconnectButtonPressCount = 0;
-                let disconnectButtonTimeout;
-                const disconnectButton = document.getElementById('disconnectButton');
-                document.getElementById('createBotForm').addEventListener('submit', function(event) {
-                    event.preventDefault();
-
-                    const keyBOT = document.getElementById('keyBOT').value.trim();
-                    const keySERVER = document.getElementById('keySERVER').value.trim();
-                    const Initcommand = InitcommandInput.value.trim();
-                    const data = {
-                        eventType: 'createBot',
-                        data: {
-                            keyBot: keyBOT,
-                            keyServer: keySERVER,
-                            Initcommand: Initcommand
-                        }
-                    };
-
-                    fetch('http://${window.location.hostname}:3001/api/create', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(data)
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log(result);
-                            const resultMessage = document.getElementById('resultMessage');
-                            resultMessage.textContent = result.message;
-
-                            // Cambiar el color del resultado según el estado
-                            if (result.success.contains('conectado ')) {
-                                console.log('%cEl bot está conectado', 'color: green');
-                                resultMessage.style.color = 'green'; // Cambiar a color verde si es exitoso
-                            } else {
-                                console.log('%cEl bot está desconectado', 'color: red'); // Cambiar a color rojo si hay un error
-                            }
-                            if (result.botStatus) {
-                                console.log('%cEl bot está conectado', 'color: green');
-                                resultMessage.style.color = 'green';
-                            } else {
-                                console.log('%cEl bot está desconectado', 'color: red');
-                            }
-                            disconnectButton.disabled = false;
-                        })
-                        .catch(error => {
-                            console.error(error);
-                            alert('Ocurrió un error al crear el bot');
-                        });
-                });
-
-                disconnectButton.addEventListener('click', function() {
-                    if (disconnectButtonPressCount === 0) {
-                        disconnectButtonPressCount++;
-                        clearTimeout(disconnectButtonTimeout);
-                        disconnectButtonTimeout = setTimeout(() => {
-                            disconnectBot();
-                            disconnectButtonPressCount = 0;
-                        }, 500);
-                    } else if (disconnectButtonPressCount === 1) {
-                        clearTimeout(disconnectButtonTimeout);
-                        reconnectBot();
-                        disconnectButtonPressCount = 0;
-                    }
-                });
-
-                function disconnectBot() {
-                    fetch('http://${window.location.hostname}:3001/api/disconnect', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                eventType: 'disconnectBot'
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log(result);
-                            document.getElementById('resultMessage').textContent = result.message;
-                            resultMessage.style.color = 'red';
-                            disconnectButton.disabled = true;
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
-                }
-
-                function reconnectBot() {
-                    fetch('http://${window.location.hostname}:3001/api/reconnect', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                eventType: 'reconnectBot'
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log(result);
-                            document.getElementById('resultMessage').textContent = result.message;
-                            disconnectButton.disabled = false;
-                        })
-                        .catch(error => {
-                            console.error(error);
-                            alert('Ocurrió un error al reconectar el bot');
-                        });
-                }
-            </script>
-            <label onclick="savePlayerName()">-Tu Minecraft playerName:</label>
-            <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
-            <br>
-            <label onclick="saveInitcommand()">--BOT Comando en login:</label>
-            <input type="text" id="InitcommandInput" placeholder="login">
-            <br>
-
-            <div> <label for="eventType"> test Event Type:</label>
-                <input type="text" id="eventType" placeholder="Event Type" value="gift">
-                <label for="data"> test Data :</label>
-                <input type="text" id="data" placeholder="Data Default">
-                <button onclick="testHandleEvent()">Test Handle Event</button> </div>
-
-            <div style="position: relative;">
-                <textarea type="text" id="commandListInput" rows="15" cols="100" placeholder="chat:
-                    -
-likes:
-                  default:
-                    -
-gift:
-                  default:
-                    -
-                    Rose:
-                    -"></textarea>
-                <button style="position: relative;" onclick="saveCommandList()">Guardar COMANDOS para Minecraft interactivo</button>
-            </div>
-
-            <div style="position: relative;">
-                <textarea type="text" id="keywordsInput" rows="15" cols="100" placeholder="keywordToGive:
-                    escudo: minecraft:shield
-                    cama: minecraft:red_bed
-keywordToMob:
-                    enderman: minecraft:enderman
-                    cerdo: minecraft:pig
-                  "></textarea>
-                <button style="position: relative;" onclick="saveKeywords()">Guardar COMANDOS para el chat, mobs, items FREE</button>
-            </div>
-            <div style="position: relative;" id="errorOutput"></div>
-            <script>
-                try {
-                    // Tu código para analizar el YAML aquí
-                  } catch (error) {
-                    // Muestra el error completo en la consola del HTML
-                    console.error(error);
-                  
-                    // Muestra una alerta con un mensaje genérico
-                    alert('Se ha producido un error. Consulta la consola para obtener más detalles.');
-                  }
-                
-                </script>
-
-            <script>
-                // Cargar el comando inicial guardado
-                const initCommandInput = document.getElementById('InitcommandInput');
-                setupLocalStorage(initCommandInput, 'Initcommand');
-
-                // Cargar el nombre del jugador guardado
-                const playerNameInput = document.getElementById('playerNameInput');
-                setupLocalStorage(playerNameInput, 'playerName');
-                const storedKeywords = localStorage.getItem('keywords');
-                const storedCommandList = localStorage.getItem('commandList');
-
-                // Actualizar el contenido de los campos de texto si hay datos guardados
-                if (storedKeywords) {
-                    document.getElementById('keywordsInput').value = storedKeywords;
-                }
-
-                if (storedCommandList) {
-                    document.getElementById('commandListInput').value = storedCommandList;
-                }
-
-                function saveKeywords() {
-                    const keywordsInputValue = document.getElementById('keywordsInput').value;
-                    localStorage.setItem('keywords', keywordsInputValue);
-                    console.log('Datos de la lista de keywords guardados en el localStorage');
-                }
-
-                function saveCommandList() {
-                    const commandListInputValue = document.getElementById('commandListInput').value;
-                    localStorage.setItem('commandList', commandListInputValue);
-                    console.log('Datos de la lista de comandos guardados en el localStorage');
-                }
-            </script>
-        </div>
-
+      </div>
     </div>
-    <div id="Tab3" class="tabcontent">
-        <form id="soundForm">
-            <input type="file" id="soundFiles" accept=".mp3,.wav,.ogg,.webm" multiple>
-            <button type="submit">Añadir sonido</button>
+    <div id="content2" class="tab-pane">
+        <form id="createBotForm">
+          <label for="keyBOT">-MinecraftBOT:</label>
+          <input type="text" id="keyBOT" name="keyBOT" value="" required>
+          <br>
+          <label for="keySERVER">--IP del Server:</label>
+          <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
+          <br>
+          <button type="submit">--Conectar Bot</button>
+          <button id="disconnectButton">-Desconectar Bot</button>
         </form>
-        <div id="dropdownButton" onclick="toggleDropdownMenu()">
-            <div id="selectedSound">
-                Sonidos
-                <label class="container">
-            <input id="sendsoundCheckbox" type="checkbox" checked>
-            <div class="checkmark"></div>
-        </label>
-            </div>
-            <ul id="soundList" style="display: block;"></ul>
-            <!-- Muestra la lista de sonidos por defecto 
-        <input checked="checked" id="sendsoundCheckbox" type="checkbox" checked> -->
-        </div>
-        <div id="modal" style="display: none;">
-            <div id="modalContent">
-                <h2>Reproductor de Audio</h2>
-                <audio id="audioPlayer" controls></audio>
-                <input type="text" id="soundNameInput" placeholder="Nombre del sonido">
-                <button id="playButton">Reproducir</button>
-            </div>
-        </div>
-
+        
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                let dropdownButton = document.getElementById('dropdownButton');
-                let dropdownMenu = document.createElement('div');
-                dropdownMenu.id = 'dropdownMenu';
-                dropdownMenu.style.display = 'block';
+        // Obtener el formulario y los inputs
+        const form = document.getElementById('createBotForm');
+        const keyBOTInput = document.getElementById('keyBOT');
+        const keySERVERInput = document.getElementById('keySERVER');
 
+        // Cargar datos guardados del formulario si existen
+        if (localStorage.getItem('botFormData')) {
+          const formData = JSON.parse(localStorage.getItem('botFormData'));
+          keyBOTInput.value = formData.keyBOT;
+          keySERVERInput.value = formData.keySERVER;
+        }
 
-                let soundList = document.getElementById('soundList');
-                for (let i = 0; i < soundList.children.length; i++) {
-                    let listItem = soundList.children[i];
+        // Escuchar el evento de envío del formulario
+        form.addEventListener('submit', function(event) {
+          event.preventDefault(); // Evitar que se envíe el formulario
+          
+          // Obtener el valor del campo "keySERVER"
+          const keySERVER = keySERVERInput.value;
+          
+          // Extraer el número de puerto utilizando split(':')
+          const serverParts = keySERVER.split(':');
+          const serverAddress = serverParts[0];
+          const serverPort = serverParts[1] || ''; // Si no hay puerto, asignar una cadena vacía
+          
+          // Guardar los datos en el localStorage
+          const formData = {
+            keyBOT: keyBOTInput.value,
+            keySERVER: keySERVER,
+            serverPort: serverPort
+          };
+          localStorage.setItem('botFormData', JSON.stringify(formData));
 
-                    let optionDiv = document.createElement('div');
-                    optionDiv.dataset.giftName = listItem.textContent.replace('X', '').replace('Renombrar', '').trim(); // Almacenar el nombre del sonido en un atributo de datos
+          // Enviar el número de puerto como parámetro adicional
+          console.log('Dirección del servidor:', serverAddress);
+          console.log('Puerto del servidor:', serverPort);
+        });
+        </script>
+          <div id="resultMessage"></div>
 
-                    let soundName = document.createElement('span');
-                    soundName.textContent = optionDiv.dataset.giftName;
-
-                    let deleteButton = listItem.querySelector('.deleteButton').cloneNode(true);
-                    deleteButton.addEventListener('click', handleDelete);
-
-                    let renameButton = listItem.querySelector('.renameButton').cloneNode(true);
-                    renameButton.addEventListener('click', handleRename);
-
-                    let playButton = listItem.querySelector('.playButton').cloneNode(true); // Crear el botón de reproducción
-                    playButton.addEventListener('click', function() { // Agregar un controlador de eventos al botón
-                        playSound(optionDiv.dataset.giftName);
-                    });
-
-                    optionDiv.appendChild(soundName);
-                    optionDiv.appendChild(deleteButton);
-                    optionDiv.appendChild(renameButton);
-                    optionDiv.appendChild(playButton); // Agregar el botón de reproducción al div de opción
-
-                    dropdownMenu.appendChild(optionDiv);
+          <script>
+            let disconnectButtonPressCount = 0;
+            let disconnectButtonTimeout;
+            const disconnectButton = document.getElementById('disconnectButton');
+            document.getElementById('createBotForm').addEventListener('submit', function(event) {
+              event.preventDefault();
+          
+              const keyBOT = document.getElementById('keyBOT').value.trim();
+              const keySERVER = document.getElementById('keySERVER').value.trim();
+              const Initcommand = InitcommandInput.value.trim();
+              const data = {
+                eventType: 'createBot',
+                data: {
+                  keyBot: keyBOT,
+                  keyServer: keySERVER,
+                  Initcommand: Initcommand
                 }
-
-                dropdownButton.appendChild(dropdownMenu);
-                dropdownButton.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    dropdownMenu.style.display = 'block';
-                });
-
-                let isMenuVisible = true;
-
-                dropdownButton.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    dropdownMenu.style.display = 'block';
-                    isMenuVisible = true;
-                });
-
-                dropdownButton.addEventListener('dblclick', function(event) {
-                    event.stopPropagation();
-                    dropdownMenu.style.display = 'none';
-                    isMenuVisible = false;
-                });
-
-                document.addEventListener('click', function() {
-                    if (!isMenuVisible) {
-                        dropdownMenu.style.display = 'none';
-                    }
-                });
+              };
+          
+              fetch('/api/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              })
+              .then(response => response.json())
+              .then(result => {
+                console.log(result);
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = result.message;
+            
+                // Cambiar el color del resultado según el estado
+                if (result.success) {
+                  console.log('%cEl bot está conectado', 'color: green');
+                  resultMessage.style.color = 'green'; // Cambiar a color verde si es exitoso
+                } else {
+                  console.log('%cEl bot está desconectado', 'color: red'); // Cambiar a color rojo si hay un error
+                }
+                if (result.botStatus) {
+                  console.log('%cEl bot está conectado', 'color: green');
+                  resultMessage.style.color = 'green'; 
+                } else {
+                  console.log('%cEl bot está desconectado', 'color: red');
+                }
+                disconnectButton.disabled = false;
+              })
+              .catch(error => {
+                console.error(error);
+                alert('Ocurrió un error al crear el bot');
+              });
             });
 
-            function toggleDropdownMenu() {
-                var dropdownMenu = document.getElementById('dropdownMenu');
-                if (dropdownMenu.style.display === 'none') {
-                    dropdownMenu.style.display = 'block';
-                } else {
-                    dropdownMenu.style.display = 'none';
-                }
+            disconnectButton.addEventListener('click', function() {
+              if (disconnectButtonPressCount === 0) {
+                disconnectButtonPressCount++;
+                clearTimeout(disconnectButtonTimeout);
+                disconnectButtonTimeout = setTimeout(() => {
+                  disconnectBot();
+                  disconnectButtonPressCount = 0;
+                }, 500);
+              } else if (disconnectButtonPressCount === 1) {
+                clearTimeout(disconnectButtonTimeout);
+                reconnectBot();
+                disconnectButtonPressCount = 0;
+              }
+            });
+          
+            function disconnectBot() {
+              fetch('/api/disconnect', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ eventType: 'disconnectBot' })
+              })
+              .then(response => response.json())
+              .then(result => {
+                console.log(result);
+                document.getElementById('resultMessage').textContent = result.message;
+                resultMessage.style.color = 'red';
+                disconnectButton.disabled = true;
+              })
+              .catch(error => {
+                console.error(error);
+              });
             }
-        </script>
+          
+            function reconnectBot() {
+              fetch('/api/reconnect', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ eventType: 'reconnectBot' })
+              })
+              .then(response => response.json())
+              .then(result => {
+                console.log(result);
+                document.getElementById('resultMessage').textContent = result.message;
+                disconnectButton.disabled = false;
+              })
+              .catch(error => {
+                console.error(error);
+                alert('Ocurrió un error al reconectar el bot');
+              });
+            }
+          </script>
+          <label onclick="savePlayerName()" >-Tu Minecraft playerName:</label>
+          <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
+          <br>
+          <label onclick="saveInitcommand()">--BOT Comando en login:</label>
+          <input type="text" id="InitcommandInput" placeholder="login">
+          <br>
+
+          <div> <label for="eventType"> test Event Type:</label>
+            <input type="text" id="eventType" placeholder="Event Type" value="gift">
+            <label for="data"> test Data :</label>
+            <input type="text" id="data" placeholder="Data Default">
+            <button onclick="testHandleEvent()">Test Handle Event</button> </div>
+
+            <div style="position: relative;">
+              <textarea type="text" id="commandListInput" rows="15" cols="100" placeholder="chat:
+                -
+likes:
+              default:
+                -
+gift:
+              default:
+                -
+                Rose:
+                -"></textarea>
+              <button style="position: relative;" onclick="saveCommandList()">Guardar COMANDOS para Minecraft interactivo</button>
+            </div>
+            
+            <div style="position: relative;">
+              <textarea type="text" id="keywordsInput" rows="15" cols="100" placeholder="keywordToGive:
+                escudo: minecraft:shield
+                cama: minecraft:red_bed
+keywordToMob:
+                enderman: minecraft:enderman
+                cerdo: minecraft:pig
+              "></textarea>
+              <button style="position: relative;" onclick="saveKeywords()">Guardar COMANDOS para el chat, mobs, items FREE</button>
+            </div>
+
+
+          <script>
+            // Cargar el comando inicial guardado
+            const initCommandInput = document.getElementById('InitcommandInput');
+            setupLocalStorage(initCommandInput, 'Initcommand');
+
+            // Cargar el nombre del jugador guardado
+            const playerNameInput = document.getElementById('playerNameInput');
+            setupLocalStorage(playerNameInput, 'playerName');
+            const storedKeywords = localStorage.getItem('keywords');
+            const storedCommandList = localStorage.getItem('commandList');
+          
+            // Actualizar el contenido de los campos de texto si hay datos guardados
+            if (storedKeywords) {
+              document.getElementById('keywordsInput').value = storedKeywords;
+            }
+          
+            if (storedCommandList) {
+              document.getElementById('commandListInput').value = storedCommandList;
+            }
+          
+            function saveKeywords() {
+              const keywordsInputValue = document.getElementById('keywordsInput').value;
+              localStorage.setItem('keywords', keywordsInputValue);
+              console.log('Datos de la lista de keywords guardados en el localStorage');
+            }
+          
+            function saveCommandList() {
+              const commandListInputValue = document.getElementById('commandListInput').value;
+              localStorage.setItem('commandList', commandListInputValue);
+              console.log('Datos de la lista de comandos guardados en el localStorage');
+            }
+            function setupLocalStorage(inputElement, storageKey, callback) {
+              const storedValue = localStorage.getItem(storageKey);
+              if (storedValue) {
+                inputElement.value = storedValue;
+              }
+            
+              inputElement.addEventListener('change', () => {
+                const currentValue = inputElement.value;
+                if (currentValue) {
+                  localStorage.setItem(storageKey, currentValue);
+                  if (typeof callback === 'function') {
+                    callback(currentValue);
+                  }
+                }
+                console.log('Valor actualizado:', currentValue);
+
+              });
+            }
+          </script>
+
 
     </div>
-    <div id="Tab4" class="tabcontent">
-        <input type="file" id="importButton">
-        <button onclick="importSettings()">ImportarCONFIG</button>
-        <button id="exportButton" onclick="exportSettings()">ExportarCONFIG</button>
-        <span id="loadingIndicator" style="display: none;">Loading...</span>
-        <div>
-            <form id="overlayForm">OverlayURL:
-                <input type="text" id="urlInput" value="http://localhost:8111/overlay/" name="url" required>ancho:
-                <input type="number" id="widthInput" value="800" name="width" required>alto:
-                <input type="number" id="heightInput" value="800" name="height" required>
-                <button type="submit">Crear Overlay</button>
-            </form>
+    <div id="content3" class="tab-pane">
+      Notifications content goes here.
+    </div>
+  </div>
 
-            <script>
-                document.getElementById('overlayForm').addEventListener('submit', async function(event) {
-                    event.preventDefault();
-
-                    const url = document.getElementById('urlInput').value;
-                    const width = document.getElementById('widthInput').value;
-                    const height = document.getElementById('heightInput').value;
-
-                    try {
-                        const response = await fetch('http://localhost:3001/crear-overlay', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                url,
-                                width,
-                                height
-                            })
-                        });
-
-                        if (response.ok) {
-                            alert('Overlay creado correctamente');
-                        } else {
-                            throw new Error('Error al crear el overlay');
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        alert('Ocurrió un error al crear el overlay');
-                    }
-                });
-            </script>
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="settingsModalLabel">Browser Source Export</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-
-        <div style="padding-top: 10px;">
-            <a href="#" onclick="generateOverlay()">overlay</a>
-            <input type="text" id="inputest"><button onclick="testOverlay()">testOverlay</button>
-            <script>
-                function generateOverlay() {
-                    let username = $('#uniqueIdInput').val();
-                    let url = `obs.html?username=${username}&showLikes=1&showChats=1&showGifts=1&showFollows=1&showJoins=1&bgColor=rgb(24,23,28)&fontColor=rgb(227,229,235)&fontSize=1.3em`;
-
-                    if (username) {
-                        window.open(url, '_blank');
-                    } else {
-                        alert("Enter username");
-                    }
-                }
-            </script>
-            <div class="inputFields">
-                <input id="channel" type="text" placeholder="Twitch channel"><button id="channel-button" value="GO" type="button"></button>
-            </div>
-            <div id="chatbox"></div>
+        <div class="modal-body">
+          <p>A continuación se muestra una URL que puede colocar como fuente del navegador en OBS. Esta URL aplicará automáticamente el nombre de su canal y comenzará a escuchar mensajes.</p><p>Tenga en cuenta que solo Amazon Polly es compatible como fuente de navegador para OBS y que los usuarios del chat excluidos no funcionan (todavía)..</p>
+          <div class="row">
+            <div class="col-8">
+            <input id="settingsURL" class="form-control" value="" disabled />
+          </div>
+          <div class="col-4">
+            <button class="btn btn-outline-dark" onclick="copyURL()">Copy URL</button>
+          </div>
+         </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container" id="main">
+    <div id="messages"></div>
+  </div>
 
-        <script>
-            function openTab(evt, tabName) {
-                var i, tabcontent, tablinks;
-                tabcontent = document.getElementsByClassName("tabcontent");
-                for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
-                }
-                tablinks = document.getElementsByClassName("tablinks");
-                for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].className = tablinks[i].className.replace(" active", "");
-                }
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.className += " active";
-            }
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const indicator = document.querySelector('.indicator');
+    const tabContent = document.querySelectorAll('.tab-pane');
+  
+    tabs.forEach(tab => {
+      tab.addEventListener('change', () => {
+        const selectedTab = document.querySelector(`#${tab.id}`);
+        const selectedContent = document.querySelector(`#${tab.id.replace('tab', 'content')}`);
+  
+        // Hide all tab content
+        tabContent.forEach(content => {
+          content.style.display = 'none';
+        });
+  
+        // Show selected tab content
+        selectedContent.style.display = 'block';
+  
+        // Update indicator position
+        const offsetLeft = selectedTab.offsetLeft;
+        const offsetWidth = selectedTab.offsetWidth;
+      });
+    });
+  
+    // Show default tab content
+    const defaultTab = document.querySelector('.tab:checked');
 
-            // Llama a openTab para mostrar Tab1 por defecto
-            openTab({
-                currentTarget: document.querySelector('.tablinks')
-            }, 'Tab1');
-        </script>
-        <script>
-            const uniqueIdInput = document.getElementById('uniqueIdInput');
-            const connectButton = document.getElementById('connectButton');
-
-            // Load the last entered value from localStorage
-            const uniqueId = localStorage.getItem('uniqueId');
-            if (uniqueId) {
-                uniqueIdInput.value = uniqueId;
-            }
-
-            if (connectButton) {
-                connectButton.addEventListener('click', () => {
-                    const currentValue = uniqueIdInput.value;
-                    if (currentValue) {
-                        // Store the current value in localStorage
-                        localStorage.setItem('uniqueId', currentValue);
-                    }
-                });
-            }
-        </script>
+  </script>
+    <form id="overlayForm">
+      <label for="urlInput">URL:</label><br>
+      <input type="text" id="urlInput" value="http://localhost:8111/overlay/" name="url" required><br><br>
+      <label for="widthInput">Ancho:</label><br>
+      <input type="number" id="widthInput" value="800" name="width" required><br><br>
+      <label for="heightInput">Alto:</label><br>
+      <input type="number" id="heightInput" value="800" name="height" required><br><br>
+      <button type="submit">Crear Overlay</button>
+    </form>
+  
+    <script>
+      document.getElementById('overlayForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+  
+        const url = document.getElementById('urlInput').value;
+        const width = document.getElementById('widthInput').value;
+        const height = document.getElementById('heightInput').value;
+  
+        try {
+          const response = await fetch('http://localhost:8082/crear-overlay', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url, width, height })
+          });
+  
+          if (response.ok) {
+            alert('Overlay creado correctamente');
+          } else {
+            throw new Error('Error al crear el overlay');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('Ocurrió un error al crear el overlay');
+        }
+      });
+    </script>
 </body>
-
+<script src="tmi.min.js"></script>
+<script src="app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>  
 </html>
