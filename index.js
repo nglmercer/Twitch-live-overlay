@@ -28,7 +28,7 @@ require('electron-reload')(__dirname, {
     if (botStatus) {
       bot.chat(replacedCommand);
     }
-    //console.log('comando minecraft', replacedCommand);
+    console.log('comando minecraft', replacedCommand);
   
     return res.json({ message: 'Datos recibidos' });
   });
@@ -157,8 +157,11 @@ require('electron-reload')(__dirname, {
     client.send('/chatbox/input', text, true);
   }
   
-  function createBot(keyBot, keyServer, keyServerPort) {
+  function createBot(keyBot, keyServer, keyServerPort, maxAttempts = 5) {
     console.log("createBot now...");
+  
+    let attemptCount = 1; // Track the number of connection attempts
+  
     if (!botStatus) {
       const botOptions = {
         host: keyServer,
@@ -169,27 +172,57 @@ require('electron-reload')(__dirname, {
         botOptions.port = keyServerPort;
       }
   
-      bot = mineflayer.createBot(botOptions);
+      const createBotInternal = () => { // Function for recursive creation
+        bot = mineflayer.createBot(botOptions);
   
-      bot.on('login', () => {
-        botStatus = true;
-        console.log('Bot is Online');
-        bot.chat('say Bot is Online');
-      });
+        bot.on('login', () => {
+          botStatus = true;
+          console.log('Bot is Online');
+          bot.chat('say Bot is Online');
+        });
   
-      bot.on('error', (err) => {
-        console.log('Error:', err);
-      });
-  
-      bot.on('end', () => {
-        botStatus = false;
-        if (!disconnect) {
-          console.log('Connection ended, reconnecting in 3 seconds');
-          if (!botStatus) {
-            setTimeout(() => createBot(keyBot, keyServer, keyServerPort), 3000);
+        bot.on('error', (err) => {
+          console.error('Error:', err);
+          botStatus = false;
+          if (!disconnect) {
+            if (attemptCount < maxAttempts) { // Check if attempts are exceeded
+              console.log(`Connection ended, reconnecting in 3 seconds (attempt ${attemptCount}/${maxAttempts})`);
+              attemptCount++;
+              setTimeout(() => createBotInternal(), 3000); // Recursive call
+            } else {
+              console.error('Error: Maximum connection attempts reached.');
+              // Handle error (return error and botStatus here)
+              return { error: 'Connection failed after maximum attempts', botStatus: false };
+            }
           }
-        }
-      });
+        });
+        bot.on('kicked', (reason) => {
+          console.log(`Bot expulsado del servidor: ${reason}`);
+        
+          // Implementar lógica de reintento
+          setTimeout(() => {
+            bot.quit(); // Desconectarse del servidor actual
+            createBot(keyBot, keyServer, keyServerPort); // Intentar conectarse de nuevo
+          }, 5000); // Esperar 5 segundos antes de intentar reconectarse
+        
+        });
+        bot.on('end', () => {
+          botStatus = false;
+          if (!disconnect) {
+            if (attemptCount < maxAttempts) { // Check if attempts are exceeded
+              console.log(`Connection ended, reconnecting in 3 seconds (attempt ${attemptCount}/${maxAttempts})`);
+              attemptCount++;
+              setTimeout(() => createBotInternal(), 3000); // Recursive call
+            } else {
+              console.error('Error: Maximum connection attempts reached.');
+              // Handle error (return error and botStatus here)
+              return { error: 'Connection failed after maximum attempts', botStatus: false };
+            }
+          }
+        });
+      };
+  
+      createBotInternal(); // Initial creation attempt
     } else {
       console.log("No se creó el bot, estado:", botStatus);
     }
