@@ -73,9 +73,20 @@ require('electron-reload')(__dirname, {
   
     res.json({ message: 'Datos recibidos receive1' });
   });
+  app1.get('/api/create', (req, res) => {
+    // Enviar un mensaje JSON por defecto como respuesta para solicitudes GET
+    res.json({ message: 'Datos recibidos create' });
+  });
+  app1.get('/api/receive', (req, res) => {
+    // Enviar un mensaje JSON por defecto como respuesta para solicitudes GET
+    res.json({ message: 'Datos recibidos receive' });
+  });
+  app1.get('/api/disconnect', (req, res) => {
+    // Enviar un mensaje JSON por defecto como respuesta para solicitudes GET
+    res.json({ message: 'Datos recibidos disconnect' });
+  });
   app1.post('/api/create', (req, res) => {
     const { eventType, data } = req.body;
-  
     if (eventType === 'createBot') {
       const { keyBot, keyServer, Initcommand } = data;
       if (keyBot && keyServer) {
