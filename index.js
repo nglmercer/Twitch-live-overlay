@@ -1,12 +1,10 @@
-const { app, BrowserWindow, globalShortcut  } = require('electron');
 const path = require('path');
 
-///*
+/*
 require('electron-reload')(__dirname, {
   electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
-});//*/
+});*/
 // Evento emitido cuando Electron ha terminado de inicializarse
-app.on('ready', () => {
   const express = require('express');
   const { createServer } = require('http');
   const cors = require('cors');
@@ -18,14 +16,14 @@ app.on('ready', () => {
   server2.on('listening', () => {
     console.log('OSC Server is listening.');
   });
-  const app12 = express();
+  const app1 = express();
 
   let bot;
   let botStatus = false;
   let disconnect = false;
-  app12.use(cors());
-  app12.use(express.json());
-  app12.post('/api/receive', (req, res) => {
+  app1.use(cors());
+  app1.use(express.json());
+  app1.post('/api/receive', (req, res) => {
     const { replacedCommand } = req.body;
     if (botStatus) {
       bot.chat(replacedCommand);
@@ -34,7 +32,7 @@ app.on('ready', () => {
   
     return res.json({ message: 'Datos recibidos' });
   });
-  app12.post('/api/receive1', (req, res) => {
+  app1.post('/api/receive1', (req, res) => {
     const { eventType, data } = req.body;
   
     switch (eventType) {
@@ -75,7 +73,7 @@ app.on('ready', () => {
   
     res.json({ message: 'Datos recibidos receive1' });
   });
-  app12.post('/api/create', (req, res) => {
+  app1.post('/api/create', (req, res) => {
     const { eventType, data } = req.body;
   
     if (eventType === 'createBot') {
@@ -111,7 +109,7 @@ app.on('ready', () => {
   });
   const overlayWindows = [];
 
-  app12.post('/crear-overlay', (req, res) => {
+  app1.post('/crear-overlay', (req, res) => {
     const { url, width, height } = req.body;
   
     // Configuración de la ventana de overlay con el tamaño especificado
@@ -185,7 +183,7 @@ app.on('ready', () => {
       console.log("No se creó el bot, estado:", botStatus);
     }
   }
-  app12.post('/api/disconnect', (req, res) => {
+  app1.post('/api/disconnect', (req, res) => {
     const { eventType } = req.body;
     if (eventType === 'disconnectBot') {
       disconnectBot();
@@ -195,7 +193,7 @@ app.on('ready', () => {
       res.json({ message: 'Datos recibidos' });
     }
   });
-  app12.post('/api/reconnect', (req, res) => {
+  app1.post('/api/reconnect', (req, res) => {
     const { eventType } = req.body;
     if (eventType === 'reconnectBot') {
       reconnectBot();
@@ -212,41 +210,7 @@ app.on('ready', () => {
     }
   }
 
-  // Inicia el servidor web
-  const webServerPort = 3001;
-  app12.listen(webServerPort, () => console.info(`Servidor web escuchando en el puerto ${webServerPort}`));
 
-  let mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
-    frame: true,
-    autoHideMenuBar: false,
-    transparent: true,
-    alwaysOnTop: false,
-    webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, 'public')
-    }
-  });
-  setTimeout(() => {
-      mainWindow.webContents.openDevTools();
-    
-  }, 3000);
-  mainWindow.setIgnoreMouseEvents(false);
-  let devTool = true;
-  // Función para activar o desactivar el frame de la ventana principal
-
-  globalShortcut.register('F1', ToolDev);
-  globalShortcut.register('F2', cdevTool);
-  function ToolDev() {
-    devTool = true;
-    mainWindow.setIgnoreMouseEvents(false);
-    mainWindow.webContents.openDevTools();
-  }
-  function cdevTool() {
-    devTool = false;
-    mainWindow.webContents.closeDevTools();
-  }
   /*
   mainWindow.on('focus', () => {
       mainWindow.setIgnoreMouseEvents(false);
@@ -259,39 +223,16 @@ app.on('ready', () => {
     mainWindow.setIgnoreMouseEvents(true, { forward: true });
   });
   *///
-  const app1 = express();
   const httpServer = createServer(app1);
   const port = process.env.PORT || 8082;
-
-  mainWindow.loadURL(`http://localhost:${port}`);
-
   // Abre las herramientas de desarrollo de Electron (opcional)
   app1.use(express.static(path.join(__dirname, 'public')));
 
-  // Evento emitido cuando la ventana se cierra
-  mainWindow.on('closed', function () {
-    mainWindow = null;
-  });
+  // Evento emitido cuando   la ventana se cierra
+
   
 
   // Iniciar el servidor HTTP
   httpServer.listen(port);
   console.info(`Server running! Please visit http://localhost:${port}`);
-});
 
-// Salir cuando todas las ventanas estén cerradas
-app.on('window-all-closed', function () {
-  // En macOS, es común que las aplicaciones y su barra de menú se mantengan activas
-  // hasta que el usuario salga explícitamente con Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', function () {
-  // En macOS, es común volver a crear una ventana en la aplicación cuando
-  // el icono del muelle se hace clic y no hay otras ventanas abiertas.
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
