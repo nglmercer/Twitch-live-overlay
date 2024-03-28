@@ -1,10 +1,11 @@
 body{
-    background:#333; 
+    background: #0000002f;
+    font-size: large;
     padding-bottom:120px;
 }
 
 #main {
-    color:#fff;
+    color:#000000;
 }
 .container {
     overflow-y: auto;
@@ -47,7 +48,7 @@ background-color: transparent; /* Fondo transparente */
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #888;
+    color: #000000;
     text-align: center;
   }
   
