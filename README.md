@@ -44,17 +44,41 @@ bits:
     - "/execute at {playername} run give @a minecraft:golden_apple 1"
     - "/title @a title {\"text\":\"{uniqueId} \"}"
     - "/say este es un comando por 10bits"
+gift:
+  default:
+    - "/tellraw @a {\"text\":\"{uniqueId}  sent a {giftName} x{repeatCount} \", \"color\":\"gold\"}"
+    - "/title @a subtitle {\"text\":\"ENVIO {giftName} x{repeatCount} \",\"bold\":true,\"color\":\"gold\"}"
+    - "/execute at {playername} run summon minecraft:zombie ~ ~ ~ {CustomName:'{\"text\":\"{uniqueId} \"}', CustomNameVisible:1}"
+    - "/execute at {playername} run playsound minecraft:entity.player.levelup ambient @p"
+    - "/execute at {playername} run give @a minecraft:golden_apple 1"
+    - "/title @a title {\"text\":\"{uniqueId} \"}"
+  1:
+    - "/tellraw @a {\"text\":\"{uniqueId}  sent a {giftName} x{repeatCount} \", \"color\":\"gold\"}"
+    - "/title @a subtitle {\"text\":\"ENVIO {giftName} x{repeatCount} \",\"bold\":true,\"color\":\"gold\"}"
+    - "/execute at {playername} run summon minecraft:zombie ~ ~ ~ {CustomName:'{\"text\":\"{uniqueId} \"}', CustomNameVisible:1}"
+    - "/execute at {playername} run playsound minecraft:entity.player.levelup ambient @p"
+    - "/execute at {playername} run give @a minecraft:golden_apple 1"
+    - "/title @a title {\"text\":\"{uniqueId} \"}"
+    - "/say este es un comando por 1 bit"
    ```
 
 ### Ejemplo
 si quiere por cada bit entonces
 
 ```
-
 bits:
   1:
    - "/say este es un comando por un bit"
-bits:
+  10:
+   - "/say este es un comando por 10bits"
+```
+igual funciona con gift
+para testear recomiendo usar gift
+```
+
+gift:
+  1:
+   - "/say este es un comando por un bit"
   10:
    - "/say este es un comando por 10bits"
 ```
