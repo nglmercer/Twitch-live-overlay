@@ -243,7 +243,7 @@
                 }
               };
           
-              fetch('http://localhost:3001/api/create', {
+              fetch('/api/create', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -293,7 +293,7 @@
             });
           
             function disconnectBot() {
-              fetch('http://localhost:3001/api/disconnect', {
+              fetch('/api/disconnect', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -313,7 +313,7 @@
             }
           
             function reconnectBot() {
-              fetch('http://localhost:3001/api/reconnect', {
+              fetch('/api/reconnect', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -507,7 +507,7 @@ keywordToMob:
         const height = document.getElementById('heightInput').value;
   
         try {
-          const response = await fetch('http://localhost:3001/crear-overlay', {
+          const response = await fetch('http://localhost:8082/crear-overlay', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
