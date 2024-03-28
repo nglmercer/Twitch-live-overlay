@@ -209,7 +209,7 @@ function testHandleEvent() {
   }
   if (eventType === 'bits') {
       let dataname = data.trim().toLowerCase();
-      let foundGift = Object.keys(commandList.gift).find(gift => gift.toLowerCase() === dataname);
+      let foundGift = commandList.gift ? Object.keys(commandList.gift).find(gift => gift.toLowerCase() === dataname) : null;
       if (foundGift) {
         eventCommands = commandList.gift[foundGift];
       } else {
@@ -230,7 +230,7 @@ function testHandleEvent() {
       eventCommands.forEach(command => {
         let replacedCommand = command
           .replace('{playername}', playerName || '');
-          if (eventType === 'gift') {
+          if (eventType === 'bits') {
               setTimeout(() => {
                 console.log('comando1', replacedCommand);
                 sendReplacedCommand(replacedCommand); // Enviar replacedCommand al servidor
@@ -247,7 +247,7 @@ function testHandleEvent() {
   }    
 }
 function sendReplacedCommand(replacedCommand) {
-  fetch('http://localhost:3001/api/receive', {
+  fetch('/api/receive', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
