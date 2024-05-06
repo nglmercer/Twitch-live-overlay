@@ -17,7 +17,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Twitch Chat TTS" />
   <meta property="og:description"
-    content="Please enter a channel -- text to speech." />
+    content="Please enter a channel  text to speech." />
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -33,13 +33,13 @@
 
 <body class="bg-gray-600">
   <div class="tab-container bg-gray-700 text-white">
-    <input type="radio" name="tab" id="tab1" class="tab tab--1" />
+    <input type="radio" name="tab" id="tab1" class="tab tab1" />
     <label class="tab_label bg-slate-600" for="tab1">Twitch Chat</label>
   
-    <input type="radio" name="tab" id="tab2" class="tab tab--2" />
+    <input type="radio" name="tab" id="tab2" class="tab tab2" />
     <label class="tab_label bg-slate-600" for="tab2">Settings</label>
   
-    <input type="radio" name="tab" id="tab3" class="tab tab--3" />
+    <input type="radio" name="tab" id="tab3" class="tab tab3" />
     <label class="tab_label bg-slate-600" for="tab3">Notifications</label>
   
     <div class="indicator"></div>
@@ -171,17 +171,17 @@
         </div>
       </div>
     </div>
-    <div id="content2" class="tab-pane bg-slate-500">
-        <form id="createBotForm">
-          <label for="keyBOT">-MinecraftBOT:</label>
-          <input type="text" id="keyBOT" name="keyBOT" value="" required>
-          <br>
-          <label for="keySERVER">--IP del Server:</label>
-          <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
-          <br>
-          <button type="submit">--Conectar Bot</button>
-          <button id="disconnectButton">-Desconectar Bot</button>
-        </form>
+    <div id="content2" class="tab-pane w-full bg-slate-500">
+      <div class="grid border-2	p-2 m-2 font-bold text-gray-900 border-slate-600 gap-4 mx-4 rounded-md">
+
+      <form id="createBotForm" class="grid w-2/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+        <label for="keyBOT" class="justify-self-start">MinecraftBOT:</label>
+        <input type="text" id="keyBOT" name="keyBOT" value="" required>
+        <label for="keySERVER" class="justify-self-start">IP del Server:</label>
+        <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
+        <button type="submit" class="border-4	p-2 m-2 border-slate-600 rounded-md">Conectar Bot</button>
+        <button id="disconnectButton" class="border-4	p-2 m-2 border-slate-600 rounded-md">Desconectar Bot</button>
+      </form>
         
         <script>
         // Obtener el formulario y los inputs
@@ -324,20 +324,22 @@
               });
             }
           </script>
-          <label>-Tu Minecraft playerName:</label>
-          <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
-          <br>
-          <label>--BOT Comando en login:</label>
-          <input type="text" id="InitcommandInput" placeholder="login">
-          <br>
 
-          <div> <label for="eventType"> test Event Type:</label>
-            <input type="text" id="eventType" placeholder="Event Type" value="gift">
-            <label for="data"> test Data :</label>
-            <input type="text" id="data" placeholder="Data Default">
-            <button onclick="testHandleEvent()">Test Handle Event</button> </div>
+          <div class="grid w-2/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+            <label>Tu Minecraft playerName:</label>
+            <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
+            <label>BOT Comando en login:</label>
+            <input type="text" id="InitcommandInput" placeholder="login">
+  
+            <div> <label for="eventType"> test Event Type:</label>
+              <input type="text" id="eventType" placeholder="Event Type" value="gift">
+              <label for="data"> test Data :
+              <input type="text" id="data" placeholder="Data Default">
+              <button onclick="testHandleEvent()">Test Handle Event</button> </div></label> 
+          </div>
 
-            <div style="position: relative;">
+
+            <div class="grid border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
               <textarea type="text" id="commandListInput" rows="15" cols="100" placeholder="chat:
                 -
 likes:
@@ -351,7 +353,7 @@ gift:
               <button style="position: relative;" onclick="saveCommandList()">Guardar COMANDOS para Minecraft interactivo</button>
             </div>
             
-            <div style="position: relative;">
+            <div class="grid border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
               <textarea type="text" id="keywordsInput" rows="15" cols="100" placeholder="keywordToGive:
                 escudo: minecraft:shield
                 cama: minecraft:red_bed
@@ -361,7 +363,7 @@ keywordToMob:
               "></textarea>
               <button style="position: relative;" onclick="saveKeywords()">Guardar COMANDOS para el chat, mobs, items FREE</button>
             </div>
-
+          </div>
 
           <script>
             // Cargar el comando inicial guardado

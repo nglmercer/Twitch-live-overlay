@@ -134,6 +134,7 @@ function startListening() {
     client.on('message', (wat, tags, message, self) => {
       manageOptions(tags, message);
       handleEvent('chat', tags, message);
+      sendToServer('chat', message)
       console.log("wat:", wat);
       console.log("message event/ tags:", tags);
       console.log("message:", message);
@@ -452,7 +453,22 @@ if(urlParams.get('channelname') !== null) {
 window.speechSynthesis.onvoiceschanged = function() {
   populateVoiceList();
 }
-
+async function sendToServer(eventType, data) {
+  fetch('/api/receive1', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ eventType, data }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      //log.console(data); // Maneja la respuesta del servidor si es necesario
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
 /*
    Si la casilla de verificación está seleccionada para excluir a los usuarios del chat, muestre las opciones para ello.
 */

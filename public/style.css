@@ -86,7 +86,9 @@ background-color: transparent; /* Fondo transparente */
     outline: none;
     opacity: 0;
   }
-  
+  button:hover {
+    background-color: darkorchid;
+  }
   .tab_label {
     width: 130px;
     height: 28px;

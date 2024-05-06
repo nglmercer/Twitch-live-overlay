@@ -63,8 +63,8 @@ router.post('/receive', (req, res) => {
     switch (eventType) {
       case 'chat':
         setTimeout(() => {
-        console.log(`${data.uniqueId} : ${data.comment}`);
-        sendChatMessage(`${data.uniqueId} : ${data.comment}`);
+        console.log(`data Message ${data.message} : else data ${data}`);
+        sendChatMessage(`${data}`);
         }, 500); // antes de enviar el comando
         break;
       case 'gift':

@@ -38,7 +38,7 @@ require('electron-reload')(__dirname, {
   });
   *///
   const httpServer = createServer(app1);
-  const port = process.env.PORT || 8082;
+  let port = process.env.PORT || 8081;
   // Abre las herramientas de desarrollo de Electron (opcional)
   app1.use(express.static(path.join(__dirname, 'public')));
   httpServer.on('error', (error) => {
