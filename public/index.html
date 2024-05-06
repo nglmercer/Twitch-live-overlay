@@ -9,16 +9,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Twitch Chat TTS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js" integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-
+  <link href="output.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css" type="text/css">
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Twitch Chat TTS" />
-  
   <meta property="og:description"
     content="Please enter a channel -- text to speech." />
-
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -32,20 +31,20 @@
 
 </head>
 
-<body>
-  <div class="tab-container">
+<body class="bg-gray-600">
+  <div class="tab-container bg-gray-700 text-white">
     <input type="radio" name="tab" id="tab1" class="tab tab--1" />
-    <label class="tab_label" for="tab1">Twitch Chat</label>
+    <label class="tab_label bg-slate-600" for="tab1">Twitch Chat</label>
   
     <input type="radio" name="tab" id="tab2" class="tab tab--2" />
-    <label class="tab_label" for="tab2">Settings</label>
+    <label class="tab_label bg-slate-600" for="tab2">Settings</label>
   
     <input type="radio" name="tab" id="tab3" class="tab tab--3" />
-    <label class="tab_label" for="tab3">Notifications</label>
+    <label class="tab_label bg-slate-600" for="tab3">Notifications</label>
   
     <div class="indicator"></div>
   </div>
-  <div class="tab-content">
+
     <div id="content1" class="tab-pane active">
       <div class="jumbotron">
         <div class="container">
@@ -172,7 +171,7 @@
         </div>
       </div>
     </div>
-    <div id="content2" class="tab-pane">
+    <div id="content2" class="tab-pane bg-slate-500">
         <form id="createBotForm">
           <label for="keyBOT">-MinecraftBOT:</label>
           <input type="text" id="keyBOT" name="keyBOT" value="" required>
@@ -420,7 +419,7 @@ keywordToMob:
     <div id="content3" class="tab-pane">
       Notifications content goes here.
     </div>
-  </div>
+
 
   <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
     <div class="modal-dialog">
@@ -481,16 +480,6 @@ keywordToMob:
     const defaultTab = document.querySelector('.tab:checked');
 
   </script>
-    <form id="overlayForm">
-      <label for="urlInput">URL:</label><br>
-      <input type="text" id="urlInput" value="http://localhost:8111/overlay/" name="url" required><br><br>
-      <label for="widthInput">Ancho:</label><br>
-      <input type="number" id="widthInput" value="800" name="width" required><br><br>
-      <label for="heightInput">Alto:</label><br>
-      <input type="number" id="heightInput" value="800" name="height" required><br><br>
-      <button type="submit">Crear Overlay</button>
-    </form>
-  
     <script>
       document.getElementById('overlayForm').addEventListener('submit', async function(event) {
         event.preventDefault();

@@ -1,5 +1,4 @@
 body{
-    background: #0000002f;
     font-size: large;
     padding-bottom:120px;
 }
@@ -61,7 +60,6 @@ background-color: transparent; /* Fondo transparente */
   
     padding: 2px;
   
-    background-color: #dadadb;
     border-radius: 9px;
   }
   
