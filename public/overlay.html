@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+</head>
+<body style="margin: 0; background-color: rgba(0, 0, 255, 0); width: auto; height: auto; overflow: hidden;">
+    <div id="container"></div>
+    <script>
+        window.api.onShowMessage((event, message) => {
+            console.log(message);
+        });
+        
+        window.api.onOverlayEvent((event, eventdata) => {
+            const { eventType, data } = eventdata;
+            handleMessage(eventdata);
+            console.log(eventdata);
+            console.log('Overlay event received:', eventType);
+            console.log('data:', data);
+            // Aquí puedes manejar los datos recibidos y actualizar el overlay en consecuencia
+        });
+        
+            const container = document.getElementById('container');
+
+            function handleMessage(event) {
+                const { eventType, data } = event;//event.data;
+                console.log('Received message from parent window:',event);
+                console.log('eventType:', eventType);
+                console.log('data:', data);//indexData);
+                
+                if (eventType === 'play') {
+                    if (!data.fileType){
+                        const div = document.createElement('div');
+                        div.textContent = 'Unsupported file type';
+                        container.appendChild(div);
+                        console.log('Unsupported file type');
+                        setTimeout(() => {
+                            container.removeChild(div);
+                            console.log('Image removed');
+                        }, 5000);
+                    }
+                    else if (data.src.endsWith('.mp4') || data.fileType.startsWith('video/')) {
+                        const video = document.createElement('video');
+                        video.style.width = 'auto';
+                        video.style.height = '400px';
+                        video.autoplay = true;
+
+                        const source = document.createElement('source');
+                        source.src = data.src;
+                        source.type = 'video/mp4';
+                        
+                        video.appendChild(source);
+                        container.appendChild(video);
+                        console.log('Video added');
+
+                        // Eliminar el video después de que termine la reproducción
+                        video.addEventListener('ended', () => {
+                            container.removeChild(video);
+                            console.log('Video removed');
+                        });
+                    } else if (data.src.endsWith('.png') || data.fileType.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = data.src;
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '400px';
+                        container.appendChild(img);
+                        console.log('Image added');
+
+                        // Eliminar la imagen después de 5 segundos
+                        setTimeout(() => {
+                            container.removeChild(img);
+                            console.log('Image removed');
+                        }, 5000);
+                    } else {
+                        const div = document.createElement('div');
+                        div.textContent = 'Unsupported file type';
+                        container.appendChild(div);
+                        console.log('Unsupported file type');
+                        setTimeout(() => {
+                            container.removeChild(div);
+                            console.log('Image removed');
+                        }, 5000);
+                    }
+                    console.log('Additional data:', data.additionalData);
+                }
+            }
+
+            window.addEventListener('message', handleMessage);
+    </script>
+</body>
+</html>

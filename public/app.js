@@ -176,168 +176,118 @@ function manageEvent(tags, message, userstate) {
   new TTS(message, tags, userstate);
   console.log('not in lines');
 }
+const request1 = indexedDB.open("giftlistDatabase", 1);
+// console.log("request",request1);
 const keyplayerName = localStorage.getItem('playerName') || 'defaultPlayerName';
-let commandList = null;
-let lastCommand = null;
-const playerNames = [`${keyplayerName}`, `${keyplayerName}`];
-const commandListInput = localStorage.getItem('commandList');
 let currentPlayerIndex = 0;
-if (keywordsInput) {
-  keywords = jsyaml.load(keywordsInput); // Asignar los datos cargados desde el localStorage a 'keywords'
-} else {
-  keywords = {}; // Asignar un objeto vacío si no hay datos en el localStorage
-}
-if (commandListInput) {
-  commandList = jsyaml.load(commandListInput);
-} else {
-  commandList = {};
-}
+const COMMAND_LIMIT = 1; // Límite de comandos por minuto
+const DELAY_PER_COMMAND = 10; // Retraso en milisegundos por cada comando adicional
+let commandCount = 0;
+
 function testHandleEvent() {
   var eventType = document.getElementById('eventType').value;
   var data = document.getElementById('data').value;
-  let playerName = null;
-  let eventCommands = [];
+  const transaction = db.transaction(["gifts"], "readonly");
+  const objectStore = transaction.objectStore("gifts");
 
-  if (playerNames[currentPlayerIndex] === undefined || playerNames[currentPlayerIndex].length < 2) {
-    playerName = `${keyplayerName}`;
-  } else {
-    playerName = playerNames[currentPlayerIndex];
-  }
+  const request = objectStore.getAll();
 
-  currentPlayerIndex++;
-  if (currentPlayerIndex >= playerNames.length) {
-    currentPlayerIndex = 0;
-  }
-  if (eventType === 'bits') {
-      let dataname = data.trim().toLowerCase();
-      let foundGift = commandList.gift ? Object.keys(commandList.gift).find(gift => gift.toLowerCase() === dataname) : null;
-      if (foundGift) {
-        eventCommands = commandList.gift[foundGift];
-      } else {
-        eventCommands = commandList.gift['default'];
-      }
-    } else if (commandList[eventType]) {
-      if (typeof commandList[eventType] === 'object' && !Array.isArray(commandList[eventType])) {
-        if (data.likes && commandList[eventType][data.likes]) {
-          eventCommands = commandList[eventType][data.likes];
-        } else {
-          eventCommands = commandList[eventType]['default'];
+  request.onsuccess = (event) => {
+      const allGifts = event.target.result;
+      console.log("All gifts:", allGifts);
+
+      if (eventType === 'gift') {
+          const giftTitle = data.trim().toLowerCase();
+          const foundGift = allGifts.find(gift => gift.title.toLowerCase() === giftTitle);
+
+          if (foundGift) {
+              const eventCommands = foundGift.description;
+              // window.api.sendChatMessage(`${eventType} ${eventCommands}`);
+              console.log("eventType gift find:",eventType,eventCommands)
+
+          } else {
+              // window.api.sendChatMessage(`${eventType} ${data}`);
+              console.log("eventype gift else:",eventType,data)
+          }
+      } else if (eventType === 'chat') {
+          const chatMessage = data.trim().toLowerCase();
+          const foundGift = allGifts.find(gift => gift.description.toLowerCase() === chatMessage);
+
+          if (foundGift) {
+              const eventCommands = foundGift.title;
+              // window.api.sendChatMessage(`${eventType} ${eventCommands}`);
+              console.log("eventType chat find:",eventType,eventCommands)
+
+          } else {
+              // window.api.sendChatMessage(`${eventType} ${data}`);
+              console.log("eventype chat else:",eventType,data)
+          } 
         }
-      } else {
-        eventCommands = commandList[eventType];
-      }
-    }
-    if (Array.isArray(eventCommands)) {
-      eventCommands.forEach(command => {
-        let replacedCommand = command
-          .replace('{playername}', playerName || '');
-          if (eventType === 'bits') {
-              setTimeout(() => {
-                console.log('comando1', replacedCommand);
-                sendReplacedCommand(replacedCommand); // Enviar replacedCommand al servidor
-              }, 100); // antes de enviar el comando
-            } else if (replacedCommand !== lastCommand) {
-              setTimeout(() => {
-                lastCommand = replacedCommand;
-                console.log('comando2', replacedCommand);
-                sendReplacedCommand(replacedCommand); // Enviar replacedCommand al servidor
-              }, 100); // antes de enviar el comando
-            }
-      });
       
-  }    
+      else{
+          // window.api.sendChatMessage(`${eventType} ${data}`);
+          console.log("ELSE testhandle Event:",eventType,data)
+      }
+  };
+
+  request.onerror = (event) => {
+      console.error("Error fetching gifts from IndexedDB:", event.target.errorCode);
+      // window.api.sendChatMessage(`${eventType} ${data}`);
+      console.log(" ONERROR testhandle Event:",eventType,data)
+  };
 }
+
 function sendReplacedCommand(replacedCommand) {
-  fetch('/api/receive', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ replacedCommand })
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log(data); // Maneja la respuesta del servidor si es necesario
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+  window.api.sendChatMessage(replacedCommand);
 }
 function handleEvent(eventType, tags, message) {
-  let playerName = null;
-  let eventCommands = [];
+  let playerName = keyplayerName
+  const additionalDelay = Math.floor(commandCount / COMMAND_LIMIT) * DELAY_PER_COMMAND;
 
-  if (playerNames[currentPlayerIndex] === undefined || playerNames[currentPlayerIndex].length < 2) {
-    playerName = `${keyplayerName}`;
+  // Inicializar el retraso
+  let delay = 0;
+
+
+  eventCommands.forEach(command => {
+    const replacedCommand = Replacevalues(command, tags, message);
+
+    /*if (tags.repeatCount > maxRepeatCount) {
+      // Verificar si el comando contiene "tellraw" o "title" y si el contador no es múltiplo de 10
+      if ((command.includes("tellraw") || command.includes("title")) && commandCounter % 10 !== 0) {
+        return; // No se ejecuta el comando
+      }
+    }
+    commandCounter++;
+
+    let repeatCount = tags.repeatCount || 1; */
+    
+
+    
+  });
+  if (!isNaN(replacedCommand)) {
+      delay = parseInt(replacedCommand) + 20;
   } else {
-    playerName = playerNames[currentPlayerIndex];
+      delay = additionalDelay;
   }
-
-  currentPlayerIndex++;
-  if (currentPlayerIndex >= playerNames.length) {
-    currentPlayerIndex = 0;
-  }
-
-  if (eventType === 'bits') {
-    let foundBits = tags.bits;
-    if (foundBits) {
-      eventCommands = commandList.bits[foundBits];
-    } else {
-      eventCommands = commandList.bits['default'];
-    }
-  } else if (commandList[eventType]) {
-    if (typeof commandList[eventType] === 'object' && !Array.isArray(commandList[eventType])) {
-      if (message && commandList[eventType][message]) {
-        eventCommands = commandList[eventType][message];
-      } else {
-        eventCommands = commandList[eventType]['default'];
-      }
-    } else {
-      eventCommands = commandList[eventType];
-    }
-  }
-
-  if (Array.isArray(eventCommands)) {
-    eventCommands.forEach(command => {
-      let replacedCommand = command
-        .replace('playername', playerName || '')
-        .replace('username', tags.username || '')
-        .replace('message', message || '')
-        .replace('bits', tags.bits || '')
-        .replace('comment', message || '')
-        .replace('gift', tags.bits || '')
-        .replace('uniqueId', tags.username || '')
-
-      if (eventType !== 'bits' && replacedCommand === lastCommand) {
-        return;
-      }
-
-      /*if (tags.repeatCount > maxRepeatCount) {
-        // Verificar si el comando contiene "tellraw" o "title" y si el contador no es múltiplo de 10
-        if ((command.includes("tellraw") || command.includes("title")) && commandCounter % 10 !== 0) {
-          return; // No se ejecuta el comando
-        }
-      }
-      commandCounter++;
-
-      let repeatCount = tags.repeatCount || 1; */
-      
-      if (eventType === 'bits') {
-        setTimeout(() => {
-          console.log('comando1', replacedCommand);
-          sendReplacedCommand(replacedCommand); // Enviar replacedCommand al servidor
-        }, 100); // antes de enviar el comando
-      } else if (replacedCommand !== lastCommand) {
-        setTimeout(() => {
-          lastCommand = replacedCommand;
-          console.log('comando2', replacedCommand);
-          sendReplacedCommand(replacedCommand); // Enviar replacedCommand al servidor
-        }, 100); // antes de enviar el comando
-      }
-      
-    });
-  }
+  Replacevalues();
 }
+const Replacevalues = (command, tags, message) => {
+  // console.log("eventype",eventype);
+  let replacedCommand = command
+    .replace('playername', keyplayerName || '')
+    .replace('username', tags.username || '')
+    .replace('message', message || '')
+    .replace('bits', tags.bits || '')
+    .replace('comment', message || '')
+    .replace('gift', tags.bits || '')
+    .replace('uniqueId', tags.username || '')
+
+  replacedCommand = replacedCommand.replace(/\\/g, '');
+  replacedCommand = replacedCommand.toLowerCase();
+
+  return replacedCommand;
+}
+
 function manageOptions(tags, message) {
   const badges = tags.badges || {};
   const isBroadcaster = badges.broadcaster;
@@ -454,7 +404,7 @@ window.speechSynthesis.onvoiceschanged = function() {
   populateVoiceList();
 }
 async function sendToServer(eventType, data) {
-  fetch('/api/receive1', {
+  fetch('localhost:8081/api/receive1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

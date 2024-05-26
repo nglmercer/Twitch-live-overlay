@@ -19,6 +19,8 @@
   <meta property="og:description"
     content="Please enter a channel  text to speech." />
   <script>
+
+  
     window.dataLayer = window.dataLayer || [];
 
     function gtag() {
@@ -28,25 +30,23 @@
 
     gtag('config', 'G-JT0GEBW5MK');
   </script>
-
+  <script src="indexdb.js"></script>
+  <script src="renderer.js"></script>
 </head>
 
 <body class="bg-gray-600">
-  <div class="tab-container bg-gray-700 text-white">
-    <input type="radio" name="tab" id="tab1" class="tab tab1" />
-    <label class="tab_label bg-slate-600" for="tab1">Twitch Chat</label>
-  
-    <input type="radio" name="tab" id="tab2" class="tab tab2" />
-    <label class="tab_label bg-slate-600" for="tab2">Settings</label>
-  
-    <input type="radio" name="tab" id="tab3" class="tab tab3" />
-    <label class="tab_label bg-slate-600" for="tab3">Notifications</label>
-  
-    <div class="indicator"></div>
+    <div class="tabs">
+      <div class="tab" data-tab="tab1">Tab 1</div>
+      <div class="tab" data-tab="tab2">Tab 2</div>
+      <div class="tab" data-tab="tab3">Tab 3</div>
+      <div class="indicator"></div>
   </div>
 
-    <div id="content1" class="tab-pane active">
+    <div id="tab1" class="tab-content">
+
       <div class="jumbotron">
+        <button id="connect-button" class="btn btn-primary">Connect</button>
+
         <div class="container">
           <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-12">
@@ -171,255 +171,68 @@
         </div>
       </div>
     </div>
-    <div id="content2" class="tab-pane w-full bg-slate-500">
-      <div class="grid border-2	p-2 m-2 font-bold text-gray-900 border-slate-600 gap-4 mx-4 rounded-md">
+    <div id="tab2" class="tab-content w-full bg-slate-500">
+      <div class="grid border-2	p-8 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
 
-      <form id="createBotForm" class="grid w-2/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+      <form id="createBotForm" class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
         <label for="keyBOT" class="justify-self-start">MinecraftBOT:</label>
         <input type="text" id="keyBOT" name="keyBOT" value="" required>
         <label for="keySERVER" class="justify-self-start">IP del Server:</label>
         <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
+        <label for="keyLOGIN" class="justify-self-start">Chat en el servidor:</label>
+        <input type="text" id="keyLOGIN" name="keyLOGIN" value="hola como estan" required>
         <button type="submit" class="border-4	p-2 m-2 border-slate-600 rounded-md">Conectar Bot</button>
         <button id="disconnectButton" class="border-4	p-2 m-2 border-slate-600 rounded-md">Desconectar Bot</button>
       </form>
-        
-        <script>
-        // Obtener el formulario y los inputs
-        const form = document.getElementById('createBotForm');
-        const keyBOTInput = document.getElementById('keyBOT');
-        const keySERVERInput = document.getElementById('keySERVER');
-
-        // Cargar datos guardados del formulario si existen
-        if (localStorage.getItem('botFormData')) {
-          const formData = JSON.parse(localStorage.getItem('botFormData'));
-          keyBOTInput.value = formData.keyBOT;
-          keySERVERInput.value = formData.keySERVER;
-        }
-
-        // Escuchar el evento de envío del formulario
-        form.addEventListener('submit', function(event) {
-          event.preventDefault(); // Evitar que se envíe el formulario
-          
-          // Obtener el valor del campo "keySERVER"
-          const keySERVER = keySERVERInput.value;
-          
-          // Extraer el número de puerto utilizando split(':')
-          const serverParts = keySERVER.split(':');
-          const serverAddress = serverParts[0];
-          const serverPort = serverParts[1] || ''; // Si no hay puerto, asignar una cadena vacía
-          
-          // Guardar los datos en el localStorage
-          const formData = {
-            keyBOT: keyBOTInput.value,
-            keySERVER: keySERVER,
-            serverPort: serverPort
-          };
-          localStorage.setItem('botFormData', JSON.stringify(formData));
-
-          // Enviar el número de puerto como parámetro adicional
-          console.log('Dirección del servidor:', serverAddress);
-          console.log('Puerto del servidor:', serverPort);
-        });
-        </script>
           <div id="resultMessage"></div>
 
-          <script>
-            let disconnectButtonPressCount = 0;
-            let disconnectButtonTimeout;
-            const disconnectButton = document.getElementById('disconnectButton');
-            document.getElementById('createBotForm').addEventListener('submit', function(event) {
-              event.preventDefault();
-          
-              const keyBOT = document.getElementById('keyBOT').value.trim();
-              const keySERVER = document.getElementById('keySERVER').value.trim();
-              const Initcommand = InitcommandInput.value.trim();
-              const data = {
-                eventType: 'createBot',
-                data: {
-                  keyBot: keyBOT,
-                  keyServer: keySERVER,
-                  Initcommand: Initcommand
-                }
-              };
-          
-              fetch('/api/create', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-              })
-              .then(response => response.json())
-              .then(result => {
-                console.log(result);
-                const resultMessage = document.getElementById('resultMessage');
-                resultMessage.textContent = result.message;
-            
-                if (result.message) {
-                  console.log('%cEl bot está conectado', 'color: green');
-                  resultMessage.style.color = 'green';
-                } else {
-                  console.log('%cEl bot está desconectado', 'color: red');
-                  resultMessage.style.color = 'red';
-                }
-                disconnectButton.disabled = false;
-              })
-              .catch(error => {
-                console.error(error);
-                alert('Ocurrió un error al crear el bot');
-              });
-            });
-
-            disconnectButton.addEventListener('click', function() {
-              if (disconnectButtonPressCount === 0) {
-                disconnectButtonPressCount++;
-                clearTimeout(disconnectButtonTimeout);
-                disconnectButtonTimeout = setTimeout(() => {
-                  disconnectBot();
-                  disconnectButtonPressCount = 0;
-                }, 500);
-              } else if (disconnectButtonPressCount === 1) {
-                clearTimeout(disconnectButtonTimeout);
-                reconnectBot();
-                disconnectButtonPressCount = 0;
-              }
-            });
-          
-            function disconnectBot() {
-              fetch('/api/disconnect', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ eventType: 'disconnectBot' })
-              })
-              .then(response => response.json())
-              .then(result => {
-                console.log(result);
-                document.getElementById('resultMessage').textContent = result.message;
-                resultMessage.style.color = 'red';
-                disconnectButton.disabled = true;
-              })
-              .catch(error => {
-                console.error(error);
-              });
-            }
-          
-            function reconnectBot() {
-              fetch('/api/reconnect', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ eventType: 'reconnectBot' })
-              })
-              .then(response => response.json())
-              .then(result => {
-                console.log(result);
-                document.getElementById('resultMessage').textContent = result.message;
-                disconnectButton.disabled = false;
-              })
-              .catch(error => {
-                console.error(error);
-              });
-            }
-          </script>
-
-          <div class="grid w-2/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+          <div class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
             <label>Tu Minecraft playerName:</label>
             <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
-            <label>BOT Comando en login:</label>
-            <input type="text" id="InitcommandInput" placeholder="login">
   
-            <div> <label for="eventType"> test Event Type:</label>
+             <label for="eventType"> test Event Type:</label>
               <input type="text" id="eventType" placeholder="Event Type" value="gift">
-              <label for="data"> test Data :
+              <label for="data"> test Data :</label> 
               <input type="text" id="data" placeholder="Data Default">
-              <button onclick="testHandleEvent()">Test Handle Event</button> </div></label> 
+              <button onclick="testHandleEvent()">Test Handle Event</button> 
           </div>
+          <div class="grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
 
-
-            <div class="grid border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
-              <textarea type="text" id="commandListInput" rows="15" cols="100" placeholder="chat:
-                -
-likes:
-              default:
-                -
-gift:
-              default:
-                -
-                Rose:
-                -"></textarea>
-              <button style="position: relative;" onclick="saveCommandList()">Guardar COMANDOS para Minecraft interactivo</button>
-            </div>
-            
-            <div class="grid border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
-              <textarea type="text" id="keywordsInput" rows="15" cols="100" placeholder="keywordToGive:
-                escudo: minecraft:shield
-                cama: minecraft:red_bed
-keywordToMob:
-                enderman: minecraft:enderman
-                cerdo: minecraft:pig
-              "></textarea>
-              <button style="position: relative;" onclick="saveKeywords()">Guardar COMANDOS para el chat, mobs, items FREE</button>
-            </div>
+          <input type="text" id="gift-title" placeholder="Gift titulo" />
+          <textarea id="gift-description" placeholder="Gift comandos"></textarea>
+          <button onclick="addGift()">Añadir Gift</button>
+          <div class="tittle flex bg-slate-300 font-bold text-3xl justify-center align-self-center">Gifts-list:</div>
+          <ul id="gift-list"></ul>
           </div>
-
+          </div>
           <script>
-            // Cargar el comando inicial guardado
-            const initCommandInput = document.getElementById('InitcommandInput');
-            setupLocalStorage(initCommandInput, 'Initcommand');
+            if (localStorage.getItem('botFormData')) {
+              const formData = JSON.parse(localStorage.getItem('botFormData'));
+              keyBOTInput = document.getElementById('keyBOT');
+              keySERVERInput = document.getElementById('keySERVER');
+              keyLOGINInput = document.getElementById('keyLOGIN');
+              keyBOTInput.value = formData.keyBOT;
+              keySERVERInput.value = formData.keySERVER;
+              keyLOGINInput.value = formData.keyLOGIN;
+            }
+            const createformData = document.getElementById('createBotForm').addEventListener('change', function(event) {
+              event.preventDefault();
+              const keyBOT = document.getElementById('keyBOT').value.trim();
+              const keySERVER = document.getElementById('keySERVER').value.trim();
+              const keyLOGIN = document.getElementById('keyLOGIN').value.trim();
+              localStorage.setItem('botFormData', JSON.stringify({ keyBOT, keySERVER, keyLOGIN }));
+              console.log('Datos guardados en el localStorage', localStorage.getItem('botFormData'));
 
-            // Cargar el nombre del jugador guardado
-            const playerNameInput = document.getElementById('playerNameInput');
-            setupLocalStorage(playerNameInput, 'playerName');
-            const storedKeywords = localStorage.getItem('keywords');
-            const storedCommandList = localStorage.getItem('commandList');
-          
-            // Actualizar el contenido de los campos de texto si hay datos guardados
-            if (storedKeywords) {
-              document.getElementById('keywordsInput').value = storedKeywords;
-            }
-          
-            if (storedCommandList) {
-              document.getElementById('commandListInput').value = storedCommandList;
-            }
-          
-            function saveKeywords() {
-              const keywordsInputValue = document.getElementById('keywordsInput').value;
-              localStorage.setItem('keywords', keywordsInputValue);
-              console.log('Datos de la lista de keywords guardados en el localStorage');
-            }
-          
-            function saveCommandList() {
-              const commandListInputValue = document.getElementById('commandListInput').value;
-              localStorage.setItem('commandList', commandListInputValue);
-              console.log('Datos de la lista de comandos guardados en el localStorage');
-            }
-            function setupLocalStorage(inputElement, storageKey, callback) {
-              const storedValue = localStorage.getItem(storageKey);
-              if (storedValue) {
-                inputElement.value = storedValue;
-              }
+            });
             
-              inputElement.addEventListener('change', () => {
-                const currentValue = inputElement.value;
-                if (currentValue) {
-                  localStorage.setItem(storageKey, currentValue);
-                  if (typeof callback === 'function') {
-                    callback(currentValue);
-                  }
-                }
-                console.log('Valor actualizado:', currentValue);
-
-              });
-            }
           </script>
-
-
     </div>
-    <div id="content3" class="tab-pane">
-      Notifications content goes here.
+    <div id="tab3" class="tab-content">
+      <h1>Notifications</h1>
+      <div class="file-container" id="drop-area">
+        <ul id="file-list"> </ul>        
+
+  </div>
     </div>
 
 
@@ -455,61 +268,52 @@ keywordToMob:
   </div>
 
   <script>
-    const tabs = document.querySelectorAll('.tab');
-    const indicator = document.querySelector('.indicator');
-    const tabContent = document.querySelectorAll('.tab-pane');
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      const indicator = document.querySelector('.indicator');
   
-    tabs.forEach(tab => {
-      tab.addEventListener('change', () => {
-        const selectedTab = document.querySelector(`#${tab.id}`);
-        const selectedContent = document.querySelector(`#${tab.id.replace('tab', 'content')}`);
+      function activateTab(tab) {
+          const tabId = tab.getAttribute('data-tab');
+          const content = document.getElementById(tabId);
   
-        // Hide all tab content
-        tabContent.forEach(content => {
-          content.style.display = 'none';
-        });
+          // Deactivate all tabs and content
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
   
-        // Show selected tab content
-        selectedContent.style.display = 'block';
+          // Activate the selected tab and content
+          tab.classList.add('active');
+          content.classList.add('active');
   
-        // Update indicator position
-        const offsetLeft = selectedTab.offsetLeft;
-        const offsetWidth = selectedTab.offsetWidth;
+          // Update indicator position and width
+          indicator.style.left = `${tab.offsetLeft}px`;
+          indicator.style.width = `${tab.offsetWidth}px`;
+  
+          // Store the last active tab in localStorage
+          localStorage.setItem('activeTab', tabId);
+      }
+  
+      // Add event listeners to tabs
+      tabs.forEach(tab => {
+          tab.addEventListener('click', () => activateTab(tab));
       });
-    });
   
-    // Show default tab content
-    const defaultTab = document.querySelector('.tab:checked');
-
-  </script>
-    <script>
-      document.getElementById('overlayForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-  
-        const url = document.getElementById('urlInput').value;
-        const width = document.getElementById('widthInput').value;
-        const height = document.getElementById('heightInput').value;
-  
-        try {
-          const response = await fetch('http://localhost:8082/crear-overlay', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ url, width, height })
-          });
-  
-          if (response.ok) {
-            alert('Overlay creado correctamente');
+      // Check for the last active tab in localStorage
+      const lastActiveTab = localStorage.getItem('activeTab');
+      if (lastActiveTab) {
+          const tab = document.querySelector(`.tab[data-tab="${lastActiveTab}"]`);
+          if (tab) {
+              activateTab(tab);
           } else {
-            throw new Error('Error al crear el overlay');
+              activateTab(tabs[0]); // Fallback to the first tab if the stored tab doesn't exist
           }
-        } catch (error) {
-          console.error(error);
-          alert('Ocurrió un error al crear el overlay');
-        }
-      });
-    </script>
+      } else {
+          activateTab(tabs[0]); // Default to the first tab
+      }
+  });
+  
+  </script>
+
 </body>
 <script src="tmi.min.js"></script>
 <script src="app.js"></script>

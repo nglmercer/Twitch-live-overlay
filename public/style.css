@@ -77,46 +77,73 @@ background-color: transparent; /* Fondo transparente */
     border-radius: 7px;
     transition: all 0.2s ease-out;
   }
-  
-  .tab {
-    width: 130px;
-    height: 28px;
+  .file-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
     position: absolute;
-    z-index: 99;
-    outline: none;
-    opacity: 0;
+    z-index: 999;
+    top: 30px;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+    text-align: center;
   }
+
   button:hover {
     background-color: darkorchid;
   }
-  .tab_label {
-    width: 130px;
-    height: 28px;
-  
-    position: relative;
-    z-index: 999;
-  
+.edit-button,
+.save-button,
+.delete-button {
+    padding: 5px;
+    margin: 5px;
+}
+
+.tabs {
     display: flex;
-    align-items: center;
-    justify-content: center;
-  
-    border: 0;
-  
-    font-size: 0.75rem;
-    opacity: 0.6;
-  
+    flex-wrap: wrap;
+    height: 50px;
     cursor: pointer;
-  }
-  
-  .tab--1:checked ~ .indicator {
-    left: 2px;
-  }
-  
-  .tab--2:checked ~ .indicator {
-    left: calc(130px + 2px);
-  }
-  
-  .tab--3:checked ~ .indicator {
-    left: calc(130px * 2 + 2px);
-  }
-  
+}
+.tab {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f1f1f1;
+    transition: background 0.3s;
+}
+button {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+}
+.tab:hover {
+    background: #ddd;
+}
+.tab.active {
+    background: white;
+    border-bottom: 2px solid #007bff;
+}
+.tab-content {
+    display: none;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background: white;
+}
+.tab-content.active {
+    display: block;
+}
+.indicator {
+    height: 2px;
+    background: #007bff;
+    position: absolute;
+    bottom: 0;
+    transition: left 0.3s, width 0.3s;
+}

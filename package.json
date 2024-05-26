@@ -1,12 +1,17 @@
 {
   "author": "melser",
-  "name": "TwitchMineTTS",
+  "name": "twitch-tts-electron",
   "productName": "TwitchMineTTS",
   "version": "1.0.9",
   "description": "tiktok mineflayer web apis speech and more",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "build": "electron-forge make",
+    "publish": "electron-forge publish --release",
+    "lint": "echo \"No linting configured\""
   },
   "keywords": [],
   "license": "MIT",
@@ -14,6 +19,7 @@
     "dotenv": "^16.4.4",
     "electron-reload": "^2.0.0-alpha.1",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.2.0",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
     "mineflayer": "^4.20.1",
