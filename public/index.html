@@ -36,9 +36,10 @@
 
 <body class="bg-gray-600">
     <div class="tabs">
-      <div class="tab" data-tab="tab1">Tab 1</div>
-      <div class="tab" data-tab="tab2">Tab 2</div>
-      <div class="tab" data-tab="tab3">Tab 3</div>
+      <div class="tab" data-tab="tab1">Tab1 chat</div>
+      <div class="tab" data-tab="tab2">Tab2 minecraft</div>
+      <div class="tab" data-tab="tab3">Tab3 actions & events</div>
+      <div class="tab" data-tab="tab4">Tab4 upload files</div>
       <div class="indicator"></div>
   </div>
 
@@ -197,12 +198,28 @@
               <button onclick="testHandleEvent()">Test Handle Event</button> 
           </div>
           <div class="grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
-
-          <input type="text" id="gift-title" placeholder="Gift titulo" />
-          <textarea id="gift-description" placeholder="Gift comandos"></textarea>
-          <button onclick="addGift()">Añadir Gift</button>
-          <div class="tittle flex bg-slate-300 font-bold text-3xl justify-center align-self-center">Gifts-list:</div>
-          <ul id="gift-list"></ul>
+            <h1>Gift List</h1>
+            <input type="text" id="gifts-title" placeholder="Gift Title">
+            <textarea id="gifts-description" placeholder="Gift Description"></textarea>
+            <button onclick="addEvent('gifts')">Add Gift</button>
+            <ul id="gifts-list"></ul>
+          <h1>Comment List</h1>
+          <input type="text" id="comments-title" placeholder="Comment Title">
+          <textarea id="comments-description" placeholder="Comment Description"></textarea>
+          <button onclick="addEvent('comments')">Add Comment</button>
+          <ul id="comments-list"></ul>
+        
+          <h1>Like List</h1>
+          <input type="text" id="likes-title" placeholder="Like Title">
+          <textarea id="likes-description" placeholder="Like Description"></textarea>
+          <button onclick="addEvent('likes')">Add Like</button>
+          <ul id="likes-list"></ul>
+        
+          <h1>Subscribe List</h1>
+          <input type="text" id="subscribes-title" placeholder="Subscribe Title">
+          <textarea id="subscribes-description" placeholder="Subscribe Description"></textarea>
+          <button onclick="addEvent('subscribes')">Add Subscribe</button>
+          <ul id="subscribes-list"></ul>
           </div>
           </div>
           <script>
@@ -228,11 +245,49 @@
           </script>
     </div>
     <div id="tab3" class="tab-content">
-      <h1>Notifications</h1>
+      <h1>Actions & Events      </h1>
+      <p>
+Aquí puede definir sus acciones y eventos personalizados (desencadenantes).Por ejemplo, puede mostrar un video o animación en cierto regalo.
+Para esto primero debe definir la acción y luego el evento.Se requiere la superposición de mis acciones para OBS/Live Studio.
+Mire este video para aprender cómo funciona las acciones y el sistema de eventos.
+      </p>
+      <div class="actions-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+        <h2>Actions</h2>
+        <p>
+¿Qué es lo que desea que suceda?Aquí puede crear nuevas acciones y editar las existentes.
+Puede vincular estas acciones a los eventos a continuación.
+        </p>
+        <button>Crear nueva acción</button>
+        <table class="table" id="actions-table">
+          <td>atajos</td>
+          <td>nombre</td>
+          <td>duración</td>
+          <td>imagen</td>
+          <td>video</td>
+          <td>sonido</td>
+        </table>
+        </div>
+      <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+        <h2>Events</h2>
+        <p>Aquí puede definir qué activará sus acciones.
+          </p>
+          <button>Crear nuevo evento</button>
+          <table class="table" id="events-table">
+            <td>atajos</td>
+            <td>activo</td>
+            <td>evento</td>
+            <td>trigger</td>
+            <td>actions</td>
+          </table>
+      </div>
+  </div>
+
+    </div>
+    <div id="tab4" class="tab-content">
+      <h1>subir archivos</h1>
       <div class="file-container" id="drop-area">
         <ul id="file-list"> </ul>        
 
-  </div>
     </div>
 
 

@@ -1,111 +1,114 @@
-// Open (or create) the database
 let db;
-const request = indexedDB.open("giftlistDatabase", 1);
+const request = indexedDB.open("eventDatabase", 1);
 
 request.onupgradeneeded = (event) => {
   db = event.target.result;
-  if (!db.objectStoreNames.contains("gifts")) {
-    db.createObjectStore("gifts", { keyPath: "id", autoIncrement: true });
-  }
+
+  const stores = ["gifts", "comments", "likes", "subscribes"];
+  stores.forEach(store => {
+    if (!db.objectStoreNames.contains(store)) {
+      db.createObjectStore(store, { keyPath: "id", autoIncrement: true });
+    }
+  });
 };
 
 request.onsuccess = (event) => {
   db = event.target.result;
-  displayGifts();
+  displayEvents("gifts");
+  displayEvents("comments");
+  displayEvents("likes");
+  displayEvents("subscribes");
 };
-
 request.onerror = (event) => {
   console.error("Database error: ", event.target.errorCode);
 };
+function addEvent(storeName) {
+  const titleInput = document.getElementById(`${storeName}-title`);
+  const descriptionInput = document.getElementById(`${storeName}-description`);
 
-function addGift() {
-  const titleInput = document.getElementById("gift-title");
-  const descriptionInput = document.getElementById("gift-description");
+  const eventTitle = titleInput.value;
+  const eventDescription = descriptionInput.value;
 
-  const giftTitle = titleInput.value;
-  const giftDescription = descriptionInput.value;
-
-  if (giftTitle === "" || giftDescription === "") {
+  if (eventTitle === "" || eventDescription === "") {
     alert("Ingrese tanto un título como una descripción.");
     return;
   }
 
-  const transaction = db.transaction(["gifts"], "readwrite");
-  const objectStore = transaction.objectStore("gifts");
+  const transaction = db.transaction([storeName], "readwrite");
+  const objectStore = transaction.objectStore(storeName);
 
-  const request = objectStore.add({ title: giftTitle, description: giftDescription });
+  const request = objectStore.add({ title: eventTitle, description: eventDescription });
 
   request.onsuccess = () => {
     titleInput.value = "";
     descriptionInput.value = "";
-    displayGifts();
+    displayEvents(storeName);
   };
 
   request.onerror = (event) => {
-    console.error("Agregar, error de regalo: ", event.target.errorCode);
+    console.error(`Agregar ${storeName}, error: `, event.target.errorCode);
   };
 }
 
-function deleteGift(id) {
-  const transaction = db.transaction(["gifts"], "readwrite");
-  const objectStore = transaction.objectStore("gifts");
+function deleteEvent(storeName, id) {
+  const transaction = db.transaction([storeName], "readwrite");
+  const objectStore = transaction.objectStore(storeName);
 
   const request = objectStore.delete(id);
 
   request.onsuccess = () => {
-    displayGifts();
+    displayEvents(storeName);
   };
 
   request.onerror = (event) => {
-    console.error("Borrar ,error de regalo: ", event.target.errorCode);
+    console.error(`Borrar ${storeName}, error: `, event.target.errorCode);
   };
 }
 
-function updateGift(id, newTitle, newDescription) {
-  const transaction = db.transaction(["gifts"], "readwrite");
-  const objectStore = transaction.objectStore("gifts");
+function updateEvent(storeName, id, newTitle, newDescription) {
+  const transaction = db.transaction([storeName], "readwrite");
+  const objectStore = transaction.objectStore(storeName);
 
   const request = objectStore.get(id);
 
   request.onsuccess = (event) => {
-    const gift = event.target.result;
-    gift.title = newTitle;
-    gift.description = newDescription;
+    const eventItem = event.target.result;
+    eventItem.title = newTitle;
+    eventItem.description = newDescription;
 
-    const updateRequest = objectStore.put(gift);
+    const updateRequest = objectStore.put(eventItem);
 
     updateRequest.onsuccess = () => {
-      displayGifts();
+      displayEvents(storeName);
     };
     updateRequest.onerror = (event) => {
-      console.error("Edit gift error: ", event.target.errorCode);
+      console.error(`Editar ${storeName} error: `, event.target.errorCode);
     };
   };
 
   request.onerror = (event) => {
-    console.error("Retrieve gift error: ", event.target.errorCode);
+    console.error(`Retrieve ${storeName} error: `, event.target.errorCode);
   };
 }
 
-function displayGifts() {
-  const transaction = db.transaction(["gifts"], "readonly");
-  const objectStore = transaction.objectStore("gifts");
+function displayEvents(storeName) {
+  const transaction = db.transaction([storeName], "readonly");
+  const objectStore = transaction.objectStore(storeName);
 
   const request = objectStore.getAll();
-  console.log("displayGifts",request);
 
   request.onsuccess = (event) => {
-    const giftList = document.getElementById("gift-list");
-    giftList.innerHTML = "";
+    const eventList = document.getElementById(`${storeName}-list`);
+    eventList.innerHTML = "";
 
-    event.target.result.forEach((gift) => {
+    event.target.result.forEach((eventItem) => {
       const listItem = document.createElement("li");
 
       const titleDiv = document.createElement("div");
-      titleDiv.textContent = gift.title;
+      titleDiv.textContent = eventItem.title;
 
       const descriptionDiv = document.createElement("div");
-      descriptionDiv.textContent = gift.description;
+      descriptionDiv.textContent = eventItem.description;
 
       const editButton = document.createElement("button");
       editButton.textContent = "Editar";
@@ -124,11 +127,11 @@ function displayGifts() {
 
       const titleInput = document.createElement("input");
       titleInput.type = "text";
-      titleInput.value = gift.title;
+      titleInput.value = eventItem.title;
       titleInput.style.display = 'none';
 
       const descriptionInput = document.createElement("textarea");
-      descriptionInput.value = gift.description;
+      descriptionInput.value = eventItem.description;
       descriptionInput.style.display = 'none';
 
       const saveButton = document.createElement("button");
@@ -136,13 +139,13 @@ function displayGifts() {
       saveButton.className = "save-button";
       saveButton.style.display = 'none';
       saveButton.onclick = () => {
-        updateGift(gift.id, titleInput.value, descriptionInput.value);
+        updateEvent(storeName, eventItem.id, titleInput.value, descriptionInput.value);
       };
 
       const deleteButton = document.createElement("button");
       deleteButton.textContent = "Borrar";
       deleteButton.className = "delete-button";
-      deleteButton.onclick = () => deleteGift(gift.id);
+      deleteButton.onclick = () => deleteEvent(storeName, eventItem.id);
 
       listItem.appendChild(titleDiv);
       listItem.appendChild(descriptionDiv);
@@ -152,11 +155,11 @@ function displayGifts() {
       listItem.appendChild(saveButton);
       listItem.appendChild(deleteButton);
 
-      giftList.appendChild(listItem);
+      eventList.appendChild(listItem);
     });
   };
 
   request.onerror = (event) => {
-    console.error("Display gifts error: ", event.target.errorCode);
+    console.error(`Display ${storeName} error: `, event.target.errorCode);
   };
 }
