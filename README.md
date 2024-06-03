@@ -21,7 +21,14 @@ Aqui le muestro la sintaxis de minecraft :
 2. gift 
 3. follow 
 4. share
-- Para los comando coloque:
+
+## Estado del proyecto
+- Refactorizacion del codigo
+- cambios en la estructura
+- generacion de una base de datos para el usuario
+- eventos personalizables con actions && events
+
+## Ejemplo de sintaxis utilizada en la demo
 ESTE ES UN EJEMPLO PARA Minecraft TNT
 ```
 
