@@ -4,7 +4,7 @@ const request = indexedDB.open("eventDatabase", 1);
 request.onupgradeneeded = (event) => {
   db = event.target.result;
 
-  const stores = ["gifts", "comments", "likes", "subscribes"];
+  const stores = ["gifts", "chat", "follows", "subscribes"];
   stores.forEach(store => {
     if (!db.objectStoreNames.contains(store)) {
       db.createObjectStore(store, { keyPath: "id", autoIncrement: true });
@@ -15,8 +15,8 @@ request.onupgradeneeded = (event) => {
 request.onsuccess = (event) => {
   db = event.target.result;
   displayEvents("gifts");
-  displayEvents("comments");
-  displayEvents("likes");
+  displayEvents("chat");
+  displayEvents("follows");
   displayEvents("subscribes");
 };
 request.onerror = (event) => {

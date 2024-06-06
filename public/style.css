@@ -82,14 +82,8 @@ background-color: transparent; /* Fondo transparente */
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    width: 100%;
     position: absolute;
     z-index: 999;
-    top: 30px;
-    left: 0;
-    padding: 0;
-    margin: 0;
     font-size: 1rem;
     font-weight: 700;
     color: #000000;

@@ -178,7 +178,8 @@ function manageEvent(tags, message, userstate) {
 }
 const request1 = indexedDB.open("giftlistDatabase", 1);
 // console.log("request",request1);
-const keyplayerName = localStorage.getItem('playerName') || 'defaultPlayerName';
+let keyplayerName = document.getElementById('playerNameInput').value || JSON.parse(localStorage.getItem('dataminecraft'))['playerName'];
+console.log("keyplayerName",keyplayerName);
 let currentPlayerIndex = 0;
 const COMMAND_LIMIT = 1; // Límite de comandos por minuto
 const DELAY_PER_COMMAND = 10; // Retraso en milisegundos por cada comando adicional
@@ -187,89 +188,79 @@ let commandCount = 0;
 function testHandleEvent() {
   var eventType = document.getElementById('eventType').value;
   var data = document.getElementById('data').value;
-  const transaction = db.transaction(["gifts"], "readonly");
-  const objectStore = transaction.objectStore("gifts");
+  
+  if (!['gifts', 'comments', 'likes', 'subscribes', 'chat'].includes(eventType)) {
+    console.error("Invalid event type:", eventType);
+    return;
+  }
+
+  const transaction = db.transaction([eventType], "readonly");
+  const objectStore = transaction.objectStore(eventType);
 
   const request = objectStore.getAll();
 
   request.onsuccess = (event) => {
-      const allGifts = event.target.result;
-      console.log("All gifts:", allGifts);
+    const allEvents = event.target.result;
+    console.log(`All ${eventType}:`, allEvents);
 
-      if (eventType === 'gift') {
-          const giftTitle = data.trim().toLowerCase();
-          const foundGift = allGifts.find(gift => gift.title.toLowerCase() === giftTitle);
-
-          if (foundGift) {
-              const eventCommands = foundGift.description;
-              // window.api.sendChatMessage(`${eventType} ${eventCommands}`);
-              console.log("eventType gift find:",eventType,eventCommands)
-
-          } else {
-              // window.api.sendChatMessage(`${eventType} ${data}`);
-              console.log("eventype gift else:",eventType,data)
-          }
-      } else if (eventType === 'chat') {
-          const chatMessage = data.trim().toLowerCase();
-          const foundGift = allGifts.find(gift => gift.description.toLowerCase() === chatMessage);
-
-          if (foundGift) {
-              const eventCommands = foundGift.title;
-              // window.api.sendChatMessage(`${eventType} ${eventCommands}`);
-              console.log("eventType chat find:",eventType,eventCommands)
-
-          } else {
-              // window.api.sendChatMessage(`${eventType} ${data}`);
-              console.log("eventype chat else:",eventType,data)
-          } 
-        }
-      
-      else{
-          // window.api.sendChatMessage(`${eventType} ${data}`);
-          console.log("ELSE testhandle Event:",eventType,data)
-      }
+    const trimmedData = data.trim().toLowerCase();
+    const foundEvent = allEvents.find(event => event.title.toLowerCase() === trimmedData || event.description.toLowerCase() === trimmedData);
+    console.log (foundEvent);
+    if (foundEvent) {
+      const eventCommands = foundEvent.description;
+      window.api.sendChatMessage(`${eventType} ${eventCommands}`);
+      Replacecommandtest(eventCommands);
+      // console.log(`eventType ${eventType} find:`, eventType, eventCommands);
+    } else {
+      console.log(`eventType ${eventType} else:`, eventType, data);
+    }
   };
 
   request.onerror = (event) => {
-      console.error("Error fetching gifts from IndexedDB:", event.target.errorCode);
-      // window.api.sendChatMessage(`${eventType} ${data}`);
-      console.log(" ONERROR testhandle Event:",eventType,data)
+    console.error(`Error fetching ${eventType} from IndexedDB:`, event.target.errorCode);
+    console.log(`ONERROR testHandleEvent:`, eventType, data);
   };
+}
+const Replacecommandtest = (command) => {
+  // console.log("eventype",eventype);
+  let replacedCommand = command
+    .replace('playername', keyplayerName || '')
+
+  replacedCommand = replacedCommand.replace(/\\/g, '');
+  replacedCommand = replacedCommand.toLowerCase();
+  console.log("replacedCommand",replacedCommand);
+  return replacedCommand;
 }
 
 function sendReplacedCommand(replacedCommand) {
   window.api.sendChatMessage(replacedCommand);
 }
 function handleEvent(eventType, tags, message) {
-  let playerName = keyplayerName
-  const additionalDelay = Math.floor(commandCount / COMMAND_LIMIT) * DELAY_PER_COMMAND;
+  const transaction = db.transaction([eventType], "readonly");
+  const objectStore = transaction.objectStore(eventType);
 
-  // Inicializar el retraso
-  let delay = 0;
+  const request = objectStore.getAll();
 
+  request.onsuccess = (event) => {
+    const allEvents = event.target.result;
+    console.log(`All ${eventType}:`, allEvents);
 
-  eventCommands.forEach(command => {
-    const replacedCommand = Replacevalues(command, tags, message);
-
-    /*if (tags.repeatCount > maxRepeatCount) {
-      // Verificar si el comando contiene "tellraw" o "title" y si el contador no es múltiplo de 10
-      if ((command.includes("tellraw") || command.includes("title")) && commandCounter % 10 !== 0) {
-        return; // No se ejecuta el comando
-      }
+    const trimmedData = data.trim().toLowerCase();
+    const foundEvent = allEvents.find(event => event.title.toLowerCase() === trimmedData || event.description.toLowerCase() === trimmedData);
+    console.log (foundEvent);
+    if (foundEvent) {
+      const eventCommands = foundEvent.description;
+      Replacevalues(eventCommands, tags, message);
+      // console.log(`eventType ${eventType} find:`, eventType, eventCommands);
+    } else {
+      console.log(`eventType ${eventType} else:`, eventType, data);
     }
-    commandCounter++;
+  };
 
-    let repeatCount = tags.repeatCount || 1; */
-    
-
-    
-  });
-  if (!isNaN(replacedCommand)) {
-      delay = parseInt(replacedCommand) + 20;
-  } else {
-      delay = additionalDelay;
-  }
-  Replacevalues();
+  request.onerror = (event) => {
+    console.error(`Error fetching ${eventType} from IndexedDB:`, event.target.errorCode);
+    console.log(`ONERROR testHandleEvent:`, eventType, data);
+  };
 }
 const Replacevalues = (command, tags, message) => {
   // console.log("eventype",eventype);

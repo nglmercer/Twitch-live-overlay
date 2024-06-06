@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dropArea.classList.remove('highlight');
     });
 
-    let existingFiles = [];
+    let existingFiles = JSON.parse(localStorage.getItem('existingFiles')) || [];
     dropArea.addEventListener('drop', async (event) => {
         event.preventDefault();
         dropArea.classList.remove('highlight');
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirmation) {
                     const result = await window.api.addFilePath(fileParams);
                     if (result.success) {
+                        addFileToLocalStorage(fileParams);
                         loadFileList();
                     } else {
                         alert(`Error al agregar el archivo: ${result.error}`);
@@ -55,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         const result = await window.api.addFilePath(fileParams);
                         if (result.success) {
                             loadFileList();
+                            addFileToLocalStorage(fileParams);
+
                         } else {
                             alert(`Error al agregar el archivo: ${result.error}`);
                         }
@@ -64,10 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
+    const addFileToLocalStorage = (fileParams) => {
+        existingFiles.push(fileParams);
+        localStorage.setItem('existingFiles', JSON.stringify(existingFiles));
+    };
     const loadFileList = async () => {
         const files = await window.api.getFilesInFolder();
-        existingFiles = files; // Asegurarse de que existingFiles sea un array plano
+        existingFiles = files;
+        localStorage.setItem('existingFiles', JSON.stringify(existingFiles));
         console.log('loadFileList', files);
         fileList.innerHTML = files.map(file => `
             <div class="file-item">
@@ -103,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.deleteFile = async (fileName) => {
         await window.api.deleteFile(fileName);
+        existingFiles = existingFiles.filter(file => file.fileName !== fileName);
+        localStorage.setItem('existingFiles', JSON.stringify(existingFiles));
         loadFileList();
     };
 
