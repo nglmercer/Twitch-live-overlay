@@ -32,7 +32,13 @@ background-color: transparent; /* Fondo transparente */
 .success {
     color:#3ebc3e;
 }
-
+.grid2cols {
+    display: grid;
+    grid-template-columns: 400px 400px;
+}
+.display-none {
+    display: none;
+}
 #options-container i, #options-container input {
     vertical-align:middle;
 }

@@ -278,7 +278,17 @@ Mire este video para aprender cómo funciona las acciones y el sistema de evento
 ¿Qué es lo que desea que suceda?Aquí puede crear nuevas acciones y editar las existentes.
 Puede vincular estas acciones a los eventos a continuación.
         </p>
-        <button>Crear nueva acción</button>
+        <button id="createActionandOpenModal">Crear nueva acción</button>
+        <script>
+          const createActionandOpenModal = document.getElementById('createActionandOpenModal');
+          createActionandOpenModal.addEventListener('click', () => {
+            console.log('createActionandOpenModal');
+          }); 
+          function openactioneventModal() {
+          }
+          function createactioneventmodal() {
+          }
+        </script>
         <table class="table" id="actions-table">
           <td>atajos</td>
           <td>nombre</td>
@@ -344,12 +354,196 @@ Puede vincular estas acciones a los eventos a continuación.
       <div id="messages"></div>
     </div>
     <div class="OverlayEvent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="OverlayEvent">
+
+      <div id="OverlayEventcontent"></div>
+    <div class="actionevent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="actionevent">
+      <div class="grid grid-cols-3 gap-4">
+        <input type="text" id="actioneventName" placeholder="Action Name" class="form-control" />
+        <select id="actionselect" class="form-control"></select>
+        <select id="eventselect" class="form-control"></select>
+
+      </div>
+      <button id="testactioneventselect">test action event</button>
       <input type="text" id="OverlayEventName" placeholder="Event Name" class="form-control" />
       <input type="text" id="OverlayEventTrigger" placeholder="Trigger" class="form-control" />
       <select id="OverlayEventActions" class="form-control"></select>
       <button id="OverlayEventAdd" class="btn btn-primary">Add Event</button>
-      <div id="OverlayEventcontent"></div>
-      
+
+    <div class="modalactions relative w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="modalactions">
+      <input type="text" id="modalactionsName" placeholder="Modal Name" class="form-control" />
+      <div>
+        <label for="modalactionsCheckbox1" class="grid2cols">video      <input type="checkbox" id="modalactionsCheckbox1" class="form-control" />
+        </label> 
+        <label for="modalactionsCheckbox2" class="grid2cols">audio      <input type="checkbox" id="modalactionsCheckbox2" class="form-control" />
+          <label for="modalactionsCheckbox3" class="grid2cols">imagen      <input type="checkbox" id="modalactionsCheckbox3" />
+          </label>
+      </div>
+
+
+      <div id="activeoncheckbox1" class="display-none">
+        <select id="modalvideoselect" class="form-control"></select>
+        <input type="range" min="1" max="100" value="50" id="videovolumen" class="form-control" />
+
+      </div>
+      <div id="activeoncheckbox2" class="display-none">
+        <select id="modalaudioselect" class="form-control"></select>
+        <input type="range" min="1" max="100" value="50" id="audiovolumen" class="form-control" />
+      </div>
+      <div id="activeoncheckbox3" class="display-none">
+        <select id="modalimageselect" class="form-control"></select>
+        <input type="range" min="1" max="100" value="50" id="imageduration" class="form-control" />
+      </div>
+
+      <button id="modalactionsAdd" class="btn btn-primary">Add Event</button>
+    </div>
+    <!-- creamos un script donde al estar checked se muestran mas espacios y elementos para modalactions -->
+    </div>
+    <script>
+      const modalactionsName = document.getElementById('modalactionsName');
+      const modalactionsCheckbox1 = document.getElementById('modalactionsCheckbox1');
+      const modalactionsCheckbox2 = document.getElementById('modalactionsCheckbox2');
+      const modalactionsCheckbox3 = document.getElementById('modalactionsCheckbox3');
+      const modalactionsAdd = document.getElementById('modalactionsAdd');
+      const modalactions = document.getElementById('modalactions');
+
+    // activeoncheckbox se muestran los espacios y elementos para modalactions
+      const activeoncheckbox1 = document.getElementById('activeoncheckbox1');
+      const activeoncheckbox2 = document.getElementById('activeoncheckbox2');
+      const activeoncheckbox3 = document.getElementById('activeoncheckbox3');
+
+    // data que esta detro de checkboxstatus
+      const selectedVideo = document.getElementById('modalvideoselect');
+      const selectedAudio = document.getElementById('modalaudioselect');
+      const selectedImage = document.getElementById('modalimageselect');
+      const videoVolumen = document.getElementById('videovolumen');
+      const audioVolumen = document.getElementById('audiovolumen');
+      const imageDuration = document.getElementById('imageduration');
+      modalactionsAdd.addEventListener('click', () => {
+        let checkboxstatus = {modalactionsCheckbox1: modalactionsCheckbox1.checked, modalactionsCheckbox2: modalactionsCheckbox2.checked, modalactionsCheckbox3: modalactionsCheckbox3.checked};
+        
+        testModalactions(checkboxstatus);
+      });
+
+      function testModalactions(checkbox) {
+        console.log('testModalactions', checkbox);
+        if (checkbox){
+          console.log('checkbox', checkbox);
+          if (checkbox.modalactionsCheckbox1) {
+            console.log('modalactionsCheckbox1', selectedVideo.value, videoVolumen.value);
+
+          }
+          if (checkbox.modalactionsCheckbox2) {
+            console.log('modalactionsCheckbox2', selectedAudio.value, audioVolumen.value);
+
+          }
+          if (checkbox.modalactionsCheckbox3) {
+            console.log('modalactionsCheckbox3', selectedImage.value, imageDuration.value);
+
+          }
+        }
+      }
+
+      modalactionsCheckbox1.addEventListener('change', () => {
+        mostrarmasopciones(modalactionsCheckbox1.checked, activeoncheckbox1);
+      });
+      modalactionsCheckbox2.addEventListener('change', () => {
+        mostrarmasopciones(modalactionsCheckbox2.checked, activeoncheckbox2);
+      });
+      modalactionsCheckbox3.addEventListener('change', () => {
+        mostrarmasopciones(modalactionsCheckbox3.checked, activeoncheckbox3);
+      });
+
+      function mostrarmasopciones(checkbox, activeoncheckbox) {
+        console.log('mostrarmasopciones', checkbox, activeoncheckbox);
+        if (checkbox) {
+          activeoncheckbox.classList.add('grid2cols');
+          activeoncheckbox.classList.remove('display-none');
+        }
+         else {
+          activeoncheckbox.classList.add('display-none');
+          activeoncheckbox.classList.remove('grid2cols');
+        }
+      }
+
+      // funciones de testeo para acciones y eventos
+      let actionEvents = ['action1', 'action2', 'action3'];
+      let eventEvents = ['event1', 'event2', 'event3'];
+      const actionselect = document.getElementById('actionselect');
+      const eventselect = document.getElementById('eventselect');
+      const actioneventName = document.getElementById('actioneventName');
+      actionselect.options.add(new Option('action1', 'action1'));
+      actionselect.options.add(new Option('action2', 'action2'));
+      actionselect.options.add(new Option('action3', 'action3'));
+      eventselect.options.add(new Option('event1', 'event1'));
+      eventselect.options.add(new Option('event2', 'event2'));
+      eventselect.options.add(new Option('event3', 'event3'));
+      const testactioneventselect = document.getElementById('testactioneventselect');
+      testactioneventselect.addEventListener('click', () => {
+        testActionEvent();
+      });
+      let numerox = 1;
+      if (numerox === 0) {
+        console.log('numerox', numerox);
+      } else if (numerox === 1) {
+        console.log('numerox', numerox);
+      }
+      function testActionEvent() {
+        const action = actionselect.value;
+        const event = eventselect.value;
+        console.log('this is a functionActionEvent action', action, 'event', event, 'actioneventName', actioneventName.value);
+        switchActionEvent(action, event);
+
+      }
+      function switchActionEvent(action, event) {
+        switch (action) {
+          case 'action1':
+            switch (event) {
+              case 'event1':
+                console.log('switchActionEvent action1, event1');
+                break;
+              case 'event2':
+                console.log('action1, event2');
+                break;  
+              case 'event3':
+                console.log('action1, event3');
+                break;
+            }
+            break;
+          case 'action2':
+            switch (event) {
+              case 'event1':
+                console.log('action2, event1');
+                break;
+              case 'event2':
+                console.log('action2, event2');
+                break;  
+              case 'event3':
+                console.log('action2, event3');
+                break;
+            }
+            break;
+          case 'action3':
+            switch (event) {
+              case 'event1':
+                console.log('action3, event1');
+                break;
+              case 'event2':
+                console.log('action3, event2');
+                break;  
+              case 'event3':
+                console.log('action3, event3');
+                break;
+            }
+            break;  
+        }
+
+      }
+      function testmodaleventwithdata() {
+        console.log('testmodaleventwithdata');
+      }
+
+    </script>
+    </div>
   </div>
 
   </div>
