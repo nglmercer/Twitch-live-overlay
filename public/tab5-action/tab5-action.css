@@ -1,0 +1,42 @@
+.tab5-action{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    .ElementITEM{
+        .inputGorup{
+            position: relative;
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            label{
+                max-width: 200px;
+            }
+            input[type="checkbox"]{
+                width: 20px;
+                height: 20px;
+            }
+
+            .config{
+                padding: 10px;
+                display: none;
+            }
+            
+            input[type="checkbox"]:checked ~ .config{
+                display: block;
+                cursor: pointer;
+            }
+        }
+    }
+}

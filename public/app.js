@@ -105,7 +105,7 @@ class TTS {
     * Validates the channel name 
     * if valid, starts listening for messages
   */
-
+const eventselects = ['chat', 'bits', 'sub', 'resub', 'logon'];
 function startListening() {
   var validator = new Validator;
   const statusElement = document.querySelector('#status'); 
@@ -139,6 +139,7 @@ function startListening() {
       console.log("message event/ tags:", tags);
       console.log("message:", message);
       console.log("self:", self);
+      eventmanager("chat", tags);
     });
     client.on('cheer', (wat, tags, message, self) => {
       console.log("wat:", wat);
@@ -147,6 +148,7 @@ function startListening() {
       console.log("cheer/ self:", self);
       manageEvent(tags, message);
       handleEvent('bits', tags, message);
+      eventmanager("cheer", tags);
 
     });
     
@@ -156,6 +158,7 @@ function startListening() {
       console.log("message:", message);
       console.log("self:", self);
       manageEvent('likes', tags);
+      eventmanager("sub", tags);
     });
     
     client.on('resub', (wat, tags, message, self) => {
@@ -164,22 +167,49 @@ function startListening() {
       console.log("message:", message);
       console.log("self:", self);
       manageEvent(tags, message);
+      eventmanager("resub", tags);
     });
     
     client.on("logon", (tags) => {
       console.log("tags:", tags);
       console.log("logon-success");
+      eventmanager("logon", tags);
     });
   }
 }
+function eventmanager(event, tags) {
+    switch (event) {
+        case "chat":
+            console.log("chat", tags);
+            break;
+        case "bits":
+            console.log("bits", tags);
+            break;
+        case "sub":
+            console.log("sub", tags);
+            break;
+        case "resub":
+            console.log("resub", tags);
+            break;
+        case "logon":
+            console.log("logon", tags);
+            break;
+        default:
+            console.log("event", event, "no se ha registrado",tags);
+            break;
+    }
+}
+
 function manageEvent(tags, message, userstate) {
   new TTS(message, tags, userstate);
   console.log('not in lines');
 }
 const request1 = indexedDB.open("giftlistDatabase", 1);
 // console.log("request",request1);
-let keyplayerName = document.getElementById('playerNameInput').value || JSON.parse(localStorage.getItem('dataminecraft'))['playerName'];
-console.log("keyplayerName",keyplayerName);
+let dataMinecraft = JSON.parse(localStorage.getItem('dataminecraft'));
+let keyplayerName = dataMinecraft && dataMinecraft['playerName'] 
+    ? dataMinecraft['playerName'] 
+    : document.getElementById('playerNameInput').value;console.log("keyplayerName?=",keyplayerName);
 let currentPlayerIndex = 0;
 const COMMAND_LIMIT = 1; // Límite de comandos por minuto
 const DELAY_PER_COMMAND = 10; // Retraso en milisegundos por cada comando adicional

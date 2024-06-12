@@ -1,0 +1,71 @@
+<form class="tab5-action">
+    <!-- Item 1 -->
+    <div class="ElementITEM">
+      <h1>Actions</h1>
+    </div>  
+    <!-- Item 1 -->
+    
+    <!-- Item 2 -->
+    <div class="ElementITEM">
+      
+      <div class="inputGorup">
+        <label for="modalactionsName" class="grid2cols">Nombre del evento</label> 
+        <input name="evento_nombre" type="text" id="modalactionsName" placeholder="Modal Name" class="form-control" />
+      </div>
+      <!-- Input 1 -->
+      <div class="inputGorup">
+        <label for="modalactionsCheckbox1" class="grid2cols">video</label> 
+        <input name="video_check" type="checkbox" id="modalactionsCheckbox1" class="form-control" />
+        
+        <!-- config -->
+        <div class="config">
+          <select name="video_select" class="form-control inputSelectSources"></select>
+          <input name="video_rango" type="range" min="1" max="100" value="50" class="form-control inputRangoSeleccion" />
+        </div>
+        <!-- config -->
+      </div>
+      <!-- Input 1 -->
+      
+      <!-- Input 2 -->
+      <div class="inputGorup">
+        <label for="modalactionsCheckbox2" class="grid2cols">audio</label>
+        <input name="audio_check" type="checkbox" id="modalactionsCheckbox2" class="form-control" />
+        
+        <!-- config -->
+        <div class="config">
+          <select name="audio_select" class="form-control inputSelectSources"></select>
+          <input name="audio_rango" type="range" min="1" max="100" value="50" class="form-control inputRangoSeleccion" />
+        </div>
+        <!-- config -->
+      </div>
+      <!-- Input 2 -->
+
+      <!-- Input 3 -->
+      <div class="inputGorup">
+        <label for="modalactionsCheckbox3" class="grid2cols">imagen</label>
+        <input name="imagen_check" type="checkbox" id="modalactionsCheckbox3" />
+
+        <!-- config -->
+        <div class="config">
+          <select name="imagen_select" class="form-control inputSelectSources"></select>
+          <input name="imagen_rango" type="range" min="1" max="100" value="50" class="form-control inputRangoSeleccion" />
+        </div>
+        <!-- config -->
+      </div>
+      <!-- Input 3 -->
+      <div class="inputGorup">
+        <input name="id" type="text" id="modalactionsName" placeholder="Modal Name" style="display: none;" />
+      </div>
+    </div>  
+    <!-- Item 2 -->
+
+    <!-- Item 3 -->
+    <div class="ElementITEM">
+      <button class="btn btn-primary modalActionAdd">Add Event</button>
+      <button class="btn btn-primary modalActionClose">close</button>
+      <button class="btn btn-primary modalActionSave" style="display: none;">Guardar</button>
+  </div>
+    <!-- Item 3 -->
+<form />
+<!-- Estilos personalizados -->
+<link rel="stylesheet" href="./tab5-action/tab5-action.css">
