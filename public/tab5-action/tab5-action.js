@@ -12,7 +12,25 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
     elementModal.querySelector('.tab5-action').addEventListener('submit', event => {
         event.preventDefault();
     });
-
+    let errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.style.color = 'red';
+    errorMessage.style.display = 'none';
+    errorMessage.textContent = 'El nombre es obligatorio.';
+    elementModal.appendChild(errorMessage);
+    function validateForm() {
+        const formulario = document.querySelector('.tab5-action');
+        const nombre = formulario.elements.namedItem('evento_nombre');
+        if (!nombre || !nombre.value.trim()) {
+            errorMessage.style.display = 'block';
+            return false;
+        }
+        errorMessage.style.display = 'none';
+        return true;
+    }
+    setTimeout(() => {
+        errorMessage.style.display = 'none';
+    }, 5000);
     // Función para llenar el formulario con los datos actuales
     const fillForm = (datos) => {
         const formulario = document.querySelector('.tab5-action');
@@ -50,6 +68,9 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
     };
 
     elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
+        if (!validateForm()) {
+            return;
+        }
         const nameFilter = obtenerDatos();
 
         // Llamar a onSave o saveData según corresponda
@@ -91,7 +112,9 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         });
 
         // Incluir el ID si existe
-        nameFilter.id = parseInt(formulario.elements.namedItem('id').value);
+        if (formulario.elements.namedItem('id')) {
+            nameFilter.id = parseInt(formulario.elements.namedItem('id').value);
+        }
         elementModal.style.display = 'none';
         console.log('nameFilter', nameFilter, datosFormulario,"datosFormulario");
         return nameFilter;
@@ -101,6 +124,9 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         onCancel();
     });
     elementModal.querySelector('.modalActionSave').addEventListener('click', () => {
+        if (!validateForm()) {
+            return;
+        }
         const nameFilter = obtenerDatos();
         elementModal.style.display = 'none';
         saveData(nameFilter);

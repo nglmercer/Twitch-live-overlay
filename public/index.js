@@ -73,10 +73,17 @@ function saveDataToIndexedDB(dbConfig, data) {
     openDatabase(dbConfig).then((db) => {
         const transaction = db.transaction([dbConfig.store], 'readwrite');
         const objectStore = transaction.objectStore(dbConfig.store);
+
+        // Verificar y eliminar la propiedad id si no es válida
+        if (typeof data.id !== 'number' || data.id <= 0) {
+            delete data.id;
+        }
+
         const request = objectStore.add(data);
         request.onsuccess = (event) => {
             console.log('Data saved to IndexedDB', data);
             data.id = event.target.result;
+            console.log('data.id', data.id);
             createElementWithButtons(dbConfig, data);
         };
         request.onerror = (event) => {
@@ -160,7 +167,11 @@ function createElementWithButtons(dbConfig, data) {
     const editButton = document.createElement('button');
     editButton.textContent = 'Editar';
     editButton.addEventListener('click', () => {
-        objectModal.open(data);
+        if (!data.Action) {
+            objectModal.open(data);
+        } else {
+            objectModal2.open(data);
+        }
     });
     container.appendChild(editButton);
 
@@ -208,8 +219,8 @@ function onSaveHandlerAction(data) {
 }
 
 function onSaveHandlerEvent(data) {
-    const id = data.id ? data.id : undefined;
-
+    const id = data.id ? parseInt(data.id) : undefined;
+    console.log('onSaveHandlerEvent', data);
     if (id) {
         data.id = id;
         updateDataInIndexedDB(databases.eventsDB, data);
@@ -249,6 +260,8 @@ tab5Event({
     onSave: (datos) => {
         onSaveHandlerEvent(datos);
     },
+    saveData: (datos) => {onSaveHandlerEvent(datos),//{updateDataInIndexedDB(databases.MyDatabaseActionevent, datos),
+    console.log('saveData', datos)},
     onCancel: () => {
         // Lógica para el evento onCancel
     },
