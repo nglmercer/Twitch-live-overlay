@@ -49,33 +49,42 @@
 
       <div class="jumbotron">
         <button id="connect-button" class="btn btn-primary">Connect</button>
-
+        <!-- <div class="grid float-end right-0">
+          <div class="card">
+            <a href="https://www.tiktok.com/@melserng" >
+              <img class="card-img-top" src="images/Rose.webp" alt="Rose">
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">una monedita</h5>
+              <p class="card-text">con una rosita me apoyas :D!</p>
+            </div>
+          </div>
+        </div> -->
         <div class="container">
-          <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-12">
               <h1>TTS de chat de Twitch</h1>
               <p>Ingrese un canal a continuación y luego haga clic en "Comenzar a escuchar" para texto a voz.</p>
-              <form action="#">
-                <div class="row">
-                  <div class="col-lg-8 col-md-8 col-sm-8 col">
-                    <div class="input-group mb-3">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon3">twitch.tv/</span>
+                <form action="#">
+                  <div class="row">
+                    <div class="col-lg-8 col">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" id="basic-addon3">twitch.tv/</span>
+                        </div>
+                        <input id="channelname" name="channel" type="text" class="form-control" />
                       </div>
-                      <input id="channelname" name="channel" type="text" class="form-control" />
+                    </div>
+                    <div class="col-lg-4 col">
+                      <button class="btn btn-primary" id="listenBtn" type="submit"> Start
+                        Listening</button>
                     </div>
                   </div>
-                  <div class="col-lg-4 col-md-4 4 col-sm-4 col">
-                    <button class="btn btn-primary" id="listenBtn" type="submit"> Start
-                      Listening</button>
-                  </div>
+                </form>
+                <div id="status" class="alert alert-info">
+                  Esperando el nombre del canal...
                 </div>
-              </form>
-              <div id="status" class="alert alert-info">
-                Esperando el nombre del canal...
-              </div>
-              <div id="options-container" class="grid border-2	p-4 m-4 border-slate-600 gap-4 mx-4 rounded-md">
-                
+              <div id="options-container" class="grid grid-cols-2 border-2 gap-2 border-slate-600 rounded-md">
+                  <div id="options-voice" class="grid border-2 p-1  gap-4 mx-2 rounded-md">
+                    
                     <label for="volume"><small>Speech Volume</small>                    <i class="bi bi-volume-up-fill"></i>
                       <input id="volume" type="range" min="0" max="1" value="1" step="0.1"></label>
                     <label for="voiceSelect"><small>select voz</small><select id="voiceSelect" class="form-control w-2/4"></select></label>
@@ -84,41 +93,31 @@
                     <label for="randomSpeed"><small>random speed</small><input id="randomSpeed" type="checkbox" />  <input type="number" id="randomSpeedValue" name="randomSpeedValue" value="1" min="0.1" max="2" step="0.1" />   </label>
                     <label for="randomPitch"><small>random pitch</small><input id="randomPitch" type="checkbox" />                     <input type="number" id="randomPitchValue" name="randomPitchValue" value="1" min="0.1" max="2" step="0.1" />
                     </label>
-                        <div>  <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
-                            <input id="modsonly" type="checkbox" data-option="modsonly" /></div>  <div>  <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
-                            <input id="cheersonly" type="checkbox" data-option="cheersonly" /></div>  <div>  <label for="exclude-toggle"><small>Exclude Chatters Listed Below</small></label>
-                            <input id="exclude-toggle" type="checkbox" data-option="exclude-toggle" /></div><div class="row">    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>  
-                          <input id="announcechatter" type="checkbox" data-option="announcechatter" /></div>
-                        <div class="col-12">
-                          <!-- Placeholder for future additions -->
-                        </div>
-                        <div class="row">
-                        <audio id="audiotrack"></audio>
-                      </div>
 
-                </div> 
+                </div>
+                  <div id="options-users" class="grid border-2 p-1 gap-4 mx-2 rounded-md">
+                  <div  >  <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
+                    <input id="modsonly" type="checkbox" data-option="modsonly" /></div>  <div>  <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
+                    <input id="cheersonly" type="checkbox" data-option="cheersonly" /></div>  <div>  <label for="exclude-toggle"><small>Exclude Chatters Listed Below</small></label>
+                    <input id="exclude-toggle" type="checkbox" data-option="exclude-toggle" /></div><div class="row">    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>  
+                  <input id="announcechatter" type="checkbox" data-option="announcechatter" /></div>
+                <div class="col-12">
+                  <textarea name="excluded-chatters" id="excluded-chatters" cols="30" rows="10"></textarea>
+                </div>
+                <div class="row">
+                <audio id="audiotrack"></audio>
               </div>
-
-              </div>
-              <!---- # esta es una parte de la tab de eventos -->
-            </div>
-            <div class="flex float-end ">
-              <div class="card">
-                <a href="https://www.tiktok.com/@melserng" >
-                  <img class="card-img-top" src="images/Rose.webp" alt="Rose">
-                </a>
-                <div class="card-body">
-                  <h5 class="card-title">una monedita</h5>
-                  <p class="card-text">con una rosita me apoyas :D!</p>
                 </div>
               </div>
-            </div>
+              <!---- # esta es una parte de la tab de eventos -->
+
           </div>
+          
     </div>
     <div id="tab2" class="tab-content w-full bg-slate-500">
       <div class="grid border-2	p-8 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
 
-      <form id="createBotForm" class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+      <form id="createBotForm" class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
         <label for="keyBOT" class="justify-self-start">MinecraftBOT:</label>
         <input type="text" id="keyBOT" name="keyBOT" value="" required>
         <label for="keySERVER" class="justify-self-start">IP del Server:</label>
@@ -130,7 +129,7 @@
       </form>
           <div id="resultMessage"></div>
 
-          <div class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+          <div class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
             <label>Tu Minecraft playerName:</label>
             <input type="text" id="playerNameInput" placeholder="minecraftPlayer" onchange="saveDataminecraft()">
 
@@ -159,7 +158,7 @@
               console.log('Datos guardados en el localStorage', localStorage.getItem('dataminecraft'));
             }
           </script>
-          <div class="grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+          <div class="grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
             <h1>Gift List</h1>
             <input type="text" id="gifts-title" placeholder="Gift Title">
             <textarea id="gifts-description" placeholder="Gift Description"></textarea>
@@ -213,7 +212,7 @@ Aquí puede definir sus acciones y eventos personalizados (desencadenantes).Por 
 Para esto primero debe definir la acción y luego el evento.Se requiere la superposición de mis acciones para OBS/Live Studio.
 Mire este video para aprender cómo funciona las acciones y el sistema de eventos.
       </p>
-      <div class="actions-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+      <div class="actions-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
         <h2>Actions</h2>
         <p>
 ¿Qué es lo que desea que suceda?Aquí puede crear nuevas acciones y editar las existentes.
@@ -239,7 +238,7 @@ Puede vincular estas acciones a los eventos a continuación.
           <td>sonido</td>
         </table>
         </div>
-      <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md">
+      <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
         <h2>Events</h2>
         <p>Aquí puede definir qué activará sus acciones.
           </p>
@@ -294,9 +293,9 @@ Puede vincular estas acciones a los eventos a continuación.
     <div class="container" id="main">
       <div id="messages"></div>
     </div>
-    <div class="OverlayEvent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="OverlayEvent">
+    <div class="OverlayEvent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md" id="OverlayEvent">
 
-    <div class="actionevent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="actionevent">
+    <div class="actionevent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md" id="actionevent">
       <div id="testsection">
         <input type="text" id="testInput" placeholder="Event Name" />
         <button id="testButton_actionevent" class="btn btn-primary">Test</button>

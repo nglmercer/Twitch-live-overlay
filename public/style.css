@@ -1,6 +1,7 @@
 body{
     font-size: large;
     padding-bottom:120px;
+    min-width: 600px;
 }
 
 #main {
@@ -8,7 +9,6 @@ body{
 }
 .container {
     overflow-y: auto;
-    max-height: 1000px;
 }
 /* Estilos para la barra de desplazamiento */
 ::-webkit-scrollbar {

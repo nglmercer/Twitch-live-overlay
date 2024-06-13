@@ -5,9 +5,9 @@ export class TTS {
   }
 
   speechType() {
-    if (!document.getElementById('hqspeech').checked) {
-      return 'browser';
-    }
+    // if (!document.getElementById('hqspeech').checked) {
+    //   return 'browser';
+    // }
     return 'browser';
   }
 
