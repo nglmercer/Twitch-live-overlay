@@ -1,4 +1,5 @@
 import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from '../indexedDB.js';
+
 export default async function tab5Action({
     elementContainer,
     files = [],
@@ -148,41 +149,75 @@ export default async function tab5Action({
         });
     }
 
-    function loadDataFromIndexedDBToForm(dbConfig) {
-        loadDataFromIndexedDB(dbConfig).then(records => {
-            records.forEach(record => {
-                const optionElement = document.createElement('option');
-                optionElement.textContent = record.name;
-                optionElement.value = record.id;
-                form.elements.namedItem('inputSelectSources').appendChild(optionElement);
-                cacheAssign[record.id] = record;
-            });
-        }).catch(error => console.error('Error loading data from IndexedDB', error));
-    }
+    const exportFormData = () => {
+        const formData = obtenerDatos();
+        const jsonData = JSON.stringify(formData, null, 2);
+        return jsonData;
+    };
+
+    const importFormData = (importedData) => {
+        try {
+            const formData = JSON.parse(importedData);
+            console.log('formData', formData);
+            fillForm(formData);
+            alert('Datos importados correctamente.');
+        } catch (error) {
+            alert('Error al importar los datos. Asegúrate de que el formato sea correcto.');
+        }
+    };
+
+    document.getElementById('export-button').addEventListener('click', () => {
+        const exportedData = exportFormData();
+        const exportTextArea = document.getElementById('export-data');
+        exportTextArea.value = exportedData;
+        exportTextArea.style.display = 'block';
+    });
+
+    document.getElementById('import-button').addEventListener('click', () => {
+        const importTextArea = document.getElementById('import-data');
+        importTextArea.style.display = 'block';
+        document.getElementById('confirm-import-button').style.display = 'block';
+    });
+
+    document.getElementById('confirm-import-button').addEventListener('click', () => {
+        const importTextArea = document.getElementById('import-data');
+        const importedData = importTextArea.value;
+        importFormData(importedData);
+        importTextArea.style.display = 'none';
+        document.getElementById('confirm-import-button').style.display = 'none';
+    });
 
     loadOptions(elementModal, files);
+    
+    const loadDataFromIndexedDBToForm = (DB) => {
+        console.log("Se carga IndexedDB en el form")
+        loadDataFromIndexedDB(DB)
+            .then(records => {
+                console.log("Records IndexedDB form", records)
+                records.forEach(record => {
+                    const optionElement = document.createElement('option');
+                    optionElement.textContent = record.id;
+                    optionElement.value = record.id;
+                    form.elements.namedItem('inputSelectSources').appendChild(optionElement);
+                    cacheAssign[record.id] = record;
+                });
+            })
+            .catch(error => console.error('Error loading data from IndexedDB', error));
+    }
 
     return {
         element: ModalElement,
         form: form,
         close: () => elementModal.style.display = 'none',
-        open: (setNewFiles = null) => {
-            if (setNewFiles !== null) {
-                loadOptions(elementModal, setNewFiles);
-            } else {
-                loadOptions(elementModal, files);
-            }
+        open: (newFiles = null) => {
+            loadOptions(elementModal, newFiles || files);
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'inline-block';
             elementModal.querySelector('.modalActionSave').style.display = 'none';
         },
         onUpdate: (datos) => {
-            if (datos) {
-                fillForm(datos);
-            }
+            fillForm(datos);
             elementModal.style.display = 'flex';
-            console.log('nameFilterid', datos.id);
-            updateDataInIndexedDB(databases.MyDatabaseActionevent, datos);
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },

@@ -83,8 +83,9 @@ import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIn
     const testButton = document.createElement('button');
     testButton.textContent = 'Probar';
     testButton.addEventListener('click', () => {
-        eventmanager("test", data);
-        eventmanager("Chat", "hola");
+        // eventmanager("test", data);
+        // eventmanager("Chat", "hola");
+        console.log('testButton', data);
     });
     container.appendChild(testButton);
 
