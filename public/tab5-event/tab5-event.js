@@ -70,9 +70,9 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
         }
         let nameFilter = obtenerDatos();
         if (nameFilter.id) {
-            await updateDataInIndexedDB(databases.eventsDB, nameFilter);
+            updateDataInIndexedDB(databases.eventsDB, nameFilter);
         } else {
-            await saveDataToIndexedDB(databases.eventsDB, nameFilter);
+            saveDataToIndexedDB(databases.eventsDB, nameFilter);
         }
         elementModal.style.display = 'none';
     });
@@ -123,9 +123,9 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
         const nameFilter = obtenerDatos();
         elementModal.style.display = 'none';
         if (nameFilter.id) {
-            await updateDataInIndexedDB(databases.eventsDB, nameFilter);
+            updateDataInIndexedDB(databases.eventsDB, nameFilter);
         } else {
-            await saveDataToIndexedDB(databases.eventsDB, nameFilter);
+            saveDataToIndexedDB(databases.eventsDB, nameFilter);
         }
     });
 

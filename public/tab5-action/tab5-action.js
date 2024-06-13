@@ -1,5 +1,4 @@
 import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from '../indexedDB.js';
-
 export default async function tab5Action({
     elementContainer,
     files = [],
@@ -79,14 +78,31 @@ export default async function tab5Action({
         });
 
         const idValue = form.elements.namedItem('id').value;
-        nameFilter.id = parseInt(idValue, 10) || null;
+        nameFilter.id = !isNaN(idValue) ? idValue : null;
 
         return nameFilter;
     }
+    
+    const fillForm = (datos) => {
+        const formulario = document.querySelector('.tab5-action');
+        for (const [key, value] of Object.entries(datos)) {
+            const keyCheck = `${key}_check`;
+            const keyNombre = `${key}_nombre`;
+            let element = formulario.elements.namedItem(keyCheck);
+            let element1 = formulario.elements.namedItem(keyNombre);
+            const idelement = formulario.elements.namedItem('id');
+            console.log('key', key, 'value', value, element, element1);
+            
+            if (idelement) {
+                idelement.value = datos.id;
+            } 
+        }
+    };
 
     elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
         if (!validateForm()) return;
         const nameFilter = obtenerDatos();
+        console.log('nameFilterid', nameFilter.id);
         if (nameFilter.id) {
             console.log('nameFilterid', nameFilter.id);
             updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
@@ -98,6 +114,8 @@ export default async function tab5Action({
 
     elementModal.querySelector('.modalActionClose').addEventListener('click', () => {
         elementModal.style.display = 'none';
+        const nameFilter = obtenerDatos();
+        console.log('nameFilterid close', nameFilter);
         onCancel();
     });
 
@@ -112,7 +130,11 @@ export default async function tab5Action({
             saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         }
     });
-
+    window.señal = (valor) => {
+        console.log("Señal recibida, ", valor);
+        loadOptions(elementModal, files);
+        loadDataFromIndexedDBToForm(databases.MyDatabaseActionevent);
+    }
     function loadOptions(elementModal, files) {
         elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
             elementHTML.innerHTML = '';
@@ -151,9 +173,13 @@ export default async function tab5Action({
                 loadOptions(elementModal, files);
             }
             elementModal.style.display = 'flex';
-            elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
+            elementModal.querySelector('.modalActionAdd').style.display = 'inline-block';
+            elementModal.querySelector('.modalActionSave').style.display = 'none';
         },
         onUpdate: (datos) => {
+            if (datos) {
+                fillForm(datos);
+            }
             elementModal.style.display = 'flex';
             console.log('nameFilterid', datos.id);
             updateDataInIndexedDB(databases.MyDatabaseActionevent, datos);
@@ -165,4 +191,3 @@ export default async function tab5Action({
         },
     };
 }
-
