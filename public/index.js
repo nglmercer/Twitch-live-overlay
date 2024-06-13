@@ -2,15 +2,17 @@ import tab5Action from "./tab5-action/tab5-action.js";
 import tab5Event from "./tab5-event/tab5-event.js";
 import overlaymedia from "./overlay/overlaymedia.js";
 import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from './indexedDB.js';
-
+import { construirModal } from './tab5-event/tabevent.js';
+import { log } from './utils/console.js';
+    construirModal();
   function getoverlayEvents() {
     const overlayEvents = localStorage.getItem('existingFiles') || '[]';
     return JSON.parse(overlayEvents);
   }
   // Load events from localStorage and display them in the select
   const parsedOverlayEvents = getoverlayEvents();
-  console.log('parsedOverlayEvents', parsedOverlayEvents);
-
+  log.indexconsole('parsedOverlayEvents', parsedOverlayEvents);
+  log.indexconsole('parsedOverlayEvents', parsedOverlayEvents);
   function getDataText(data) {
       return data && data.select ? data.select.name : 'N/A';
   }
@@ -41,7 +43,7 @@ import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIn
         } else {
             textElement.textContent = `Evento: ${data.Evento.nombre}, Acción: ${data.Action.select?.evento || 'N/A'}`;
         }
-        console.log('createElementWithButtons', data);
+        log.indexconsole('createElementWithButtons', data);
     }
     container.appendChild(textElement);
 
@@ -75,7 +77,7 @@ import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIn
         } else {
             deleteDataFromIndexedDB(databases.eventsDB, data.id);
         }
-        console.log('deleteDataFromIndexedDB', data);
+        log.indexconsole('deleteDataFromIndexedDB', data);
     });
     container.appendChild(deleteButton);
 
@@ -83,9 +85,9 @@ import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIn
     const testButton = document.createElement('button');
     testButton.textContent = 'Probar';
     testButton.addEventListener('click', () => {
-        // eventmanager("test", data);
-        // eventmanager("Chat", "hola");
-        console.log('testButton', data);
+        eventmanager("test", data);
+        eventmanager("Chat", "hola");
+        log.indexconsole('testButton', data);
     });
     container.appendChild(testButton);
 
@@ -99,8 +101,8 @@ let objectModal2=null;
 objectModal = await tab5Action({
     elementContainer: document.getElementById('tab5-action'),
     files: parsedOverlayEvents,
-    onSave: (datos) => console.log('onSave', datos),
-    saveData: (datos) => console.log('saveData', datos),
+    onSave: (datos) => log.indexconsole('onSave', datos),
+    saveData: (datos) => log.indexconsole('saveData', datos),
     onCancel: () => {
 
     },
@@ -120,8 +122,8 @@ closeActionBtn.addEventListener('click', () => objectModal.close());
 const modal2 = await tab5Event({
     elementContainer: document.getElementById('tab5-event'),
     files: actionEvents,
-    onSave: (datos) => console.log('onSave', datos),
-    saveData: (datos) => console.log('saveData', datos),
+    onSave: (datos) => log.indexconsole('onSave', datos),
+    saveData: (datos) => log.indexconsole('saveData', datos),
     onCancel: () => {
     },
 });
@@ -138,7 +140,7 @@ if (openEventBtn && closeEventBtn) {
     ));
 }
 window.señal = (valor) => {
-    console.log("Señal recibida, ", valor);
+    log.indexconsole("Señal recibida, ", valor);
     loadDataFromIndexedDB123();
 }
 loadDataFromIndexedDB(databases.eventsDB, createElementWithButtons);
@@ -151,13 +153,13 @@ function loadDataFromIndexedDB123() {
 const testButton_actionevent = document.getElementById('testButton_actionevent');
 testButton_actionevent.addEventListener('click', () => {
   const testInput = document.getElementById('testInput');
-  console.log('testInput', testInput);
+  log.indexconsole('testInput', testInput);
   eventmanager(testInput.value, testInput.value);
 });
 
 // await window.api.sendOverlayData('play', { src: file.path, fileType: file.type, additionalData });
 async function videoexists(video) {
-    console.log('videoexists', video);
+    log.indexconsole('videoexists', video);
     if (video.check) {
         await window.api.createOverlayWindow();
         await window.api.sendOverlayData('play', { src: video.select.path, fileType: video.select.type, video });
@@ -165,7 +167,7 @@ async function videoexists(video) {
     return false;
 }
 async function audioexists(audio) {
-    console.log('audioexists', audio);
+    log.indexconsole('audioexists', audio);
     if (audio.check) {
         await window.api.createOverlayWindow();
         await window.api.sendOverlayData('play', { src: audio.select.path, fileType: audio.select.type, audio });
@@ -173,7 +175,7 @@ async function audioexists(audio) {
     return false;
 }
 async function imageexists(imagen) {
-    console.log('imageexists', imagen);
+    log.indexconsole('imageexists', imagen);
     if (imagen.check) {
         await window.api.createOverlayWindow();
         await window.api.sendOverlayData('play', { src: imagen.select.path, fileType: imagen.select.type, imagen });
@@ -189,18 +191,18 @@ export default async function eventmanager(event, tags) {
         eventsfind.forEach(eventname => {
             // let loweventname = eventname.toLowerCase();
             for (const [key, value] of Object.entries(eventname)) {
-            // console.log('key', key, 'value', value);
+            // log.indexconsole('key', key, 'value', value);
                 if (key === event) {
-                    // console.log('event', event, 'found');
+                    // log.indexconsole('event', event, 'found');
                     if (value.check) {
-                        // console.log('key', key, 'value', value);
+                        // log.indexconsole('key', key, 'value', value);
                         if (value.check) {
                             videoexists(eventname.Action.select.video);
                             audioexists(eventname.Action.select.audio);
                             imageexists(eventname.Action.select.imagen);
                         }
                     
-                                // console.log('event', "true or false in for key value",event.Action); // Safe access using optional chaining
+                                // log.indexconsole('event', "true or false in for key value",event.Action); // Safe access using optional chaining
 
                     }
                 }
@@ -213,4 +215,7 @@ export default async function eventmanager(event, tags) {
     } catch (error) {
         console.error('Error in eventmanager', error);
     }
+}
+function modalhtml(event, tags) {
+    
 }

@@ -110,9 +110,7 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
         nameFilter.id = !isNaN(id) ? id : null;
         return nameFilter;
     }
-    window.señal = (valor) => {
-        console.log("Señal recibida, ", valor);
-    }
+
     elementModal.querySelector('.modalEventClose').addEventListener('click', (event) => {
         elementModal.style.display = 'none';
         onCancel();
@@ -130,20 +128,12 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
             saveDataToIndexedDB(databases.eventsDB, nameFilter);
         }
     });
+
     window.señal = (valor) => {
         console.log("Señal recibida, ", valor);
-        elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
-            loadDataFromIndexedDB(databases.MyDatabaseActionevent, (dbConfig, record) => {
-                elementHTML.innerHTML = '';
-                const optionElement = document.createElement('option');
-                optionElement.textContent = record.evento ? record.evento.nombre : '';
-                optionElement.value = record.id || '';
-                elementHTML.appendChild(optionElement);
-                cacheAssign[record.id] = record;
-            });
-        });
-        
+
     };
+
     elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
         loadDataFromIndexedDB(databases.MyDatabaseActionevent, (dbConfig, record) => {
             elementHTML.innerHTML = '';
@@ -154,6 +144,7 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
             cacheAssign[record.id] = record;
         });
     });
+
     return {
         element: ModalElement,
         form: form,
@@ -172,3 +163,11 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
         },
     };
 }
+// export  async function updateEvet(evento, tags) {
+//     console.log("Señal recibida, ", evento);
+
+// }
+window.señal = (valor) => {
+    console.log("Señal recibida, ", valor);
+
+};
