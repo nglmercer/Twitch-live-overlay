@@ -253,29 +253,37 @@ function onSaveHandlerEvent(data) {
     }
     console.log('onSave event', data, data.evento);
 }
-let objectModal;
+let objectModal=null;
 let objectModal2;
 
 async function initializeModalAction() {
     try {
-        const modal = await tab5Action({
-            elementContainer: document.getElementById('tab5-action'),
-            files: parsedOverlayEvents,
-            onSave: (datos) => onSaveHandlerAction(datos),
-            saveData: (datos) => {
-                onSaveHandlerAction(datos);
-                console.log('saveData', datos);
-            },
-            onCancel: () => {
-                destroyModalAction();
-            },
-        });
-        objectModal = modal;
+        
+        // modal.Files = ["", "", ""]
+        // objectModal = {...modal}; asi se declara una copia de un objeto
+        if (objectModal==null){
+            objectModal = await tab5Action({
+                elementContainer: document.getElementById('tab5-action'),
+                files: parsedOverlayEvents,
+                onSave: (datos) => onSaveHandlerAction(datos),
+                saveData: (datos) => {
+                    onSaveHandlerAction(datos);
+                    console.log('saveData', datos);
+                },
+                onCancel: () => {
+                    destroyModalAction();
+                },
+            });
+        }
         const openActionBtn = document.getElementById('openaction');
         const closeActionBtn = document.getElementById('closeaction');
         if (openActionBtn && closeActionBtn) {
-            openActionBtn.addEventListener('click', objectModal.open);
-            closeActionBtn.addEventListener('click', objectModal.close);
+            // llamada 1
+            openActionBtn.addEventListener('click', ()=>{
+                const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+                objectModal.open(newFiles)
+            });
+            closeActionBtn.addEventListener('click', ()=>objectModal.close());
         }
         loadDataFromIndexedDB(databases.MyDatabaseActionevent);
     } catch (error) {
@@ -286,13 +294,16 @@ async function initializeModalAction() {
 function destroyModalAction() {
     if (objectModal) {
         objectModal.close();
-        objectModal = null;
     }
     const openActionBtn = document.getElementById('openaction');
     const closeActionBtn = document.getElementById('closeaction');
     if (openActionBtn && closeActionBtn) {
-        openActionBtn.removeEventListener('click', objectModal?.open);
-        closeActionBtn.removeEventListener('click', objectModal?.close);
+        // llamada 2
+        openActionBtn.removeEventListener('click', ()=>{
+            const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+            objectModal?.open(newFiles)
+        });
+        closeActionBtn.removeEventListener('click', ()=>{objectModal?.close()});
     }
 }
 
@@ -316,8 +327,13 @@ async function initializeModalEvent() {
         const openEventBtn = document.getElementById('openevent');
         const closeEventBtn = document.getElementById('closeevent');
         if (openEventBtn && closeEventBtn) {
-            openEventBtn.addEventListener('click', objectModal2.open);
-            closeEventBtn.addEventListener('click', objectModal2.close);
+            const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+            // llamada 3
+            openEventBtn.addEventListener('click', ()=>{
+                const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+                objectModal2.open(newFiles)
+            });
+            closeEventBtn.addEventListener('click', ()=>objectModal2.close());
         }
         loadDataFromIndexedDB(databases.eventsDB);
     } catch (error) {
@@ -333,7 +349,12 @@ function destroyModalEvent() {
     const openEventBtn = document.getElementById('openevent');
     const closeEventBtn = document.getElementById('closeevent');
     if (openEventBtn && closeEventBtn) {
-        openEventBtn.removeEventListener('click', objectModal2?.open);
+        const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+        // llamada 4
+        openEventBtn.removeEventListener('click', ()=>{
+            const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+            objectModal2?.open(newFiles)
+        });
         closeEventBtn.removeEventListener('click', objectModal2?.close);
     }
 }
@@ -357,7 +378,12 @@ overlaymedia({
     closereturn: () => console.log('closereturn')
 }).then((modal) => {
     overlayObject = modal;
-    document.getElementById('openoverlay').addEventListener('click', overlayObject.open);
+    const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+    // llamada 5
+    document.getElementById('openoverlay').addEventListener('click', ()=>{
+        const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
+        overlayObject.open(newFiles)
+    });
     document.getElementById('closeoverlay').addEventListener('click', overlayObject.close);
     // Cargar datos desde IndexedDB al iniciar
 });

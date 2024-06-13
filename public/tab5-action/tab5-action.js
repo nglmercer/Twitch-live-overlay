@@ -143,21 +143,34 @@ export default async function tab5Action({
         saveData(nameFilter);
     });
 
-    elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
-        files.forEach(file => {
-            const optionElement = document.createElement('option');
-            optionElement.textContent = file.name;
-            optionElement.value = file.path;
-            elementHTML.appendChild(optionElement);
-            cacheAssign[file.path] = file;
+    function loadOptions(elementModal, files) {
+        elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
+            elementHTML.innerHTML = '';
+            files.forEach(file => {
+                const optionElement = document.createElement('option');
+                optionElement.textContent = file.name;
+                optionElement.value = file.path;
+                elementHTML.appendChild(optionElement);
+                cacheAssign[file.path] = file;
+            });
         });
-    });
+    }
+    loadOptions(elementModal, files);
 
     return {
         element: ModalElement,
         form: form,
         close: () => elementModal.style.display = 'none',
-        open: () => {
+        open: (setNewFiles=null) => {
+            if (setNewFiles!==null) {
+                try {
+                    loadOptions(elementModal, setNewFiles);
+                } catch (error) {
+                    console.log('Error loading options:', error, " el evento del cual se estarciendo invocado no cumple con la sintaxis de la lista de archivos JSON");
+                }
+            } else {
+                loadOptions(elementModal, files);
+            }
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },
@@ -168,6 +181,6 @@ export default async function tab5Action({
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
-        }
+        },
     };
 }
