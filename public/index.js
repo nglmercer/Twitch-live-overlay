@@ -22,10 +22,12 @@ import overlaymedia from "./overlay/overlaymedia.js";
         console.error('Database error:', event.target.errorCode);
     };
 
-
+  function getoverlayEvents() {
+    const overlayEvents = localStorage.getItem('existingFiles') || '[]';
+    return JSON.parse(overlayEvents);
+  }
   // Load events from localStorage and display them in the select
-  const overlayevents = localStorage.getItem('existingFiles') || '[]';
-  const parsedOverlayEvents = JSON.parse(overlayevents);
+  const parsedOverlayEvents = getoverlayEvents();
   console.log('parsedOverlayEvents', parsedOverlayEvents);
 
 
@@ -327,7 +329,6 @@ async function initializeModalEvent() {
         const openEventBtn = document.getElementById('openevent');
         const closeEventBtn = document.getElementById('closeevent');
         if (openEventBtn && closeEventBtn) {
-            const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
             // llamada 3
             openEventBtn.addEventListener('click', ()=>{
                 const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
@@ -349,7 +350,6 @@ function destroyModalEvent() {
     const openEventBtn = document.getElementById('openevent');
     const closeEventBtn = document.getElementById('closeevent');
     if (openEventBtn && closeEventBtn) {
-        const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');
         // llamada 4
         openEventBtn.removeEventListener('click', ()=>{
             const newFiles = JSON.parse(localStorage.getItem('existingFiles') || '[]');

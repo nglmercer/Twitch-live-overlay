@@ -94,6 +94,7 @@ background-color: transparent; /* Fondo transparente */
     font-weight: 700;
     color: #000000;
     text-align: center;
+    overflow: auto;
     width: 100%;
     height: 100%;
   }
@@ -107,7 +108,11 @@ background-color: transparent; /* Fondo transparente */
     padding: 5px;
     margin: 5px;
 }
-
+.file-item {
+    justify-content: center;
+    max-width: 500px;
+    max-height: 500px;
+  }
 .tabs {
     display: flex;
     flex-wrap: wrap;
