@@ -177,28 +177,7 @@ function startListening() {
     });
   }
 }
-function eventmanager(event, tags) {
-    switch (event) {
-        case "chat":
-            console.log("chat", tags);
-            break;
-        case "bits":
-            console.log("bits", tags);
-            break;
-        case "sub":
-            console.log("sub", tags);
-            break;
-        case "resub":
-            console.log("resub", tags);
-            break;
-        case "logon":
-            console.log("logon", tags);
-            break;
-        default:
-            console.log("event", event, "no se ha registrado",tags);
-            break;
-    }
-}
+
 
 function manageEvent(tags, message, userstate) {
   new TTS(message, tags, userstate);

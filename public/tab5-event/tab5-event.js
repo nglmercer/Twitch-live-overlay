@@ -1,4 +1,4 @@
-export default async function tab5Action({ elementContainer, files = [], onSave = () => { }, saveData = () => { }, onCancel = () => { }, separator = "_" }) {
+export default async function tab5Action({ elementContainer, files = [], onSave = () => { },onUpdate = () => { }, saveData = () => { }, onCancel = () => { }, separator = "_" }) {
     const ModalElement = document.createElement('div');
     const idModal = `ModalElement${Math.floor(Math.random() * 1000)}`;
     console.log('files', files);
@@ -13,7 +13,7 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
     elementModal.querySelector('.tab5-event').addEventListener('submit', event => {
         event.preventDefault();
     });
-
+    const form = elementModal.querySelector('.tab5-event');
     console.log('elementModal', elementModal.querySelector('.tab5-event'));
     console.log('idmodal', idModal);
     let errorMessage = document.createElement('div');
@@ -168,24 +168,6 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         });
     }
     elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
-        // files es un array files[Array(5)]0:Array(5)0:"chat"1:"bits"2:"sub"3:"resub"4:"logon"length:5 entonces para cada elemento de files
-        // files.forEach(data => {
-        //     const optionElement = document.createElement('option');
-        //     optionElement.textContent = data;
-        //     optionElement.value = data;
-        //     elementHTML.appendChild(optionElement);
-        //     cacheAssign[data] = data;
-        //     // if (Array.isArray(data) && data.length > 0) {
-        //     //     const file = data[0];
-        //     //     const optionElement = document.createElement('option');
-        //     //     optionElement.textContent = file;
-        //     //     optionElement.value = file;
-        //     //     elementHTML.appendChild(optionElement);
-        //     //     cacheAssign[file] = file;
-        //     // } else {
-        //     //     console.error('data is not a valid array or is empty:', data);
-        //     // }
-        // });
         function loadDataFromIndexedDB(dbConfig) {
 
         openDatabase(dbConfig).then((db) => {
@@ -203,6 +185,7 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
                     optionElement.value = record;
                     elementHTML.appendChild(optionElement);
                     cacheAssign[record] = record;
+                    
                 });
             };
             request.onerror = (event) => {
@@ -214,9 +197,8 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
     }
     loadDataFromIndexedDB(databases.MyDatabaseActionevent);
     });
-    const clearForm = () => {
-        const formulario = document.querySelector('.tab5-event');
-        for (const elemento of formulario.elements) {
+    function clearForm() {
+        for (const elemento of form.elements) {
             if (elemento.type === 'checkbox') {
                 elemento.checked = false;
             } else if (elemento.type === 'select-one') {
@@ -224,36 +206,30 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
             } else {
                 elemento.value = "";
             }
+            console.log('elemento clearForm', elemento);
         }
-    };
+    }
     return {
         element: ModalElement,
-        form: elementModal.querySelector('.tab5-event'),
+        form: form,
         close: () => elementModal.style.display = 'none',
-        open: (datos) => {
-            if (datos) {
-                fillForm(datos); // Llenar el formulario con los datos actuales
-            } else {
-                clearForm(); // Limpiar el formulario si no hay datos
-            }
+        open: () => {
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalEventSave').style.display = 'inline-block';
-
+            clearForm();
         },
         onUpdate: (datos) => {
             if (datos) {
                 fillForm(datos); // Llenar el formulario con los datos actuales
-            } else {
-                clearForm(); // Limpiar el formulario si no hay datos
             }
             elementModal.style.display = 'flex';
     
             // Actualizar datos con la función saveData
-            saveData(datos);
+            // saveData(datos);
     
             // Mostrar botón Guardar y ocultar botones Agregar y Cerrar
-            elementModal.querySelector('.modalActionAdd').style.display = 'none';
-            elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
+            elementModal.querySelector('.modalEventAdd').style.display = 'none';
+            elementModal.querySelector('.modalEventSave').style.display = 'inline-block';
         },
     };
 }

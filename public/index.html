@@ -355,122 +355,34 @@ Puede vincular estas acciones a los eventos a continuación.
     </div>
     <div class="OverlayEvent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="OverlayEvent">
 
-      <div id="OverlayEventcontent"></div>
     <div class="actionevent grid w-full border-2 p-2 m-2 border-slate-600 gap-4 mx-4 rounded-md" id="actionevent">
-      <div class="grid grid-cols-3 gap-4">
-        <input type="text" id="actioneventName" placeholder="Action Name" class="form-control" />
-        <select id="actionselect" class="form-control"></select>
-        <select id="eventselect" class="form-control"></select>
-
+      <div id="testsection">
+        <input type="text" id="testInput" placeholder="Event Name" />
+        <button id="testButton_actionevent" class="btn btn-primary">Test</button>
       </div>
-      <button id="testactioneventselect">test action event</button>
-      <input type="text" id="OverlayEventName" placeholder="Event Name" class="form-control" />
-      <input type="text" id="OverlayEventTrigger" placeholder="Trigger" class="form-control" />
-      <select id="OverlayEventActions" class="form-control"></select>
-      <button id="OverlayEventAdd" class="btn btn-primary">Add Event</button>
-      <div>
-        <select name="eventselects" id="eventselects"></select>
 
-      </div>
           <!-- Modulo tab 5 Apartado Modal, tab5 Action -->
     <div id="tab5-action"></div>
     <!-- Modulo tab 5 Apartado Modal, tab5 Action -->
     
 
-    <button id="openaction" >open</button>
+    <button id="openaction" >openaction</button>
     <button id="closeaction" >close</button>
     <div id="tab5-event"></div> 
-    <button id="openevent" >open</button>
+    <button id="openevent" >openevent</button>
     <button id="closeevent" >close</button>
+    <div id="tab5overlay" ></div>
+    <button id="openoverlay" >openoverlay</button>
+    <button id="closeoverlay" >closeoverlay</button>
     <script type="module" src="./index.js"></script>
     </div>
     <!-- creamos un script donde al estar checked se muestran mas espacios y elementos para modalactions -->
     </div>
     <script>
-      
-      const modalactionsName = document.getElementById('modalactionsName');
-      const modalactionsCheckbox1 = document.getElementById('modalactionsCheckbox1');
-      const modalactionsCheckbox2 = document.getElementById('modalactionsCheckbox2');
-      const modalactionsCheckbox3 = document.getElementById('modalactionsCheckbox3');
-      const modalactionsAdd = document.getElementById('modalactionsAdd');
-      const modalactions = document.getElementById('modalactions');
-
-    // activeoncheckbox se muestran los espacios y elementos para modalactions
-      const activeoncheckbox1 = document.getElementById('activeoncheckbox1');
-      const activeoncheckbox2 = document.getElementById('activeoncheckbox2');
-      const activeoncheckbox3 = document.getElementById('activeoncheckbox3');
-
-    // data que esta detro de checkboxstatus
-      const selectedVideo = document.getElementById('modalvideoselect');
-      const selectedAudio = document.getElementById('modalaudioselect');
-      const selectedImage = document.getElementById('modalimageselect');
-      const videoVolumen = document.getElementById('videovolumen');
-      const audioVolumen = document.getElementById('audiovolumen');
-      const imageDuration = document.getElementById('imageduration');
-
-      function testModalactions(checkbox) {
-        console.log('testModalactions', checkbox);
-        if (checkbox){
-          console.log('checkbox', checkbox);
-          if (checkbox.modalactionsCheckbox1) {
-            console.log('modalactionsCheckbox1', selectedVideo.value, videoVolumen.value);
-
-          }
-          if (checkbox.modalactionsCheckbox2) {
-            console.log('modalactionsCheckbox2', selectedAudio.value, audioVolumen.value);
-
-          }
-          if (checkbox.modalactionsCheckbox3) {
-            console.log('modalactionsCheckbox3', selectedImage.value, imageDuration.value);
-
-          }
-        }
-      }
-
-
-
-      function mostrarmasopciones(checkbox, activeoncheckbox) {
-        console.log('mostrarmasopciones', checkbox, activeoncheckbox);
-        if (checkbox) {
-          activeoncheckbox.classList.add('grid2cols');
-          activeoncheckbox.classList.remove('display-none');
-        }
-         else {
-          activeoncheckbox.classList.add('display-none');
-          activeoncheckbox.classList.remove('grid2cols');
-        }
-      }
-
       // funciones de testeo para acciones y eventos
       let actionEvents = ['chat', 'bits', 'sub', 'resub', 'logon'];
       const actionselect = document.getElementById('actionselect');
-      const eventselect = document.getElementById('eventselect');
-      const actioneventName = document.getElementById('actioneventName');
-      const testactioneventselect = document.getElementById('testactioneventselect');
-      testactioneventselect.addEventListener('click', () => {
-        testActionEvent();
-      });
-      for (const event of actionEvents) {
-        appendactionevent(event);
-        //console.log('appendactionevent', event);
-      }
-      function appendactionevent(event) {
-        // hacemos el append de actionEvents usando el array
-        eventselect.options.add(new Option(event, event));
-      }
-      let numerox = 1;
-      if (numerox === 0) {
-        console.log('numerox', numerox);
-      } else if (numerox === 1) {
-        console.log('numerox', numerox);
-      }
-      function testActionEvent() {
-        const action = actionselect.value;
-        const event = eventselect.value;
-        console.log('this is a functionActionEvent action', action, 'event', event, 'actioneventName', actioneventName.value);
-        switchActionEvent(action, event);
 
-      }
       function switchActionEvent(action, event) {
         switch (action) {
           case 'chat':

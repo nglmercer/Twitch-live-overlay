@@ -1,26 +1,48 @@
-export default async function tab5Action({ elementContainer, files = [], onSave = () => { }, saveData = () => { }, onCancel = () => { }, separator = "_" }) {
+export default async function tab5Action({
+    elementContainer,
+    files = [],
+    onSave = () => {},
+    onUpdate = () => {},
+    saveData = () => {},
+    onCancel = () => {},
+    separator = "_"
+}) {
     const ModalElement = document.createElement('div');
     const idModal = `ModalElement${Math.floor(Math.random() * 1000)}`;
     const cacheAssign = {};
+
     ModalElement.className = 'modalElement';
     ModalElement.id = idModal;
     ModalElement.innerHTML = await (await fetch('./tab5-action/tab5-action.html')).text();
     elementContainer.parentNode.insertBefore(ModalElement, elementContainer.nextSibling);
     elementContainer.remove();
+
     const elementModal = document.getElementById(idModal);
     elementModal.style.display = 'none';
-    elementModal.querySelector('.tab5-action').addEventListener('submit', event => {
+
+    const form = elementModal.querySelector('.tab5-action');
+    form.addEventListener('submit', event => {
         event.preventDefault();
     });
-    let errorMessage = document.createElement('div');
-    errorMessage.className = 'error-message';
-    errorMessage.style.color = 'red';
-    errorMessage.style.display = 'none';
-    errorMessage.textContent = 'El nombre es obligatorio.';
+
+    let errorMessage = createErrorMessage();
     elementModal.appendChild(errorMessage);
+
+    setTimeout(() => {
+        errorMessage.style.display = 'none';
+    }, 5000);
+
+    function createErrorMessage() {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = 'El nombre es obligatorio.';
+        return errorDiv;
+    }
+
     function validateForm() {
-        const formulario = document.querySelector('.tab5-action');
-        const nombre = formulario.elements.namedItem('evento_nombre');
+        const nombre = form.elements.namedItem('evento_nombre');
         if (!nombre || !nombre.value.trim()) {
             errorMessage.style.display = 'block';
             return false;
@@ -28,71 +50,61 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         errorMessage.style.display = 'none';
         return true;
     }
-    setTimeout(() => {
-        errorMessage.style.display = 'none';
-    }, 5000);
-    // Función para llenar el formulario con los datos actuales
-    const fillForm = (datos) => {
-        const formulario = document.querySelector('.tab5-action');
+
+    function fillForm(datos) {
         for (const [key, value] of Object.entries(datos)) {
-            console.log('datos', datos);
-
-            // console.log('Buscando elemento:', key); // Añadido
-            var keycheck = `${key}_check`;
-            var keynombre = `${key}_nombre`;
-            const element = formulario.elements.namedItem(keycheck);
-            const element1 = formulario.elements.namedItem(keynombre);
-            const idelement = formulario.elements.namedItem('id');
-            // console.log('Elemento encontrado 0:', formulario.elements); // Añadido
+            const keyCheck = `${key}_check`;
+            const keyNombre = `${key}_nombre`;
+            const keyselect = `${key}_select`;
+            const element = form.elements.namedItem(keyCheck);
+            const element1 = form.elements.namedItem(keyNombre);
+            const element2 = form.elements.namedItem(keyselect);
+            const idElement = form.elements.namedItem('id');
+            console.log(element2)
             if (element) {
+                // console.log('key', key, 'value', value);
+                // console.log('element', element);
                 if (element.type === 'checkbox') {
-                    element.checked = value;
-                } else if (element.type === 'select-one') {
-                    element.value = value.path || value; // No asumimos que value es un objeto con path
-                } else{
-                    element.value = value;
+                    element.checked = value.check;
                 }
-            } else {
-                console.warn(`Elemento con nombre ${key} no encontrado en el formulario.`);
-            }
-            if (element1) {
+            } else if (element1) {
+                // console.log('key', key, 'value', value);
+                // console.log('element1', element1);
                 element1.value = value.nombre || value;
+            } 
+            else if (idElement) {
+                idElement.value = datos.id;
+            } else if (element2) {
+                console.log('key', key, 'value', value);
+                console.log('element2', element2);
+                element2.value = value.select.name;
             } else {
                 console.warn(`Elemento con nombre ${key} no encontrado en el formulario.`);
             }
-            if (idelement) {
-                idelement.value = datos.id
-                console.log('id', datos.id);
+        }
+    }
+
+    function clearForm() {
+        for (const elemento of form.elements) {
+            if (elemento.type === 'checkbox') {
+                elemento.checked = false;
+            } else if (elemento.type === 'select-one') {
+                elemento.value = "";
+            } else {
+                elemento.value = "";
             }
         }
-    };
+    }
 
-    elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
-        if (!validateForm()) {
-            return;
-        }
-        const nameFilter = obtenerDatos();
-
-        // Llamar a onSave o saveData según corresponda
-        if (nameFilter.id) {
-            console.log('nameFilterid', nameFilter.id);
-            saveData(nameFilter);
-        } else {
-            onSave(nameFilter);
-        }
-
-        elementModal.style.display = 'none';
-    });
     function obtenerDatos() {
-        const formulario = document.querySelector('.tab5-action');
         const datosFormulario = new Map();
         const nameFilter = {};
-        for (const elemento of formulario.elements) {
+        for (const elemento of form.elements) {
             if (elemento.name) {
                 if (elemento.type === 'checkbox') {
                     datosFormulario.set(elemento.name, elemento.checked);
                 } else if (elemento.type === 'select-one') {
-                    datosFormulario.set(elemento.name, cacheAssign[elemento.value] || elemento.value); // Usar cacheAssign si está disponible
+                    datosFormulario.set(elemento.name, cacheAssign[elemento.value] || elemento.value);
                 } else {
                     datosFormulario.set(elemento.name, elemento.value);
                 }
@@ -101,28 +113,39 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         }
         const retornoDatos = Object.fromEntries(datosFormulario);
         Object.keys(nameFilter).forEach((key) => {
-            const KeysFilter = Object.fromEntries(
+            const keysFilter = Object.fromEntries(
                 Object.entries(retornoDatos).filter(([clave, valor]) => clave.includes(key + separator))
             );
-            const ResultSpited = {};
-            Object.entries(KeysFilter).forEach(([clave, valor]) => {
-                ResultSpited[clave.split(separator)[1]] = valor;
+            const resultSplitted = {};
+            Object.entries(keysFilter).forEach(([clave, valor]) => {
+                resultSplitted[clave.split(separator)[1]] = valor;
             });
-            nameFilter[key] = ResultSpited;
+            nameFilter[key] = resultSplitted;
         });
+        const idValue = form.elements.namedItem('id').value;
+        nameFilter.id = parseInt(idValue, 10) || null;
 
-        // Incluir el ID si existe
-        if (formulario.elements.namedItem('id')) {
-            nameFilter.id = parseInt(formulario.elements.namedItem('id').value);
-        }
-        elementModal.style.display = 'none';
-        console.log('nameFilter', nameFilter, datosFormulario,"datosFormulario");
         return nameFilter;
     }
+
+    elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
+        if (!validateForm()) {
+            return;
+        }
+        const nameFilter = obtenerDatos();
+        if (nameFilter.id) {
+            saveData(nameFilter);
+        } else {
+            onSave(nameFilter);
+        }
+        elementModal.style.display = 'none';
+    });
+
     elementModal.querySelector('.modalActionClose').addEventListener('click', () => {
         elementModal.style.display = 'none';
         onCancel();
     });
+
     elementModal.querySelector('.modalActionSave').addEventListener('click', () => {
         if (!validateForm()) {
             return;
@@ -131,9 +154,9 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         elementModal.style.display = 'none';
         saveData(nameFilter);
     });
+
     elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
         files.forEach(file => {
-            console.log('file', file);
             const optionElement = document.createElement('option');
             optionElement.textContent = file.name;
             optionElement.value = file.path;
@@ -144,27 +167,20 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
 
     return {
         element: ModalElement,
-        form: elementModal.querySelector('.tab5-action'),
+        form: form,
         close: () => elementModal.style.display = 'none',
-        open: (datos) => {
-            if (datos) {
-                fillForm(datos); // Llenar el formulario con los datos actuales
-                elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
-            }
+        open: () => {
             elementModal.style.display = 'flex';
+            clearForm();
+            elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },
         onUpdate: (datos) => {
             if (datos) {
-                fillForm(datos); // Llenar el formulario con los datos actuales
+                fillForm(datos);
             }
             elementModal.style.display = 'flex';
-    
-            // Actualizar datos con la función saveData
-            saveData(datos);
-    
-            // Mostrar botón Guardar y ocultar botones Agregar y Cerrar
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
-        },
+        }
     };
 }

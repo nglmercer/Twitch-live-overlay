@@ -4,128 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: rgba(0, 0, 255, 0.13);
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .overlay {
+            position: absolute;
+        }
+    </style>
 </head>
-<body style="margin: 0; background-color: rgba(0, 0, 255, 0.13); width: auto; height: auto; overflow: hidden;">
+<body>
     <div id="container"></div>
     <script>
+        const container = document.getElementById('container');
+
+        // Función para generar una posición aleatoria
+        function randomPosition() {
+            const x = Math.floor(Math.random() * (window.innerWidth - 200));
+            const y = Math.floor(Math.random() * (window.innerHeight - 200));
+            return { x, y };
+        }
+
+        // Función para barajar un array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Crear una matriz de posiciones predefinida
+        let positions = [];
+        for (let x = 8; x <= 88; x += 4) {
+            for (let y = 8; y <= 88; y += 4) {
+                positions.push({ x, y });
+            }
+        }
+
+        // Barajar el array de posiciones
+        positions = shuffleArray(positions);
+
+        // Función que devuelve una posición aleatoria o una posición proporcionada
+        function getPosition(existingPosition = null) {
+            if (existingPosition) {
+                return existingPosition;
+            }
+            return randomPosition();
+        }
+
+        // Función para crear y añadir un video
+        function addVideo(data, position) {
+            const video = document.createElement('video');
+            video.style.width = 'auto';
+            video.style.height = '400px';
+            video.autoplay = true;
+
+            const source = document.createElement('source');
+            source.src = data.src;
+            source.type = 'video/mp4';
+
+            video.appendChild(source);
+            setPosition(video, position);
+            container.appendChild(video);
+
+            video.addEventListener('ended', () => {
+                container.removeChild(video);
+            });
+        }
+
+        // Función para crear y añadir una imagen
+        function addImage(data, position) {
+            const img = document.createElement('img');
+            img.src = data.src;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '400px';
+
+            setPosition(img, position);
+            container.appendChild(img);
+
+            setTimeout(() => {
+                container.removeChild(img);
+            }, 5000);
+        }
+
+        // Función para establecer la posición de un elemento
+        function setPosition(element, position) {
+            const { x, y } = position;
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+            element.classList.add('overlay');
+        }
+
+        // Función para manejar mensajes recibidos
+        function handleMessage(event) {
+            const { eventType, data } = event;
+            console.log('Received message from parent window:', event);
+            console.log('eventType:', eventType);
+            console.log('data:', data);
+
+            if (eventType === 'play') {
+                let position = getPosition(data.position);
+
+                if (data.src.endsWith('.mp4') || data.fileType.startsWith('video/')) {
+                    addVideo(data, position);
+                } else if (data.src.endsWith('.png') || data.fileType.startsWith('image/')) {
+                    addImage(data, position);
+                } else {
+                    const div = document.createElement('div');
+                    div.textContent = 'Unsupported file type';
+                    setPosition(div, position);
+                    container.appendChild(div);
+
+                    setTimeout(() => {
+                        container.removeChild(div);
+                    }, 5000);
+                }
+                console.log('Additional data:', data.additionalData);
+            }
+        }
+
         window.api.onShowMessage((event, message) => {
             console.log(message);
         });
-        
+
         window.api.onOverlayEvent((event, eventdata) => {
             const { eventType, data } = eventdata;
             handleMessage(eventdata);
             console.log(eventdata);
             console.log('Overlay event received:', eventType);
             console.log('data:', data);
-            // Aquí puedes manejar los datos recibidos y actualizar el overlay en consecuencia
         });
-        
-            const container = document.getElementById('container');
 
-            function handleMessage(event) {
-                const { eventType, data } = event;//event.data;
-                console.log('Received message from parent window:',event);
-                console.log('eventType:', eventType);
-                console.log('data:', data);//indexData);
-                
-                if (eventType === 'play') {
-                    if (!data.fileType){
-                        const div = document.createElement('div');
-                        div.textContent = 'Unsupported file type';
-                        container.appendChild(div);
-                        console.log('Unsupported file type');
-                        setTimeout(() => {
-                            container.removeChild(div);
-                            console.log('Image removed');
-                        }, 5000);
-                    }
-                    else if (data.src.endsWith('.mp4') || data.fileType.startsWith('video/')) {
-                        const video = document.createElement('video');
-                        video.style.width = 'auto';
-                        video.style.height = '400px';
-                        video.autoplay = true;
-
-                        const source = document.createElement('source');
-                        source.src = data.src;
-                        source.type = 'video/mp4';
-                        
-                        video.appendChild(source);
-                        container.appendChild(video);
-                        console.log('Video added');
-
-                        // Eliminar el video después de que termine la reproducción
-                        video.addEventListener('ended', () => {
-                            container.removeChild(video);
-                            console.log('Video removed');
-                        });
-                    } else if (data.src.endsWith('.png') || data.fileType.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = data.src;
-                        img.style.maxWidth = '100%';
-                        img.style.maxHeight = '400px';
-                        container.appendChild(img);
-                        console.log('Image added');
-
-                        // Eliminar la imagen después de 5 segundos
-                        setTimeout(() => {
-                            container.removeChild(img);
-                            console.log('Image removed');
-                        }, 5000);
-                    } else {
-                        const div = document.createElement('div');
-                        div.textContent = 'Unsupported file type';
-                        container.appendChild(div);
-                        console.log('Unsupported file type');
-                        setTimeout(() => {
-                            container.removeChild(div);
-                            console.log('Image removed');
-                        }, 5000);
-                    }
-                    console.log('Additional data:', data.additionalData);
-                }
-            }
-            function randomPosition() {
-                const x = Math.floor(Math.random() * (window.innerWidth - 200));
-                const y = Math.floor(Math.random() * (window.innerHeight - 200));
-                return { x, y };
-            }
-            function randomSize() {
-                const width = Math.floor(Math.random() * (window.innerWidth - 200));
-                const height = Math.floor(Math.random() * (window.innerHeight - 200));
-                return { width, height };
-            }
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-              }
-              
-              // Crear una matriz de posiciones predefinida
-              let positions = [];
-              for (let x = 8; x <= 88; x += 4) {
-                for (let y = 8; y <= 88; y += 4) {
-                    positions.push({ x, y });
-                }
-              }
-              
-              // Barajar el array de posiciones
-              positions = shuffleArray(positions);
-            function overlayinrandompositionordefault(overlayposition) {
-                defaultposition = 50;
-                if (overlayposition) {
-                    const { x, y } = overlayposition;
-                } else if (overlayposition => 90 && overlayposition <= 10) {
-                    overlayposition = positions
-                } else{
-                    const {x, y} = defaultposition;
-                }
-                return overlayposition;
-            }
-               
-            window.addEventListener('message', handleMessage);
+        window.addEventListener('message', handleMessage);
     </script>
 </body>
 </html>

@@ -1,9 +1,8 @@
 import tab5Action from "./tab5-action/tab5-action.js";
 import tab5Event from "./tab5-event/tab5-event.js";
-
+import overlaymedia from "./overlay/overlaymedia.js";
 document.addEventListener('DOMContentLoaded', () => {
     let db;
-    let editingEventId = null;
     
     // Open IndexedDB
     const request = indexedDB.open('eventsDB', 1);
@@ -18,33 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     request.onsuccess = (event) => {
         db = event.target.result;
-        loadEvents();
     };
 
     request.onerror = (event) => {
         console.error('Database error:', event.target.errorCode);
     };
 
-    const actionselect = document.getElementById('actionselect');
-
-  const overlayEventAdd = document.getElementById('OverlayEventAdd');
-  const overlayEventName = document.getElementById('OverlayEventName');
-  const overlayEventTrigger = document.getElementById('OverlayEventTrigger');
-  const overlayEventActions = document.getElementById('OverlayEventActions');
-  const overlayEventcontent = document.getElementById('OverlayEventcontent');
 
   // Load events from localStorage and display them in the select
   const overlayevents = localStorage.getItem('existingFiles') || '[]';
   const parsedOverlayEvents = JSON.parse(overlayevents);
   console.log('parsedOverlayEvents', parsedOverlayEvents);
-  function loadLocalStorageEvents() {
-      parsedOverlayEvents.forEach(file => {
-          const option = document.createElement('option');
-          option.value = file.name;
-          option.textContent = file.name;
-          overlayEventActions.appendChild(option);
-      });
-  }
+
 
   const databases = {
       eventsDB: { name: 'eventsDB', version: 1, store: 'events' },
@@ -85,9 +69,13 @@ function saveDataToIndexedDB(dbConfig, data) {
             data.id = event.target.result;
             console.log('data.id', data.id);
             createElementWithButtons(dbConfig, data);
+            localStorage.setItem(dbConfig, JSON.stringify(data));
+            console.log('localStorage', localStorage.getItem(dbConfig));
         };
         request.onerror = (event) => {
             console.error('Error saving data to IndexedDB', event.target.error);
+            localStorage.setItem(dbConfig, []);
+            console.log('localStorage', localStorage.getItem(dbConfig));
         };
     }).catch((error) => {
         console.error('Error opening IndexedDB', error);
@@ -147,7 +135,31 @@ function loadDataFromIndexedDB(dbConfig) {
         console.error('Error opening IndexedDB', error);
     });
 }
-function createElementWithButtons(dbConfig, data) {
+async function getDataFromIndexedDB(dbConfig) {
+    try {
+        const db = await openDatabase(dbConfig);
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([dbConfig.store], 'readonly');
+            const objectStore = transaction.objectStore(dbConfig.store);
+            const request = objectStore.getAll();
+            
+            request.onsuccess = (event) => {
+                const allRecords = event.target.result;
+                resolve(allRecords);
+            };
+            
+            request.onerror = (event) => {
+                console.error('Error loading data from IndexedDB', event.target.error);
+                reject(event.target.error);
+            };
+        });
+    } catch (error) {
+        console.error('Error opening database', error);
+        throw error;
+    }
+}
+
+async function createElementWithButtons(dbConfig, data) {
     const container = document.createElement('div');
     container.className = 'data-container';
     container.dataset.id = data.id;
@@ -166,11 +178,21 @@ function createElementWithButtons(dbConfig, data) {
 
     const editButton = document.createElement('button');
     editButton.textContent = 'Editar';
-    editButton.addEventListener('click', () => {
+    editButton.addEventListener('click', async () => {
         if (!data.Action) {
-            objectModal.open(data);
+            await initializeModalAction();
+            if (objectModal) {
+                objectModal.onUpdate(data);
+            } else {
+                console.error('objectModal is null');
+            }
         } else {
-            objectModal2.open(data);
+            await initializeModalEvent();
+            if (objectModal2) {
+                objectModal2.onUpdate(data);
+            } else {
+                console.error('objectModal2 is null');
+            }
         }
     });
     container.appendChild(editButton);
@@ -187,14 +209,13 @@ function createElementWithButtons(dbConfig, data) {
     const testButton = document.createElement('button');
     testButton.textContent = 'Probar';
     testButton.addEventListener('click', () => {
-        console.log('Probando datos:', data);
         eventmanager("test", data);
+        eventmanager("Chat", "hola");
     });
     container.appendChild(testButton);
 
     document.body.appendChild(container);
 }
-
 
 function onSaveHandlerAction(data) {
     const id = data.id ? data.id : undefined;
@@ -233,185 +254,199 @@ function onSaveHandlerEvent(data) {
     }
     console.log('onSave event', data, data.evento);
 }
-
-// Llamada a la función onSaveHandler en el evento onSave
 let objectModal;
-tab5Action({
-    elementContainer: document.getElementById('tab5-action'), 
-    files: 
-        parsedOverlayEvents,
-    
-    onSave: (datos) => onSaveHandlerAction(datos),
-    saveData: (datos) => {onSaveHandlerAction(datos),//{updateDataInIndexedDB(databases.MyDatabaseActionevent, datos),
-    console.log('saveData', datos)},
-    onCancel: () => {
-        // Lógica para el evento onCancel
-    },
-}).then((modal) => {
-    objectModal = modal;
-    document.getElementById('openaction').addEventListener('click', objectModal.open);
-    document.getElementById('closeaction').addEventListener('click', objectModal.close);
-    // Cargar datos desde IndexedDB al iniciar
-});
 let objectModal2;
-tab5Event({
-    elementContainer: document.getElementById('tab5-event'), 
-    files: actionEvents,
-    onSave: (datos) => {
-        onSaveHandlerEvent(datos);
-    },
-    saveData: (datos) => {onSaveHandlerEvent(datos),//{updateDataInIndexedDB(databases.MyDatabaseActionevent, datos),
-    console.log('saveData', datos)},
-    onCancel: () => {
-        // Lógica para el evento onCancel
-    },
-}).then((modal2) => {
-    objectModal2 = modal2;
-    document.getElementById('openevent').addEventListener('click', objectModal2.open);
-    document.getElementById('closeevent').addEventListener('click', objectModal2.close);
+
+async function initializeModalAction() {
+    try {
+        const modal = await tab5Action({
+            elementContainer: document.getElementById('tab5-action'),
+            files: parsedOverlayEvents,
+            onSave: (datos) => onSaveHandlerAction(datos),
+            saveData: (datos) => {
+                onSaveHandlerAction(datos);
+                console.log('saveData', datos);
+            },
+            onCancel: () => {
+                destroyModalAction();
+            },
+        });
+        objectModal = modal;
+        const openActionBtn = document.getElementById('openaction');
+        const closeActionBtn = document.getElementById('closeaction');
+        if (openActionBtn && closeActionBtn) {
+            openActionBtn.addEventListener('click', objectModal.open);
+            closeActionBtn.addEventListener('click', objectModal.close);
+        }
+        loadDataFromIndexedDB(databases.MyDatabaseActionevent);
+    } catch (error) {
+        console.error('Error initializing action modal:', error);
+    }
+}
+
+function destroyModalAction() {
+    if (objectModal) {
+        objectModal.close();
+        objectModal = null;
+    }
+    const openActionBtn = document.getElementById('openaction');
+    const closeActionBtn = document.getElementById('closeaction');
+    if (openActionBtn && closeActionBtn) {
+        openActionBtn.removeEventListener('click', objectModal?.open);
+        closeActionBtn.removeEventListener('click', objectModal?.close);
+    }
+}
+
+async function initializeModalEvent() {
+    try {
+        const modal2 = await tab5Event({
+            elementContainer: document.getElementById('tab5-event'),
+            files: actionEvents,
+            onSave: (datos) => {
+                onSaveHandlerEvent(datos);
+            },
+            saveData: (datos) => {
+                onSaveHandlerEvent(datos);
+                console.log('saveData', datos);
+            },
+            onCancel: () => {
+                destroyModalEvent();
+            },
+        });
+        objectModal2 = modal2;
+        const openEventBtn = document.getElementById('openevent');
+        const closeEventBtn = document.getElementById('closeevent');
+        if (openEventBtn && closeEventBtn) {
+            openEventBtn.addEventListener('click', objectModal2.open);
+            closeEventBtn.addEventListener('click', objectModal2.close);
+        }
+        loadDataFromIndexedDB(databases.eventsDB);
+    } catch (error) {
+        console.error('Error initializing event modal:', error);
+    }
+}
+
+function destroyModalEvent() {
+    if (objectModal2) {
+        objectModal2.close();
+        objectModal2 = null;
+    }
+    const openEventBtn = document.getElementById('openevent');
+    const closeEventBtn = document.getElementById('closeevent');
+    if (openEventBtn && closeEventBtn) {
+        openEventBtn.removeEventListener('click', objectModal2?.open);
+        closeEventBtn.removeEventListener('click', objectModal2?.close);
+    }
+}
+
+// Inicializar los modales al cargar la página
+initializeModalAction();
+initializeModalEvent();
+
+function dataoverlay() {
+
+}
+let overlayObject;
+overlaymedia({
+    modalevent: document.getElementById('tab5overlay'),
+    Position: () => console.log('randomPosition'),
+    overlay: () => console.log('randomSize'),
+    dataoverlay: () => console.log('dataoverlay'),
+    open: () => console.log('openreturn'),
+    close: () => console.log('closereturn'),
+    openreturn: () => console.log('openreturn'),
+    closereturn: () => console.log('closereturn')
+}).then((modal) => {
+    overlayObject = modal;
+    document.getElementById('openoverlay').addEventListener('click', overlayObject.open);
+    document.getElementById('closeoverlay').addEventListener('click', overlayObject.close);
     // Cargar datos desde IndexedDB al iniciar
 });
-    loadDataFromIndexedDB(databases.MyDatabaseActionevent);
-    loadDataFromIndexedDB(databases.eventsDB);
-
-  function handleSelectChange(event) {
-      const selectedFileName = event.target.value;
-      const selectedFile = parsedOverlayEvents.find(file => file.name === selectedFileName);
-      console.log('Selected file from localStorage:', selectedFile);
-  }
-
-  overlayEventActions.addEventListener('change', handleSelectChange);
-
-  function loadEvents() {
-      if (!db) {
-          console.error('Database not initialized');
-          return;
+const testButton_actionevent = document.getElementById('testButton_actionevent');
+testButton_actionevent.addEventListener('click', () => {
+  const testInput = document.getElementById('testInput');
+  console.log('testInput', testInput);
+  eventmanager(testInput.value, testInput.value);
+});
+async function eventmanager(event, tags) {
+    const EVENTS_MAP = {
+        "bits": "Bits",
+        "chat": "Chat",
+        "follow": "Follow",
+        "subscribe": "Subscribe",
+        "subgift": "Subgift",
+        "submysterygift": "Submysterygift",
+        "sub": "Sub",
+        "resub": "Resub",
+        "gift": "Gift",
+        "giftpaidupgrade": "Giftpaidupgrade",
+        "default": "Default",
+        "logon": "Logon",
+        "test": "Test",
       }
 
-      const transaction = db.transaction(['events'], 'readonly');
-      const objectStore = transaction.objectStore('events');
-      const request = objectStore.getAll();
+    try {
+        let eventsfind = await getDataFromIndexedDB(databases.eventsDB);
+        eventsfind.forEach(eventname => {
+            // let loweventname = eventname.toLowerCase();
+            for (const [key, value] of Object.entries(eventname)) {
+            // console.log('key', key, 'value', value);
+                if (key === event) {
+                    // console.log('event', event, 'found');
+                    if (value.check) {
+                        // console.log('key', key, 'value', value);
+                        if (value.check) {
+                            videoexists(eventname.Action.select.video);
+                            audioexists(eventname.Action.select.audio);
+                            imageexists(eventname.Action.select.imagen);
+                        }
+                    
+                                // console.log('event', "true or false in for key value",event.Action); // Safe access using optional chaining
 
-      request.onsuccess = (event) => {
-          const events = event.target.result;
-          overlayEventActions.innerHTML = ''; // Clear previous options
-          overlayEventcontent.innerHTML = ''; // Clear previous content
+                    }
+                }
 
-          // Load events from IndexedDB
-          events.forEach(event => {
-              const option = document.createElement('option');
-              option.value = event.id;
-              option.textContent = event.name;
+        }
 
-              // Create event elements for display
-              const eventElement = document.createElement('div');
-              eventElement.classList.add('modal-body');
-              eventElement.innerHTML = `
-                  <p>Name: <span class="event-name">${event.name}</span></p>
-                  <p>Trigger: <span class="event-trigger">${event.trigger}</span></p>
-                  <p>Action: <span class="event-action">${event.action}</span></p>
-                  <button class="edit-event" data-id="${event.id}">Edit</button>
-                  <button class="delete-event" data-id="${event.id}">Delete</button>
-              `;
-              overlayEventcontent.appendChild(eventElement);
-          });
+        /// test de prueba ya que el anterior duplica el numero de veces que realiza el evento
 
-          // Load events from localStorage
-          loadLocalStorageEvents();
-      };
+        });
 
-      request.onerror = (event) => {
-          console.error('Failed to load events:', event.target.errorCode);
-      };
-  }
+        eventsfind.forEach((event) => {
+        const event_name = EVENTS_MAP[name]
+        const isInEvent = event.hasOwnProperty(event_name)
+        if(isInEvent && event[event_name].check){
+            
+        }
+        })
+    } catch (error) {
+        console.error('Error in eventmanager', error);
+    }
+}
+// await window.api.sendOverlayData('play', { src: file.path, fileType: file.type, additionalData });
 
-  overlayEventAdd.addEventListener('click', () => {
-      const name = overlayEventName.value;
-      const trigger = overlayEventTrigger.value;
-      const action = overlayEventActions.value;
-
-      if (name && trigger) {
-          const transaction = db.transaction(['events'], 'readwrite');
-          const objectStore = transaction.objectStore('events');
-          const request = objectStore.add({ name, trigger, action });
-
-          request.onsuccess = (event) => {
-              console.log('Event added to the database:', event.target.result);
-              loadEvents(); // Refresh the list of events
-          };
-
-          request.onerror = (event) => {
-              console.error('Failed to add event:', event.target.errorCode);
-          };
-      } else {
-          alert('Please fill in all fields.');
-      }
-  });
-
-  overlayEventcontent.addEventListener('click', (event) => {
-      if (event.target.classList.contains('edit-event')) {
-          editingEventId = parseInt(event.target.dataset.id);
-          const eventElement = event.target.closest('.modal-body');
-          const name = eventElement.querySelector('.event-name').textContent;
-          const trigger = eventElement.querySelector('.event-trigger').textContent;
-          const action = eventElement.querySelector('.event-action').textContent;
-
-          eventElement.innerHTML = `
-              <p>Name: <input type="text" class="edit-name" value="${name}" /></p>
-              <p>Trigger: <input type="text" class="edit-trigger" value="${trigger}" /></p>
-              <p>Action: <input type="text" class="edit-action" value="${action}" /></p>
-              <button class="save-edit" data-id="${editingEventId}">Save</button>
-              <button class="cancel-edit">Cancel</button>
-          `;
-      }
-
-      if (event.target.classList.contains('delete-event')) {
-          const eventId = parseInt(event.target.dataset.id);
-          const transaction = db.transaction(['events'], 'readwrite');
-          const objectStore = transaction.objectStore('events');
-          const request = objectStore.delete(eventId);
-
-          request.onsuccess = (event) => {
-              console.log('Event deleted:', eventId);
-              loadEvents(); // Refresh the list of events
-          };
-
-          request.onerror = (event) => {
-              console.error('Failed to delete event:', event.target.errorCode);
-          };
-      }
-
-      if (event.target.classList.contains('save-edit')) {
-          const eventId = parseInt(event.target.dataset.id);
-          const eventElement = event.target.closest('.modal-body');
-          const name = eventElement.querySelector('.edit-name').value;
-          const trigger = eventElement.querySelector('.edit-trigger').value;
-          const action = eventElement.querySelector('.edit-action').value;
-
-          if (name && trigger && action) {
-              const transaction = db.transaction(['events'], 'readwrite');
-              const objectStore = transaction.objectStore('events');
-              const request = objectStore.put({ id: eventId, name, trigger, action });
-
-              request.onsuccess = (event) => {
-                  console.log('Event updated:', eventId);
-                  loadEvents(); // Refresh the list of events
-              };
-
-              request.onerror = (event) => {
-                  console.error('Failed to update event:', event.target.errorCode);
-              };
-          } else {
-              alert('Please fill in all fields.');
-          }
-      }
-
-      if (event.target.classList.contains('cancel-edit')) {
-          loadEvents(); // Reload events to revert changes
-      }
-  });
-
-  if (db) {
-      loadEvents();
-  }
+async function videoexists(video) {
+    console.log('videoexists', video);
+    if (video.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: video.select.path, fileType: video.select.type, video });
+    }
+    return false;
+}
+async function audioexists(audio) {
+    console.log('audioexists', audio);
+    if (audio.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: audio.select.path, fileType: audio.select.type, audio });
+    }
+    return false;
+}
+async function imageexists(imagen) {
+    console.log('imageexists', imagen);
+    if (imagen.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: imagen.select.path, fileType: imagen.select.type, imagen });
+    }
+    return false;
+}
 });
