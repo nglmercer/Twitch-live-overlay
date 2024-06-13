@@ -1,7 +1,6 @@
 import tab5Action from "./tab5-action/tab5-action.js";
 import tab5Event from "./tab5-event/tab5-event.js";
 import overlaymedia from "./overlay/overlaymedia.js";
-document.addEventListener('DOMContentLoaded', () => {
     let db;
     
     // Open IndexedDB
@@ -368,22 +367,50 @@ testButton_actionevent.addEventListener('click', () => {
   console.log('testInput', testInput);
   eventmanager(testInput.value, testInput.value);
 });
-async function eventmanager(event, tags) {
-    const EVENTS_MAP = {
-        "bits": "Bits",
-        "chat": "Chat",
-        "follow": "Follow",
-        "subscribe": "Subscribe",
-        "subgift": "Subgift",
-        "submysterygift": "Submysterygift",
-        "sub": "Sub",
-        "resub": "Resub",
-        "gift": "Gift",
-        "giftpaidupgrade": "Giftpaidupgrade",
-        "default": "Default",
-        "logon": "Logon",
-        "test": "Test",
-      }
+const EVENTS_MAP = {
+    "bits": "Bits",
+    "chat": "Chat",
+    "follow": "Follow",
+    "subscribe": "Subscribe",
+    "subgift": "Subgift",
+    "submysterygift": "Submysterygift",
+    "sub": "Sub",
+    "resub": "Resub",
+    "gift": "Gift",
+    "giftpaidupgrade": "Giftpaidupgrade",
+    "default": "Default",
+    "logon": "Logon",
+    "test": "Test",
+};
+
+// await window.api.sendOverlayData('play', { src: file.path, fileType: file.type, additionalData });
+async function videoexists(video) {
+    console.log('videoexists', video);
+    if (video.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: video.select.path, fileType: video.select.type, video });
+    }
+    return false;
+}
+async function audioexists(audio) {
+    console.log('audioexists', audio);
+    if (audio.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: audio.select.path, fileType: audio.select.type, audio });
+    }
+    return false;
+}
+async function imageexists(imagen) {
+    console.log('imageexists', imagen);
+    if (imagen.check) {
+        await window.api.createOverlayWindow();
+        await window.api.sendOverlayData('play', { src: imagen.select.path, fileType: imagen.select.type, imagen });
+    }
+    return false;
+}
+
+
+export default async function eventmanager(event, tags) {
 
     try {
         let eventsfind = await getDataFromIndexedDB(databases.eventsDB);
@@ -423,30 +450,3 @@ async function eventmanager(event, tags) {
         console.error('Error in eventmanager', error);
     }
 }
-// await window.api.sendOverlayData('play', { src: file.path, fileType: file.type, additionalData });
-
-async function videoexists(video) {
-    console.log('videoexists', video);
-    if (video.check) {
-        await window.api.createOverlayWindow();
-        await window.api.sendOverlayData('play', { src: video.select.path, fileType: video.select.type, video });
-    }
-    return false;
-}
-async function audioexists(audio) {
-    console.log('audioexists', audio);
-    if (audio.check) {
-        await window.api.createOverlayWindow();
-        await window.api.sendOverlayData('play', { src: audio.select.path, fileType: audio.select.type, audio });
-    }
-    return false;
-}
-async function imageexists(imagen) {
-    console.log('imageexists', imagen);
-    if (imagen.check) {
-        await window.api.createOverlayWindow();
-        await window.api.sendOverlayData('play', { src: imagen.select.path, fileType: imagen.select.type, imagen });
-    }
-    return false;
-}
-});

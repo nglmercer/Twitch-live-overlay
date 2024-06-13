@@ -1,8 +1,12 @@
+import eventmanager from './index.js';
 document.getElementById("listenBtn").addEventListener("click", function(event){
   event.preventDefault()
 });
-
-
+const btnlisten = document.getElementById('listenBtn');
+btnlisten.addEventListener('click', function(event){
+  event.preventDefault()
+  startListening();
+});
 class Validator {
 /*
      * Determina si el nombre del canal es válido
@@ -139,7 +143,7 @@ function startListening() {
       console.log("message event/ tags:", tags);
       console.log("message:", message);
       console.log("self:", self);
-      eventmanager("chat", tags);
+      eventmanager("Chat", tags);
     });
     client.on('cheer', (wat, tags, message, self) => {
       console.log("wat:", wat);
@@ -245,31 +249,31 @@ function sendReplacedCommand(replacedCommand) {
   window.api.sendChatMessage(replacedCommand);
 }
 function handleEvent(eventType, tags, message) {
-  const transaction = db.transaction([eventType], "readonly");
-  const objectStore = transaction.objectStore(eventType);
+  // const transaction = db.transaction([eventType], "readonly");
+  // const objectStore = transaction.objectStore(eventType);
 
-  const request = objectStore.getAll();
+  // const request = objectStore.getAll();
 
-  request.onsuccess = (event) => {
-    const allEvents = event.target.result;
-    console.log(`All ${eventType}:`, allEvents);
+  // request.onsuccess = (event) => {
+  //   const allEvents = event.target.result;
+  //   console.log(`All ${eventType}:`, allEvents);
 
-    const trimmedData = data.trim().toLowerCase();
-    const foundEvent = allEvents.find(event => event.title.toLowerCase() === trimmedData || event.description.toLowerCase() === trimmedData);
-    console.log (foundEvent);
-    if (foundEvent) {
-      const eventCommands = foundEvent.description;
-      Replacevalues(eventCommands, tags, message);
-      // console.log(`eventType ${eventType} find:`, eventType, eventCommands);
-    } else {
-      console.log(`eventType ${eventType} else:`, eventType, data);
-    }
-  };
+  //   const trimmedData = event.trim().toLowerCase();
+  //   const foundEvent = allEvents.find(event => event.title.toLowerCase() === trimmedData || event.description.toLowerCase() === trimmedData);
+  //   console.log (foundEvent);
+  //   if (foundEvent) {
+  //     const eventCommands = foundEvent.description;
+  //     Replacevalues(eventCommands, tags, message);
+  //     // console.log(`eventType ${eventType} find:`, eventType, eventCommands);
+  //   } else {
+  //     console.log(`eventType ${eventType} else:`, eventType, event);
+  //   }
+  // };
 
-  request.onerror = (event) => {
-    console.error(`Error fetching ${eventType} from IndexedDB:`, event.target.errorCode);
-    console.log(`ONERROR testHandleEvent:`, eventType, data);
-  };
+  // request.onerror = (event) => {
+  //   console.error(`Error fetching ${eventType} from IndexedDB:`, event.target.errorCode);
+  //   console.log(`ONERROR testHandleEvent:`, eventType, data);
+  // };
 }
 const Replacevalues = (command, tags, message) => {
   // console.log("eventype",eventype);
@@ -329,6 +333,11 @@ function manageOptions(tags, message) {
 /*
   * Changes the volume of Polly speech. 
 */
+const volumechange = document.getElementById('volume');
+volumechange.addEventListener('change', function(event){
+  event.preventDefault()
+  document.getElementById("audiotrack").volume = volumechange.value;
+});
 function volumeChange() {
   var currentVolume = document.querySelector('#volume').value;
   document.getElementById("audiotrack").volume = currentVolume;
@@ -404,20 +413,20 @@ window.speechSynthesis.onvoiceschanged = function() {
   populateVoiceList();
 }
 async function sendToServer(eventType, data) {
-  fetch('localhost:8081/api/receive1', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ eventType, data }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      //log.console(data); // Maneja la respuesta del servidor si es necesario
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+  // fetch('localhost:8081/api/receive1', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify({ eventType, data }),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     //log.console(data); // Maneja la respuesta del servidor si es necesario
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:', error);
+  //   });
 }
 /*
    Si la casilla de verificación está seleccionada para excluir a los usuarios del chat, muestre las opciones para ello.

@@ -66,7 +66,7 @@
                     </div>
                   </div>
                   <div class="col-lg-4 col-md-4 4 col-sm-4 col">
-                    <button class="btn btn-primary" onclick="startListening()" id="listenBtn" type="submit"> Start
+                    <button class="btn btn-primary" id="listenBtn" type="submit"> Start
                       Listening</button>
                   </div>
                 </div>
@@ -83,7 +83,7 @@
                   </div>
                   <div class="col-6">
                     <i class="bi bi-volume-up-fill"></i>
-                    <input id="volume" type="range" min="0" max="1" value="1" step="0.1" onchange="volumeChange()">
+                    <input id="volume" type="range" min="0" max="1" value="1" step="0.1">
                   </div>
                 </div>
                 <div class="row">
@@ -498,7 +498,7 @@ Puede vincular estas acciones a los eventos a continuación.
 
 </body>
 <script src="tmi.min.js"></script>
-<script src="app.js"></script>
+<script src="app.js" type="module"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
