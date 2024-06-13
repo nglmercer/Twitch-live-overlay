@@ -6,7 +6,7 @@
   "description": "tiktok mineflayer web apis speech and more",
   "main": "index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "build": "electron-forge make",

@@ -1,4 +1,6 @@
 import eventmanager from './index.js';
+import { TTS } from './tts.js';
+
 document.getElementById("listenBtn").addEventListener("click", function(event){
   event.preventDefault()
 });
@@ -7,108 +9,18 @@ btnlisten.addEventListener('click', function(event){
   event.preventDefault()
   startListening();
 });
+
 class Validator {
-/*
-     * Determina si el nombre del canal es válido
-     * la cadena de parámetros es el nombre del canal
-   */
-  isAZ(string) {
-    var res = string.match(/^(#)?[a-zA-Z0-9_]{4,25}$/); 
-    return (res !== null)
-  }
-}
-  
-
-class TTS {
-/*
-     * En construcción
-     * Hablar mensaje, determinar si Polly está marcada
-     * Escribir mensaje independientemente
-   */
-  constructor(message, tags) {
-    this.speak(message, tags, this.speechType(), this.announceFlag());
-    this.write(message, tags); 
-  }
-/*
-     * Determina si se utilizará Polly o voz basada en navegador.
-   */
-  speechType() {
-    if(!document.getElementById('hqspeech').checked) {
-      return 'browser';
-    }
-    if(document.getElementById('hqspeech').checked) {
-      return 'browser';
-    }
-  }
-/*
-     * Habla un mensaje
-     * el mensaje de parámetro es el mensaje de contracción de tmi.js
-     * las etiquetas param son las etiquetas enviadas a través de tmi.js
-     * El tipo de parámetro habla a través de Polly o del navegador.
-   */
-  announceFlag() {
-    if(document.getElementById('announcechatter').checked) {
-      return true; 
-    }
-    if(!document.getElementById('announcechatter').checked) {
-      return false; 
-    }    
-  }
-
-  speak(message, tags, type, announceflag) {
-    if(type == 'browser') {
-      if(announceflag == true) {
-        var chatter = tags['display-name']; 
-        // lee el mensaje
-        message = chatter+" dice "+message;
-      }
-
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.volume = document.querySelector('#volume').value;
-
-      const voices = speechSynthesis.getVoices();
-      var voiceSelect = document.getElementById('voiceSelect');
-      const selectedOption = voiceSelect.selectedOptions[0].getAttribute("data-name");
-      for (let i = 0; i < voices.length; i++) {
-        if (voices[i].name === selectedOption) {
-          utterance.voice = voices[i];
-        }
-      }
-
-      window.speechSynthesis.speak(utterance);
-      document.getElementById("audiotrack").pause();
-      document.getElementById("audiotrack").currentTime = 0;
-    }
-  }
-/*
-     * escribir un mensaje al navegador
-     * el mensaje de parámetro es el mensaje de contracción de tmi.js
-     * las etiquetas param son las etiquetas enviadas a través de tmi.js
-   */
-  write(message, tags) {
-    let div = document.createElement('div'); 
-    div.className = "single-message";
-
-    let chatter = document.createElement('span'); 
-    chatter.className= "chatter";
-    chatter.style.color = tags['color'];
-    chatter.textContent = tags['display-name']+': ';
-
-    let chatMessage = document.createElement('span'); 
-    chatMessage.className= "messageContent"; 
-    chatMessage.textContent = message; 
-
-    div.appendChild(chatter); 
-    div.appendChild(chatMessage); 
-
-    document.getElementById("messages").appendChild(div); 
-  }
-}
   /*
-    * Starts routing the request
-    * Validates the channel name 
-    * if valid, starts listening for messages
-  */
+       * Determina si el nombre del canal es válido
+       * la cadena de parámetros es el nombre del canal
+     */
+    isAZ(string) {
+      var res = string.match(/^(#)?[a-zA-Z0-9_]{4,25}$/); 
+      return (res !== null)
+    }
+}
+
 const eventselects = ['chat', 'bits', 'sub', 'resub', 'logon'];
 function startListening() {
   var validator = new Validator;
@@ -138,7 +50,6 @@ function startListening() {
     client.on('message', (wat, tags, message, self) => {
       manageOptions(tags, message);
       handleEvent('chat', tags, message);
-      sendToServer('chat', message)
       console.log("wat:", wat);
       console.log("message event/ tags:", tags);
       console.log("message:", message);
@@ -181,7 +92,6 @@ function startListening() {
     });
   }
 }
-
 
 function manageEvent(tags, message, userstate) {
   new TTS(message, tags, userstate);
@@ -297,43 +207,44 @@ function manageOptions(tags, message) {
   const isBroadcaster = badges.broadcaster;
   const isMod = badges.moderator;
 
-  const excludedchatterstextarea = document.getElementById('excluded-chatters');
-  var lines = excludedchatterstextarea.value.split('\n');
-  var lines = lines.map(line => line.toLowerCase());
+  const excludedChattersTextArea = document.getElementById('excluded-chatters');
+  const excludedLines = excludedChattersTextArea.value.split('\n').map(line => line.toLowerCase());
 
-  if(document.getElementById('modsonly').checked) {
-    if(isBroadcaster || isMod ) {
-      new TTS(message, tags);
-      return;
-    }
-  }
-  if (document.getElementById('cheersonly').checked) {
-    if (tags.bits > 0) {
-      new TTS(message, tags);
-      return;
-    }
-  }
-  if(document.getElementById('exclude-toggle').checked) {
-    console.log(lines);
-    if(lines.includes(tags['display-name'].toLowerCase())) {
-      return;
-    }
-    else {
-      new TTS(message, tags);
-      console.log('not in lines');
-      return;
-    }
-  }
-  else {
-    new TTS(message, tags); 
+  const options = document.querySelectorAll('.option input[type="checkbox"]:checked');
+
+  if (options.length === 0) {
+    new TTS(message, tags);
     return;
   }
+
+  options.forEach(option => {
+    switch (option.getAttribute('data-option')) {
+      case 'modsonly':
+        if (isBroadcaster || isMod) {
+          new TTS(message, tags);
+        }
+        break;
+      case 'cheersonly':
+        if (tags.bits > 0) {
+          new TTS(message, tags);
+        }
+        break;
+      case 'exclude-toggle':
+        if (!excludedLines.includes(tags['display-name'].toLowerCase())) {
+          new TTS(message, tags);
+        }
+        break;
+      default:
+        new TTS(message, tags);
+    }
+  });
 }
+
 
 /*
   * Changes the volume of Polly speech. 
 */
-const volumechange = document.getElementById('volume');
+let volumechange = document.getElementById('volume');
 volumechange.addEventListener('change', function(event){
   event.preventDefault()
   document.getElementById("audiotrack").volume = volumechange.value;
@@ -372,6 +283,11 @@ function populateVoiceList() {
   }
 }
 
+
+window.speechSynthesis.onvoiceschanged = function() {
+  populateVoiceList();
+}
+
 function exportSettings() {
   var channelName = document.querySelector("#channelname").value;
   document.getElementById('settingsURL').value = "https://twitchtts.net?channelname="+channelName;
@@ -405,40 +321,18 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 if(urlParams.get('channelname') !== null) {
   document.querySelector("#channelname").value = urlParams.get('channelname');
-  document.getElementById("hqspeech").checked = true;
   startListening();
 };
 
 window.speechSynthesis.onvoiceschanged = function() {
   populateVoiceList();
 }
-async function sendToServer(eventType, data) {
-  // fetch('localhost:8081/api/receive1', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify({ eventType, data }),
-  //   })
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     //log.console(data); // Maneja la respuesta del servidor si es necesario
-  //   })
-  //   .catch(error => {
-  //     console.error('Error:', error);
-  //   });
-}
 /*
    Si la casilla de verificación está seleccionada para excluir a los usuarios del chat, muestre las opciones para ello.
 */
 document.getElementById("exclude-toggle").addEventListener("change", function() {
   var options = document.getElementById('exclude-options');
-  if(this.checked == true) {
-    options.classList.remove('d-none');
-  }
-  if(this.checked == false) {
-    options.classList.add('d-none');
-  }
+
 });
 
 /*

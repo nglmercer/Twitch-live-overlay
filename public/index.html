@@ -71,97 +71,40 @@
                   </div>
                 </div>
               </form>
-              <p></p>
               <div id="status" class="alert alert-info">
                 Esperando el nombre del canal...
               </div>
-              <p></p>
-              <div id="options-container" class="container">
-                <div class="row">
-                  <div class="col-6">
-                    <label for="volume"><small>Speech Volume</small></label>
-                  </div>
-                  <div class="col-6">
-                    <i class="bi bi-volume-up-fill"></i>
-                    <input id="volume" type="range" min="0" max="1" value="1" step="0.1">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-6">
-                    <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
-                  </div>
-                  <div class="col-5">
-                    <input id="cheersonly" type="checkbox" />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-6">
-                    <label for="voiceSelect"><small>Voz (no aplicable a Polly)</small></label>
-                  </div>
-                  <div class="col-6">
-                    <select id="voiceSelect" class="form-control"></select>
-                  </div>
+              <div id="options-container" class="grid border-2	p-4 m-4 border-slate-600 gap-4 mx-4 rounded-md">
+                
+                    <label for="volume"><small>Speech Volume</small>                    <i class="bi bi-volume-up-fill"></i>
+                      <input id="volume" type="range" min="0" max="1" value="1" step="0.1"></label>
+                    <label for="voiceSelect"><small>select voz</small><select id="voiceSelect" class="form-control w-2/4"></select></label>
+                    
+                    <label for="randomVoice"><small>random voice</small><input id="randomVoice" type="checkbox" /></label>
+                    <label for="randomSpeed"><small>random speed</small><input id="randomSpeed" type="checkbox" />  <input type="number" id="randomSpeedValue" name="randomSpeedValue" value="1" min="0.1" max="2" step="0.1" />   </label>
+                    <label for="randomPitch"><small>random pitch</small><input id="randomPitch" type="checkbox" />                     <input type="number" id="randomPitchValue" name="randomPitchValue" value="1" min="0.1" max="2" step="0.1" />
+                    </label>
+                        <div>  <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
+                            <input id="modsonly" type="checkbox" data-option="modsonly" /></div>  <div>  <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
+                            <input id="cheersonly" type="checkbox" data-option="cheersonly" /></div>  <div>  <label for="exclude-toggle"><small>Exclude Chatters Listed Below</small></label>
+                            <input id="exclude-toggle" type="checkbox" data-option="exclude-toggle" /></div><div class="row">    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>  
+                          <input id="announcechatter" type="checkbox" data-option="announcechatter" /></div>
+                        <div class="col-12">
+                          <!-- Placeholder for future additions -->
+                        </div>
+                        <div class="row">
+                        <audio id="audiotrack"></audio>
+                      </div>
+
                 </div> 
-                <div class="row">
-                  <div class="col-6">
-                    <label for="hqspeech"><small>Use <a href="https://aws.amazon.com/polly/" target="_blank">Amazon Polly</a> (Beta)</small></label>
-                  </div>
-                  <div class="col-6">
-                    <input id="hqspeech" type="checkbox" />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-6">
-                    <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
-                  </div>
-                  <div class="col-5">
-                    <input id="modsonly" type="checkbox" />
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-6">
-                    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>
-                  </div>
-                  <div class="col-6">
-                    <input id="announcechatter" type="checkbox" />
-                  </div>
-                </div>   
-                <div class="row">
-                  <div class="col-6">
-                    <label for="exclude"><small>Excluir ciertos usuarios de Chat</small></label>
-                  </div>
-                  <div class="col-6">
-                    <input id="exclude-toggle" type="checkbox" />
-                  </div>
-                </div>    
-                <div class="row d-none" id="exclude-options">
-                  <div clase="col-6">
-                    <small>Ingrese los usuarios del chat que desea excluir en el cuadro de la derecha, creando una nueva línea para cada chat.</small>
-                    <button class="btn btn-outline-primary" onclick="fillInBots()">Empiece con Bots conocidos</button>
-                  </div>
-                  <div class="col-6">
-                    <textarea id="excluded-chatters" rows="10" class="form-control" placeholder="XQC&#10;BagofChaos"></textarea>
-                  </div>
-                </div>                    
-                <div class="row">
-                  <div class="col-12">
-                  <small></small>
-                    </div>
-                </div>
-                <div class="row">
-                  <audio id="audiotrack"></audio>
-                </div>
-                <div class="row">
-                  <button class="btn btn-dark mt-3 ml-2" data-toggle="modal" data-target="#settingsModal" onclick="exportSettings()">Export Channel to URL</button>
-                </div>
-                <div class="row">
-                  <button class="btn btn-danger mt-3 ml-2" onclick="skipMessage()">Skip Message</button>
-                </div>            
               </div>
+
+              </div>
+              <!---- # esta es una parte de la tab de eventos -->
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 pt-3">
+            <div class="flex float-end ">
               <div class="card">
-                <a href="https://www.tiktok.com/@melserng">
+                <a href="https://www.tiktok.com/@melserng" >
                   <img class="card-img-top" src="images/Rose.webp" alt="Rose">
                 </a>
                 <div class="card-body">
@@ -171,8 +114,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
     </div>
     <div id="tab2" class="tab-content w-full bg-slate-500">
       <div class="grid border-2	p-8 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
