@@ -185,7 +185,7 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
                     optionElement.value = record;
                     elementHTML.appendChild(optionElement);
                     cacheAssign[record] = record;
-                    
+
                 });
             };
             request.onerror = (event) => {
@@ -197,18 +197,7 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
     }
     loadDataFromIndexedDB(databases.MyDatabaseActionevent);
     });
-    function clearForm() {
-        for (const elemento of form.elements) {
-            if (elemento.type === 'checkbox') {
-                elemento.checked = false;
-            } else if (elemento.type === 'select-one') {
-                elemento.value = "";
-            } else {
-                elemento.value = "";
-            }
-            console.log('elemento clearForm', elemento);
-        }
-    }
+
     return {
         element: ModalElement,
         form: form,
@@ -216,7 +205,6 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         open: () => {
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalEventSave').style.display = 'inline-block';
-            clearForm();
         },
         onUpdate: (datos) => {
             if (datos) {

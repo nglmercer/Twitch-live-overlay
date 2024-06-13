@@ -167,8 +167,9 @@ let overlayWindow;
 ipcMain.handle('create-overlay-window', () => {
     if (!overlayWindow) {
         overlayWindow = new BrowserWindow({
-            width: 800,
-            height: 600,
+            // width: 800,
+            // height: 600,
+            fullscreen: true,  // Configura la ventana en pantalla completa
             frame: false,
             transparent: true,
             alwaysOnTop: true,

@@ -84,18 +84,6 @@ export default async function tab5Action({
         }
     }
 
-    function clearForm() {
-        for (const elemento of form.elements) {
-            if (elemento.type === 'checkbox') {
-                elemento.checked = false;
-            } else if (elemento.type === 'select-one') {
-                elemento.value = "";
-            } else {
-                elemento.value = "";
-            }
-        }
-    }
-
     function obtenerDatos() {
         const datosFormulario = new Map();
         const nameFilter = {};
@@ -171,7 +159,6 @@ export default async function tab5Action({
         close: () => elementModal.style.display = 'none',
         open: () => {
             elementModal.style.display = 'flex';
-            clearForm();
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },
         onUpdate: (datos) => {
