@@ -1,3 +1,5 @@
+import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from '../indexedDB.js';
+
 export default async function tab5Action({
     elementContainer,
     files = [],
@@ -21,16 +23,12 @@ export default async function tab5Action({
     elementModal.style.display = 'none';
 
     const form = elementModal.querySelector('.tab5-action');
-    form.addEventListener('submit', event => {
-        event.preventDefault();
-    });
+    form.addEventListener('submit', event => event.preventDefault());
 
     let errorMessage = createErrorMessage();
     elementModal.appendChild(errorMessage);
 
-    setTimeout(() => {
-        errorMessage.style.display = 'none';
-    }, 5000);
+    setTimeout(() => errorMessage.style.display = 'none', 5000);
 
     function createErrorMessage() {
         const errorDiv = document.createElement('div');
@@ -51,42 +49,10 @@ export default async function tab5Action({
         return true;
     }
 
-    function fillForm(datos) {
-        for (const [key, value] of Object.entries(datos)) {
-            const keyCheck = `${key}_check`;
-            const keyNombre = `${key}_nombre`;
-            const keyselect = `${key}_select`;
-            const element = form.elements.namedItem(keyCheck);
-            const element1 = form.elements.namedItem(keyNombre);
-            const element2 = form.elements.namedItem(keyselect);
-            const idElement = form.elements.namedItem('id');
-            console.log(element2)
-            if (element) {
-                // console.log('key', key, 'value', value);
-                // console.log('element', element);
-                if (element.type === 'checkbox') {
-                    element.checked = value.check;
-                }
-            } else if (element1) {
-                // console.log('key', key, 'value', value);
-                // console.log('element1', element1);
-                element1.value = value.nombre || value;
-            } 
-            else if (idElement) {
-                idElement.value = datos.id;
-            } else if (element2) {
-                console.log('key', key, 'value', value);
-                console.log('element2', element2);
-                element2.value = value.select.name;
-            } else {
-                console.warn(`Elemento con nombre ${key} no encontrado en el formulario.`);
-            }
-        }
-    }
-
     function obtenerDatos() {
         const datosFormulario = new Map();
         const nameFilter = {};
+
         for (const elemento of form.elements) {
             if (elemento.name) {
                 if (elemento.type === 'checkbox') {
@@ -99,6 +65,7 @@ export default async function tab5Action({
                 nameFilter[(elemento.name).split(separator)[0]] = [];
             }
         }
+
         const retornoDatos = Object.fromEntries(datosFormulario);
         Object.keys(nameFilter).forEach((key) => {
             const keysFilter = Object.fromEntries(
@@ -110,6 +77,7 @@ export default async function tab5Action({
             });
             nameFilter[key] = resultSplitted;
         });
+
         const idValue = form.elements.namedItem('id').value;
         nameFilter.id = parseInt(idValue, 10) || null;
 
@@ -117,14 +85,13 @@ export default async function tab5Action({
     }
 
     elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
         const nameFilter = obtenerDatos();
         if (nameFilter.id) {
-            saveData(nameFilter);
+            console.log('nameFilterid', nameFilter.id);
+            updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         } else {
-            onSave(nameFilter);
+            saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         }
         elementModal.style.display = 'none';
     });
@@ -135,12 +102,15 @@ export default async function tab5Action({
     });
 
     elementModal.querySelector('.modalActionSave').addEventListener('click', () => {
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
         const nameFilter = obtenerDatos();
         elementModal.style.display = 'none';
-        saveData(nameFilter);
+        if (nameFilter.id) {
+            console.log('nameFilterid', nameFilter.id);
+            updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+        } else {
+            saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+        }
     });
 
     function loadOptions(elementModal, files) {
@@ -155,19 +125,28 @@ export default async function tab5Action({
             });
         });
     }
+
+    function loadDataFromIndexedDBToForm(dbConfig) {
+        loadDataFromIndexedDB(dbConfig).then(records => {
+            records.forEach(record => {
+                const optionElement = document.createElement('option');
+                optionElement.textContent = record.name;
+                optionElement.value = record.id;
+                form.elements.namedItem('inputSelectSources').appendChild(optionElement);
+                cacheAssign[record.id] = record;
+            });
+        }).catch(error => console.error('Error loading data from IndexedDB', error));
+    }
+
     loadOptions(elementModal, files);
 
     return {
         element: ModalElement,
         form: form,
         close: () => elementModal.style.display = 'none',
-        open: (setNewFiles=null) => {
-            if (setNewFiles!==null) {
-                try {
-                    loadOptions(elementModal, setNewFiles);
-                } catch (error) {
-                    console.log('Error loading options:', error, " el evento del cual se estarciendo invocado no cumple con la sintaxis de la lista de archivos JSON");
-                }
+        open: (setNewFiles = null) => {
+            if (setNewFiles !== null) {
+                loadOptions(elementModal, setNewFiles);
             } else {
                 loadOptions(elementModal, files);
             }
@@ -175,12 +154,15 @@ export default async function tab5Action({
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },
         onUpdate: (datos) => {
-            if (datos) {
-                fillForm(datos);
-            }
             elementModal.style.display = 'flex';
+            console.log('nameFilterid', datos.id);
+            updateDataInIndexedDB(databases.MyDatabaseActionevent, datos);
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
         },
+        loadIndexedDB: () => {
+            loadDataFromIndexedDBToForm(databases.MyDatabaseActionevent);
+        },
     };
 }
+

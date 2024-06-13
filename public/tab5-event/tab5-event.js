@@ -1,7 +1,8 @@
-export default async function tab5Action({ elementContainer, files = [], onSave = () => { },onUpdate = () => { }, saveData = () => { }, onCancel = () => { }, separator = "_" }) {
+import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from '../indexedDB.js';
+
+export default async function tab5Event({ elementContainer, files = [], onSave = () => { }, onUpdate = () => { }, saveData = () => { }, onCancel = () => { }, separator = "_" }) {
     const ModalElement = document.createElement('div');
     const idModal = `ModalElement${Math.floor(Math.random() * 1000)}`;
-    console.log('files', files);
     const cacheAssign = {};
     ModalElement.className = 'modalElement';
     ModalElement.id = idModal;
@@ -14,14 +15,14 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         event.preventDefault();
     });
     const form = elementModal.querySelector('.tab5-event');
-    console.log('elementModal', elementModal.querySelector('.tab5-event'));
-    console.log('idmodal', idModal);
+    
     let errorMessage = document.createElement('div');
     errorMessage.className = 'error-message';
     errorMessage.style.color = 'red';
     errorMessage.style.display = 'none';
     errorMessage.textContent = 'El nombre es obligatorio.';
     elementModal.appendChild(errorMessage);
+
     function validateForm() {
         const formulario = document.querySelector('.tab5-event');
         const nombre = formulario.elements.namedItem('Evento_nombre');
@@ -32,10 +33,11 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         errorMessage.style.display = 'none';
         return true;
     }
+
     setTimeout(() => {
         errorMessage.style.display = 'none';
     }, 5000);
-    // // Función para llenar el formulario con los datos actuales
+
     const fillForm = (datos) => {
         const formulario = document.querySelector('.tab5-event');
         for (const [key, value] of Object.entries(datos)) {
@@ -45,48 +47,36 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
             const element1 = formulario.elements.namedItem(keynombre);
             const idelement = formulario.elements.namedItem('id');
             if (element) {
-                // console.log('datos', datos);
-                console.log('element', element);
                 if (element.type === 'checkbox') {
                     element.checked = value.check;
-                    console.log('element.checked', value);
                 } else if (element.type === 'select-one') {
-                    element.value = value; // assuming value is an object with a path
+                    element.value = value; 
                 } else {
                     element.value = value;
                 }
             }
             if (element1) {
-                console.log('elemet1', element1);
-
                 element1.value = value.nombre || value;
-            } else {
-                console.warn(`Elemento con nombre ${key} no encontrado en el formulario.`);
             }
             if (idelement) {
-                idelement.value = datos.id
-                console.log('id', datos.id);
+                idelement.value = datos.id;
             }
         }
     };
 
-    elementModal.querySelector('.modalEventAdd').addEventListener('click', (event) => {
+    elementModal.querySelector('.modalEventAdd').addEventListener('click', async (event) => {
         if (!validateForm()) {
-            
             return;
         }
-        let nameFilter = {};
-        nameFilter = obtenerDatos();
-
+        let nameFilter = obtenerDatos();
         if (nameFilter.id) {
-            console.log('nameFilterid', nameFilter.id);
-            saveData(nameFilter);
+            await updateDataInIndexedDB(databases.eventsDB, nameFilter);
         } else {
-            onSave(nameFilter);
+            await saveDataToIndexedDB(databases.eventsDB, nameFilter);
         }
         elementModal.style.display = 'none';
-        
     });
+
     function obtenerDatos() {
         const formulario = document.querySelector('.tab5-event');
         const datosFormulario = new Map();
@@ -114,88 +104,39 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
             });
             nameFilter[key] = ResultSpited;
         });
-    
-        // Verificar y convertir id a un número entero válido
+
         const idValue = formulario.elements.namedItem('id').value;
         const id = parseInt(idValue, 10);
         nameFilter.id = !isNaN(id) ? id : null;
-        console.log('nameFilter', nameFilter, datosFormulario, "datosFormulario");
         return nameFilter;
     }
-    
+
     elementModal.querySelector('.modalEventClose').addEventListener('click', (event) => {
-        const nameFilter = obtenerDatos();
-        console.log('nameFilter', nameFilter);
         elementModal.style.display = 'none';
-        
         onCancel();
     });
-    elementModal.querySelector('.modalEventSave').addEventListener('click', (event) => {
+
+    elementModal.querySelector('.modalEventSave').addEventListener('click', async (event) => {
         if (!validateForm()) {
-            
             return;
         }
         const nameFilter = obtenerDatos();
-        
         elementModal.style.display = 'none';
         if (nameFilter.id) {
-            console.log('nameFilterid', nameFilter.id);
-            saveData(nameFilter);
+            await updateDataInIndexedDB(databases.eventsDB, nameFilter);
         } else {
-            onSave(nameFilter);
+            await saveDataToIndexedDB(databases.eventsDB, nameFilter);
         }
     });
-    const databases = {
-        eventsDB: { name: 'eventsDB', version: 1, store: 'events' },
-        MyDatabaseActionevent: { name: 'MyDatabaseActionevent', version: 1, store: 'files' }
-    };
-    function openDatabase({ name, version, store }) {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(name, version);
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                const objectStore = db.createObjectStore(store, { keyPath: 'id', autoIncrement: true });
-                objectStore.createIndex('name', 'name', { unique: false });
-                objectStore.createIndex('type', 'type', { unique: false });
-                objectStore.createIndex('path', 'path', { unique: false });
-            };
-            request.onsuccess = (event) => {
-                resolve(event.target.result);
-            };
-            request.onerror = (event) => {
-                reject(event.target.error);
-            };
-        });
-    }
+
     elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
-        function loadDataFromIndexedDB(dbConfig) {
-
-        openDatabase(dbConfig).then((db) => {
-            const transaction = db.transaction([dbConfig.store], 'readonly');
-            const objectStore = transaction.objectStore(dbConfig.store);
-            const request = objectStore.getAll();
-            
-            request.onsuccess = (event) => {
-                const allRecords = event.target.result;
-                allRecords.forEach(record => {
-                    console.log('record', record);
-                    console.log('record.name', record.evento);
-                    const optionElement = document.createElement('option');
-                    optionElement.textContent = record.evento;
-                    optionElement.value = record;
-                    elementHTML.appendChild(optionElement);
-                    cacheAssign[record] = record;
-
-                });
-            };
-            request.onerror = (event) => {
-                console.error('Error loading data from IndexedDB', event.target.error);
-            };
-        }).catch((error) => {
-            console.error('Error opening IndexedDB', error);
+        loadDataFromIndexedDB(databases.MyDatabaseActionevent, (dbConfig, record) => {
+            const optionElement = document.createElement('option');
+            optionElement.textContent = record.evento.nombre;
+            optionElement.value = record.id;
+            elementHTML.appendChild(optionElement);
+            cacheAssign[record.id] = record;
         });
-    }
-    loadDataFromIndexedDB(databases.MyDatabaseActionevent);
     });
 
     return {
@@ -204,19 +145,14 @@ export default async function tab5Action({ elementContainer, files = [], onSave 
         close: () => elementModal.style.display = 'none',
         open: () => {
             elementModal.style.display = 'flex';
-            elementModal.querySelector('.modalEventSave').style.display = 'inline-block';
+            elementModal.querySelector('.modalEventSave').style.display = 'none';
         },
-        onUpdate: (datos) => {
+        onUpdate: async (datos) => {
             if (datos) {
-                fillForm(datos); // Llenar el formulario con los datos actuales
+                fillForm(datos);
             }
             elementModal.style.display = 'flex';
-    
-            // Actualizar datos con la función saveData
-            // saveData(datos);
-    
-            // Mostrar botón Guardar y ocultar botones Agregar y Cerrar
-            elementModal.querySelector('.modalEventAdd').style.display = 'none';
+            updateDataInIndexedDB(databases.eventsDB, datos);
             elementModal.querySelector('.modalEventSave').style.display = 'inline-block';
         },
     };
