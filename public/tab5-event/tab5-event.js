@@ -130,8 +130,9 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
     });
 
     window.señal = (valor) => {
-        console.log("Señal recibida, ", valor);
-
+        setInterval(() => {
+            console.log("Señal recibida, ", 1);
+        }, 1000);
     };
 
     elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
@@ -148,7 +149,10 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
     return {
         element: ModalElement,
         form: form,
-        close: () => elementModal.style.display = 'none',
+        close: () => {elementModal.style.display = 'none',
+            // destruimos la modal para crearlo de nuevo
+            elementModal = null;
+        },
         open: () => {
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalEventSave').style.display = 'none';
@@ -167,7 +171,3 @@ export default async function tab5Event({ elementContainer, files = [], onSave =
 //     console.log("Señal recibida, ", evento);
 
 // }
-window.señal = (valor) => {
-    console.log("Señal recibida, ", valor);
-
-};

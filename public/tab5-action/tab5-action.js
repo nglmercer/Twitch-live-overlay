@@ -208,7 +208,10 @@ export default async function tab5Action({
     return {
         element: ModalElement,
         form: form,
-        close: () => elementModal.style.display = 'none',
+        close: () => {elementModal.style.display = 'none',
+            // destruimos la modal para crearlo de nuevo
+            ModalElement = null;
+        },
         open: (newFiles = null) => {
             loadOptions(elementModal, newFiles || files);
             elementModal.style.display = 'flex';

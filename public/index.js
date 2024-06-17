@@ -2,9 +2,9 @@ import tab5Action from "./tab5-action/tab5-action.js";
 import tab5Event from "./tab5-event/tab5-event.js";
 import overlaymedia from "./overlay/overlaymedia.js";
 import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from './indexedDB.js';
-import { construirModal } from './tab5-event/tabevent.js';
+// import { construirModal } from './tab5-event/tabevent.js';
 import { log } from './utils/console.js';
-    construirModal();
+    // construirModal();
   function getoverlayEvents() {
     const overlayEvents = localStorage.getItem('existingFiles') || '[]';
     return JSON.parse(overlayEvents);
@@ -15,7 +15,13 @@ import { log } from './utils/console.js';
   log.indexconsole('parsedOverlayEvents', parsedOverlayEvents);
   function getDataText(data) {
       return data && data.select ? data.select.name : 'N/A';
-  }
+  }//   const idelement = formulario.elements.namedItem('id');  
+  setTimeout(() => {
+    const formulario = document.querySelector('.tab5-event');
+
+    console.log('formulario', formulario);
+  }, 3000);
+//   idelement.value = '12345';
   async function createElementWithButtons(dbConfig, data) {
     if (!data || !data.id) {
         console.error('Data is missing or invalid:', data);
@@ -217,5 +223,5 @@ export default async function eventmanager(event, tags) {
     }
 }
 function modalhtml(event, tags) {
-    
+
 }

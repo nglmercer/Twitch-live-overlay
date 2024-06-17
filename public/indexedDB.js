@@ -1,15 +1,15 @@
-window.señal = ()=>{}
+// window.señal = ()=>{}
 
-let elemento = new Proxy({ value: 0 }, {
-    set: (target, prop, value) => {
-        target[prop] = value;
-        señal(target[prop])
-        return true;
-    },
-    get: (target, prop) => {
-        return target[prop];
-    }
-});
+// let elemento = new Proxy({ value: 0 }, {
+//     set: (target, prop, value) => {
+//         target[prop] = value;
+//         señal(target[prop])
+//         return true;
+//     },
+//     get: (target, prop) => {
+//         return target[prop];
+//     }
+// });
 
 
 
@@ -51,7 +51,7 @@ export const databases = {
         delete data.id;
 
     }
-    elemento.value++;
+    // elemento.value++;
 
     const request = objectStore.add(data);
       request.onsuccess = (event) => {
@@ -89,7 +89,7 @@ export const databases = {
       const request = objectStore.put(data);
       request.onsuccess = () => {
         console.log(`Data with id ${data.id} updated in IndexedDB`, data);
-              elemento.value++;
+              // elemento.value++;
 
     };
       request.onerror = (event) => {
