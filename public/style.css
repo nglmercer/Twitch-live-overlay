@@ -84,11 +84,9 @@ background-color: transparent; /* Fondo transparente */
     transition: all 0.2s ease-out;
   }
   .file-container {
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: absolute;
     z-index: 999;
     font-size: 1rem;
     font-weight: 700;
@@ -140,13 +138,23 @@ button {
 }
 .tab-content {
     display: none;
-    border: 1px solid #ccc;
+    flex-direction: column;
+    overflow-x: hidden;
     padding: 20px;
-    background: white;
+    max-height: 90dvh; /* ajusta la altura máxima del contenedor */
 }
 .tab-content.active {
     display: block;
 }
+.tabs-menu {
+    margin-top: 20px;
+    float: inline-start;
+    margin-inline: 0.5rem;
+    width: 180px;
+    max-height: 100dvh; /* ajusta la altura máxima del contenedor */
+    overflow-x: hidden;
+    height: 100%;
+  }
 .indicator {
     height: 2px;
     background: #007bff;
@@ -154,3 +162,17 @@ button {
     bottom: 0;
     transition: left 0.3s, width 0.3s;
 }
+.containerbox {
+    border: 1px solid rgba(88, 88, 255, 0.123);
+    background-color: #212121;
+    margin: 1rem;
+    min-width: 90%;
+    min-height: 90%;
+  }
+  .containerbox-child {
+    border: 1px solid rgba(88, 88, 255, 0.123);
+    background-color: #1a1919;
+    min-width: 90%;
+    min-height: 90%;
+    margin-right: 5%;
+  }

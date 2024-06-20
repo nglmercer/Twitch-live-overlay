@@ -1,3 +1,5 @@
+// See the Electron documentation for details on how to use preload scripts:
+// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const { ipcRenderer, contextBridge } = require("electron");
 const mineflayer = require('mineflayer');
 const { Client, Server: ServerOsc } = require('node-osc');
@@ -8,6 +10,8 @@ const api = {
     getFilesInFolder: () => ipcRenderer.invoke('get-files-in-folder'),
     startDrag: (fileName) => ipcRenderer.invoke('on-drag-start', fileName),
     deleteFile: (fileName) => ipcRenderer.invoke('delete-file', fileName),  
+    getFileById: (fileId) => ipcRenderer.invoke('get-file-by-id', fileId),
+    getFileByname: (fileIdname) => ipcRenderer.invoke('get-file-by-name', fileIdname),
     createOverlayWindow: async () => {
         return await ipcRenderer.invoke('create-overlay-window');
     },

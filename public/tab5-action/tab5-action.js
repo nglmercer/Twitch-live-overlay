@@ -1,15 +1,18 @@
-import { databases, saveDataToIndexedDB, deleteDataFromIndexedDB, updateDataInIndexedDB, loadDataFromIndexedDB, getDataFromIndexedDB } from '../indexedDB.js';
+import {
+    databases,
+    saveDataToIndexedDB,
+    updateDataInIndexedDB,
+} from '../indexedDB.js';
 
 export default async function tab5Action({
     elementContainer,
     files = [],
-    onSave = () => {},
-    onUpdate = () => {},
-    saveData = () => {},
     onCancel = () => {},
+    onSave = () => {},
+    saveData = () => {},
     separator = "_"
 }) {
-    const ModalElement = document.createElement('div');
+    let ModalElement = document.createElement('div');
     const idModal = `ModalElement${Math.floor(Math.random() * 1000)}`;
     const cacheAssign = {};
 
@@ -26,7 +29,7 @@ export default async function tab5Action({
     form.addEventListener('submit', event => event.preventDefault());
 
     let errorMessage = createErrorMessage();
-    elementModal.appendChild(errorMessage);
+    ModalElement.appendChild(errorMessage);
 
     setTimeout(() => errorMessage.style.display = 'none', 5000);
 
@@ -35,14 +38,18 @@ export default async function tab5Action({
         errorDiv.className = 'error-message';
         errorDiv.style.color = 'red';
         errorDiv.style.display = 'none';
+        errorDiv.style.zIndex = '100';
         errorDiv.textContent = 'El nombre es obligatorio.';
         return errorDiv;
     }
 
     function validateForm() {
-        const nombre = form.elements.namedItem('evento_nombre');
+        const nombre = form.elements.namedItem('accionevento_nombre');
         if (!nombre || !nombre.value.trim()) {
             errorMessage.style.display = 'block';
+            errorMessage.style.position = 'absolute';
+            errorMessage.style.top = '26%';
+            errorMessage.style.left = '40%';
             return false;
         }
         errorMessage.style.display = 'none';
@@ -50,104 +57,230 @@ export default async function tab5Action({
     }
 
     function obtenerDatos() {
-        const datosFormulario = new Map();
+        const datosFormulario = {};
         const nameFilter = {};
-
+    
         for (const elemento of form.elements) {
             if (elemento.name) {
+
                 if (elemento.type === 'checkbox') {
-                    datosFormulario.set(elemento.name, elemento.checked);
+                    const numberElement = form.elements.namedItem(`${elemento.name}_number`);
+                    datosFormulario[elemento.name] = {
+                        checked: elemento.checked,
+                        number: numberElement ? numberElement.value || 0 : 0
+                    };
                 } else if (elemento.type === 'select-one') {
-                    datosFormulario.set(elemento.name, cacheAssign[elemento.value] || elemento.value);
+                    datosFormulario[elemento.name] = cacheAssign[elemento.value] || elemento.value;
                 } else {
-                    datosFormulario.set(elemento.name, elemento.value);
+                    datosFormulario[elemento.name] = elemento.value;
                 }
-                nameFilter[(elemento.name).split(separator)[0]] = [];
+    
+                const [prefix] = elemento.name.split(separator);
+                if (!nameFilter[prefix]) {
+                    nameFilter[prefix] = {};
+                }
+    
+                const [, suffix] = elemento.name.split(separator);
+                if (suffix) {
+                    nameFilter[prefix][suffix] = elemento.type === 'checkbox' ? elemento.checked : elemento.value;
+                }
             }
         }
-
-        const retornoDatos = Object.fromEntries(datosFormulario);
-        Object.keys(nameFilter).forEach((key) => {
-            const keysFilter = Object.fromEntries(
-                Object.entries(retornoDatos).filter(([clave, valor]) => clave.includes(key + separator))
-            );
-            const resultSplitted = {};
-            Object.entries(keysFilter).forEach(([clave, valor]) => {
-                resultSplitted[clave.split(separator)[1]] = valor;
-            });
-            nameFilter[key] = resultSplitted;
-        });
-
+    
         const idValue = form.elements.namedItem('id').value;
         nameFilter.id = !isNaN(idValue) ? idValue : null;
-
+    
         return nameFilter;
     }
     
-    const fillForm = (datos) => {
-        const formulario = document.querySelector('.tab5-action');
-        for (const [key, value] of Object.entries(datos)) {
-            const keyCheck = `${key}_check`;
-            const keyNombre = `${key}_nombre`;
-            let element = formulario.elements.namedItem(keyCheck);
-            let element1 = formulario.elements.namedItem(keyNombre);
-            const idelement = formulario.elements.namedItem('id');
-            console.log('key', key, 'value', value, element, element1);
-            
-            if (idelement) {
-                idelement.value = datos.id;
-            } 
+    
+
+    const fillForm = (datos = {}) => {
+        const booleanElements = {};
+        for (const elemento of form.elements) {
+            const { name, type } = elemento;
+            let value = null;
+            if (name) {
+                const [prefix, suffix] = name.split(separator);
+                
+                if (suffix) {
+                    value = datos[prefix] && datos[prefix][suffix] ? datos[prefix][suffix].check : null;
+
+                    if (type === 'checkbox') {
+                        // console.log('elemento.name', elemento.name, elemento.checked, elemento.value,"---------------------elemento",elemento);
+                        // elemento.checked = elemento.value === 'false' ? false : true;
+                        const checkElement = form.elements.namedItem(`${name}`);
+                        const checkdataproperity = datos.hasOwnProperty(name)
+
+                        if (checkElement){ 
+                        Object.entries(datos).forEach(([clave, valor]) => {
+                            const checkvalue = `${clave}_check`;
+                            if (checkvalue === name) {
+                                console.log('${clave}_check', checkvalue,"clave---------nombre",name,"valor--------",valor,"----------------------");
+                                elemento.checked = valor.check;
+                                return true;
+                            } else if (checkvalue === `eventos_check`) {
+                                console.log('eventos_check', checkvalue,"clave---------nombre",name,"valor--------",valor,valor[name]);
+                            }
+                            
+                        });
+                            // console.log('checkElement', checkElement,"datos",datos[name],"datacheck",datos[name]);
+                            // elemento.checked = value === 'false' ? false : true;
+                            }
+                        // console.log('checkElement', checkElement,`${name}_check`);
+                        const numberElement = form.elements.namedItem(`${name}_number`);
+                        if (numberElement) {
+                            numberElement.value = datos[prefix] && datos[prefix][suffix] ? datos[prefix][suffix].number || '' : '';
+                        }
+                    } else {
+                        elemento.value = datos[prefix] && datos[prefix][suffix] ? datos[prefix][suffix] || '' : '';
+                    }
+                } else {
+                    value = datos[name] ? datos[name].check : null;
+                    if (type === 'checkbox') {
+                        elemento.checked = datos[name] ? datos[name].checked || false : false;
+                        const numberElement = form.elements.namedItem(`${name}_number`);
+                        if (numberElement) {
+                            numberElement.value = datos[name] ? datos[name].number || '' : '';
+                        }
+                    } else if (type === 'select-one') {
+                        elemento.value = datos[name] || '';
+                        elemento.selectedIndex = datos[name] ? datos[name].index || 0 : 0;
+                    } else if (type === 'range') {
+                        elemento.value = datos[name] || elemento.defaultValue;
+                    } else {
+                        elemento.value = datos[name] || '';
+                    }
+                }
+            }
+            if (value !== null && typeof value === 'boolean') {
+                booleanElements[name] = value;
+            }
+        }
+        console.log('Boolean elements found:', booleanElements);
+    };
+    
+
+    const resetForm = () => {
+        for (const elemento of form.elements) {
+            if (elemento.name) {
+                if (elemento.type === 'checkbox') {
+                    elemento.checked = false;
+                    const numberElement = form.querySelector(`#${elemento.name}_number`);
+                    if (numberElement) {
+                        numberElement.value = ''; // Asegúrate de manejar el valor del campo de número correctamente
+                    }
+                } else if (elemento.type === 'select-one') {
+                    elemento.selectedIndex = 0;
+                } else if (elemento.type === 'range') {
+                    elemento.value = elemento.defaultValue;
+                } else {
+                    elemento.value = '';
+                }
+            }
         }
     };
-
-    elementModal.querySelector('.modalActionAdd').addEventListener('click', () => {
+    
+    
+    elementModal.querySelector('.modalActionAdd').addEventListener('click', async () => {
         if (!validateForm()) return;
         const nameFilter = obtenerDatos();
-        console.log('nameFilterid', nameFilter.id);
+        onSave();
+        saveData();
         if (nameFilter.id) {
-            console.log('nameFilterid', nameFilter.id);
-            updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            
+            await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         } else {
-            saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         }
         elementModal.style.display = 'none';
     });
 
     elementModal.querySelector('.modalActionClose').addEventListener('click', () => {
         elementModal.style.display = 'none';
-        const nameFilter = obtenerDatos();
-        console.log('nameFilterid close', nameFilter);
         onCancel();
     });
 
-    elementModal.querySelector('.modalActionSave').addEventListener('click', () => {
+    elementModal.querySelector('.modalActionSave').addEventListener('click', async () => {
         if (!validateForm()) return;
         const nameFilter = obtenerDatos();
         elementModal.style.display = 'none';
+        onSave();
+        saveData();
         if (nameFilter.id) {
-            console.log('nameFilterid', nameFilter.id);
-            updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         } else {
-            saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
         }
     });
-    window.señal = (valor) => {
-        console.log("Señal recibida, ", valor);
-        loadOptions(elementModal, files);
-        loadDataFromIndexedDBToForm(databases.MyDatabaseActionevent);
+// Limpiar los elementos select correspondientes
+const selectVideo = form.elements.namedItem('type-video_select');
+const selectImage = form.elements.namedItem('type-imagen_select');
+const selectAudio = form.elements.namedItem('type-audio_select');
+
+if (selectVideo) selectVideo.innerHTML = '';
+if (selectImage) selectImage.innerHTML = '';
+if (selectAudio) selectAudio.innerHTML = '';
+
+// Banderas para comprobar si se añadieron elementos
+let hasVideo = false;
+let hasImage = false;
+let hasAudio = false;
+
+// Iterar sobre los archivos y agregar opciones a los selects correspondientes
+files.forEach(file => {
+    // Creamos el elemento option
+    const optionElement = document.createElement('option');
+    optionElement.textContent = file.name;
+    optionElement.value = file.index;
+
+    // Seleccionamos el select correspondiente según el tipo de archivo
+    let selectElement = null;
+    if (file.type.startsWith('video')) {
+        selectElement = selectVideo;
+        hasVideo = true;
+    } else if (file.type.startsWith('image')) {
+        selectElement = selectImage;
+        hasImage = true;
+    } else if (file.type.startsWith('audio')) {
+        selectElement = selectAudio;
+        hasAudio = true;
+    } else {
+        console.log('No se ha encontrado el tipo de archivo');
     }
-    function loadOptions(elementModal, files) {
-        elementModal.querySelectorAll('.inputSelectSources').forEach(elementHTML => {
-            elementHTML.innerHTML = '';
-            files.forEach(file => {
-                const optionElement = document.createElement('option');
-                optionElement.textContent = file.name;
-                optionElement.value = file.path;
-                elementHTML.appendChild(optionElement);
-                cacheAssign[file.path] = file;
-            });
-        });
+
+    // Si encontramos el select correspondiente, hacemos el append
+    if (selectElement) {
+        selectElement.appendChild(optionElement);
     }
+
+    console.log('selectname', selectElement, file);
+    cacheAssign[file.path] = file;
+});
+
+// Añadir una opción "Sin elementos" si no se añadió ninguna opción
+if (!hasVideo && selectVideo) {
+    const optionElement = document.createElement('option');
+    optionElement.textContent = 'Sin elementos';
+    optionElement.value = 'false';
+    selectVideo.appendChild(optionElement);
+}
+
+if (!hasImage && selectImage) {
+    const optionElement = document.createElement('option');
+    optionElement.textContent = 'Sin elementos';
+    optionElement.value = 'false';
+    selectImage.appendChild(optionElement);
+}
+
+if (!hasAudio && selectAudio) {
+    const optionElement = document.createElement('option');
+    optionElement.textContent = 'Sin elementos';
+    optionElement.value = 'false';
+    selectAudio.appendChild(optionElement);
+}
+
+    
 
     const exportFormData = () => {
         const formData = obtenerDatos();
@@ -158,7 +291,6 @@ export default async function tab5Action({
     const importFormData = (importedData) => {
         try {
             const formData = JSON.parse(importedData);
-            console.log('formData', formData);
             fillForm(formData);
             alert('Datos importados correctamente.');
         } catch (error) {
@@ -166,54 +298,15 @@ export default async function tab5Action({
         }
     };
 
-    document.getElementById('export-button').addEventListener('click', () => {
-        const exportedData = exportFormData();
-        const exportTextArea = document.getElementById('export-data');
-        exportTextArea.value = exportedData;
-        exportTextArea.style.display = 'block';
-    });
-
-    document.getElementById('import-button').addEventListener('click', () => {
-        const importTextArea = document.getElementById('import-data');
-        importTextArea.style.display = 'block';
-        document.getElementById('confirm-import-button').style.display = 'block';
-    });
-
-    document.getElementById('confirm-import-button').addEventListener('click', () => {
-        const importTextArea = document.getElementById('import-data');
-        const importedData = importTextArea.value;
-        importFormData(importedData);
-        importTextArea.style.display = 'none';
-        document.getElementById('confirm-import-button').style.display = 'none';
-    });
-
-    loadOptions(elementModal, files);
-    
-    const loadDataFromIndexedDBToForm = (DB) => {
-        console.log("Se carga IndexedDB en el form")
-        loadDataFromIndexedDB(DB)
-            .then(records => {
-                console.log("Records IndexedDB form", records)
-                records.forEach(record => {
-                    const optionElement = document.createElement('option');
-                    optionElement.textContent = record.id;
-                    optionElement.value = record.id;
-                    form.elements.namedItem('inputSelectSources').appendChild(optionElement);
-                    cacheAssign[record.id] = record;
-                });
-            })
-            .catch(error => console.error('Error loading data from IndexedDB', error));
-    }
-
     return {
         element: ModalElement,
         form: form,
-        close: () => {elementModal.style.display = 'none',
-            // destruimos la modal para crearlo de nuevo
+        close: () => {
+            elementModal.style.display = 'none';
             ModalElement = null;
         },
         open: (newFiles = null) => {
-            loadOptions(elementModal, newFiles || files);
+            resetForm();
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'inline-block';
             elementModal.querySelector('.modalActionSave').style.display = 'none';
@@ -223,9 +316,6 @@ export default async function tab5Action({
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
             elementModal.querySelector('.modalActionSave').style.display = 'inline-block';
-        },
-        loadIndexedDB: () => {
-            loadDataFromIndexedDBToForm(databases.MyDatabaseActionevent);
         },
     };
 }

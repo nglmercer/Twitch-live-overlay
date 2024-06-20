@@ -36,12 +36,12 @@
 </head>
 
 <body class="bg-gray-600">
-    <div class="tabs">
-      <div class="tab" data-tab="tab1">Tab1 chat</div>
-      <div class="tab" data-tab="tab2">Tab2 minecraft</div>
-      <div class="tab" data-tab="tab3">Tab3 actions & events</div>
-      <div class="tab" data-tab="tab4">Tab4 upload files</div>
-      <div class="tab" data-tab="tab5">Tab5 settings</div>
+    <div class="tabs-menu">
+      <div class="tab" data-tab="tab1">chat</div>
+      <div class="tab" data-tab="tab2">minecraft</div>
+      <div class="tab" data-tab="tab3">actions & events</div>
+      <div class="tab" data-tab="tab4">upload files</div>
+      <div class="tab" data-tab="tab5">settings</div>
       <div class="indicator"></div>
   </div>
 
@@ -115,10 +115,10 @@
           
     </div>
   </div>
-    <div id="tab2" class="tab-content w-full bg-slate-500">
-      <div class="grid border-2	p-8 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
+    <div id="tab2" class="tab-content">
+      <div class="grid border-2 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
 
-      <form id="createBotForm" class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
+      <form id="createBotForm" class="grid w-11/12 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
         <label for="keyBOT" class="justify-self-start">MinecraftBOT:</label>
         <input type="text" id="keyBOT" name="keyBOT" value="" required>
         <label for="keySERVER" class="justify-self-start">IP del Server:</label>
@@ -130,7 +130,7 @@
       </form>
           <div id="resultMessage"></div>
 
-          <div class="grid w-3/4 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
+          <div class="grid w-11/12 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
             <label>Tu Minecraft playerName:</label>
             <input type="text" id="playerNameInput" placeholder="minecraftPlayer" onchange="saveDataminecraft()">
 
@@ -303,18 +303,15 @@ Puede vincular estas acciones a los eventos a continuación.
       </div>
 
           <!-- Modulo tab 5 Apartado Modal, tab5 Action -->
-    <div id="tab5-action"></div>
-    <!-- Modulo tab 5 Apartado Modal, tab5 Action -->
-    
+          <div id="tab5-action"></div>
+          <button id="openaction" class="btn btn-primary">openaction</button>
+          <button id="closeaction" class="btn btn-primary">closeaction</button>
+          <div id="loadrowactionsevents"></div>
+          <div>
+              <input type="text" id="action-name" placeholder="action name">
+              <button id="testactionevent" class="btn btn-primary">test</button>
+          </div>
 
-    <button id="openaction" >openaction</button>
-    <button id="closeaction" >close</button>
-    <div id="tab5-event"></div> 
-    <button id="openevent" >openevent</button>
-    <button id="closeevent" >close</button>
-    <div id="tab5overlay" ></div>
-    <button id="openoverlay" >openoverlay</button>
-    <button id="closeoverlay" >closeoverlay</button>
     <script type="module" src="./index.js"></script>
     </div>
     <!-- creamos un script donde al estar checked se muestran mas espacios y elementos para modalactions -->
