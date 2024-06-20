@@ -50,11 +50,8 @@ function startListening() {
     client.on('message', (wat, tags, message, self) => {
       manageOptions(tags, message);
       handleEvent('chat', tags, message);
-      console.log("wat:", wat);
-      console.log("message event/ tags:", tags);
-      console.log("message:", message);
-      console.log("self:", self);
-      eventmanager("Chat", tags);
+      console.log("message event/ tags wat self y message", message, tags, self,wat);
+      // eventmanager("chat", tags);
     });
     client.on('cheer', (wat, tags, message, self) => {
       console.log("wat:", wat);
@@ -63,7 +60,7 @@ function startListening() {
       console.log("cheer/ self:", self);
       manageEvent(tags, message);
       handleEvent('bits', tags, message);
-      eventmanager("cheer", tags);
+      eventmanager("bits", tags);
 
     });
     
@@ -86,9 +83,21 @@ function startListening() {
     });
     
     client.on("logon", (tags) => {
-      console.log("tags:", tags);
-      console.log("logon-success");
-      eventmanager("logon", tags);
+      console.log("logon event/tags:", tags);
+    });
+    client.on('join', (tags) => {
+      console.log("join event/tags:", tags);
+    });
+    client.on('subscription', (tags) => {
+      console.log("subscription event/tags:", tags);
+    });
+    client.on('resub', (tags) => {
+      console.log("resub event/tags:", tags);
+    });
+    client.on("follow", (tags) => {
+      console.log("follow event/tags:", tags);
+      eventmanager("follow", tags);
+
     });
   }
 }

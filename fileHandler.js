@@ -107,7 +107,7 @@ const getFileById = (fileId) => {
     console.log('fileData', fileData);
 
     if (!file) {
-        throw new Error(`File with id ${fileId} not found`);
+        throw new Error(`File with id ${fileIdNumber} not found`);
     }
 
     return {

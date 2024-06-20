@@ -46,7 +46,7 @@ export class TTS {
       utterance.voice = selectedVoice;
       utterance.rate = parseFloat(speed);
       utterance.pitch = parseFloat(pitch);
-      console.log(utterance.voice, utterance.rate, utterance.pitch);
+      // console.log(utterance.voice, utterance.rate, utterance.pitch);
 
       window.speechSynthesis.speak(utterance);
       document.getElementById("audiotrack").pause();

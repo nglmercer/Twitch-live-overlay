@@ -11,8 +11,8 @@ import { log } from './utils/console.js';
   console.log('parsedOverlayEvents', parsedOverlayEvents);
   console.log('parsedOverlayEvents', parsedOverlayEvents);
   function getDataText(data) {
-      return data && data.select ? data.select.name : 'N/A';
-  }//   const idelement = formulario.elements.namedItem('id');  
+    return data && data.select ? data.select : 'N/A';
+}
 
 //   idelement.value = '12345';
 async function createElementWithButtons(dbConfig, data) {
@@ -156,39 +156,89 @@ async function imageexists(imagen) {
     return false;
 }
 
+const actionnameinput = document.getElementById('action-name');
+const testactionevent = document.getElementById('testactionevent');
+testactionevent.addEventListener('click', () => {
+    eventmanager(actionnameinput.value, actionnameinput.value);
+    // console.log('testactionevent', actionnameinput.value);
+});
+export default async function eventmanager(eventType, data) {
+    console.log('eventmanager', eventType, "eventype data -------------------", data);
 
-export default async function eventmanager(event, tags) {
+    let eventsfind = await getDataFromIndexedDB(databases.MyDatabaseActionevent);
 
-    try {
-        let eventsfind = await getDataFromIndexedDB(databases.eventsDB);
-        eventsfind.forEach(eventname => {
-            // let loweventname = eventname.toLowerCase();
-            for (const [key, value] of Object.entries(eventname)) {
-            // console.log('key', key, 'value', value);
-                if (key === event) {
-                    // console.log('event', event, 'found');
-                    if (value.check) {
-                        // console.log('key', key, 'value', value);
-                        if (value.check) {
-                            videoexists(eventname.Action.select.video);
-                            audioexists(eventname.Action.select.audio);
-                            imageexists(eventname.Action.select.imagen);
+    // Conjunto para almacenar los tipos de archivo que ya se han procesado
+    let processedTypes = new Set();
+
+    // Iteramos sobre cada evento encontrado
+    eventsfind.forEach(eventname => {
+        Object.entries(eventname).forEach(([key, value]) => {
+            let splitkey = key.split('-');
+
+            // Verificamos si el tipo de evento coincide y si el evento no tiene check
+            if (splitkey[1] === eventType && !value.check) {
+                console.log(splitkey, "eventsfind---------------------", eventsfind, "eventname---------------------", eventname, "eventType------------------", eventType, "value------------------", value, "key data -------------------", key);
+                return true;
+            }
+
+            // Verificamos si el tipo de evento coincide
+            if (splitkey[1] === eventType) {
+                console.log('eventname', eventname["type-imagen"], "value", value, "key data -------------------", key);
+                console.log('eventname', eventname["type-video"], "value", value, "key data -------------------", key);
+                console.log('eventname', eventname["type-audio"], "value", value, "key data -------------------", key);
+
+                // Procesamos el tipo de imagen si no ha sido procesado aún
+                if (eventname["type-imagen"] && eventname["type-imagen"].check && !processedTypes.has("image")) {
+                    processedTypes.add("image");
+                    getfileId(eventname["type-imagen"].select).then(srcoverlay => {
+                        if (srcoverlay !== null) {
+                            window.api.createOverlayWindow();
+                            window.api.sendOverlayData('play', { src: srcoverlay.path, fileType: srcoverlay.type, options: eventname["type-imagen"] });
+                            console.log("srcoverlay encontrado", "index", eventname["type-imagen"].select, "src", srcoverlay.path, "fileType", srcoverlay.type);
                         }
-                    
-                                // console.log('event', "true or false in for key value",event.Action); // Safe access using optional chaining
-
-                    }
+                    });
                 }
 
-        }
-        /// test de prueba ya que el anterior duplica el numero de veces que realiza el evento
+                // Procesamos el tipo de video si no ha sido procesado aún
+                if (eventname["type-video"] && eventname["type-video"].check && !processedTypes.has("video")) {
+                    processedTypes.add("video");
+                    getfileId(eventname["type-video"].select).then(srcoverlay => {
+                        if (srcoverlay !== null) {
+                            window.api.createOverlayWindow();
+                            window.api.sendOverlayData('play', { src: srcoverlay.path, fileType: srcoverlay.type, options: eventname["type-video"] });
+                            console.log("srcoverlay encontrado", srcoverlay, "index", eventname["type-video"].select, "src", srcoverlay.path, "fileType", srcoverlay.type);
+                        }
+                    });
+                }
+
+                // Procesamos el tipo de audio si no ha sido procesado aún
+                if (eventname["type-audio"] && eventname["type-audio"].check && !processedTypes.has("audio")) {
+                    processedTypes.add("audio");
+                    getfileId(eventname["type-audio"].select).then(srcoverlay => {
+                        if (srcoverlay !== null) {
+                            window.api.createOverlayWindow();
+                            window.api.sendOverlayData('play', { src: srcoverlay.path, fileType: srcoverlay.type, options: eventname["type-audio"] });
+                            console.log("srcoverlay encontrado", srcoverlay, "index", eventname["type-audio"].select, "src");
+                        }
+                    });
+                }
+            }
         });
-
-
-    } catch (error) {
-        console.error('Error in eventmanager', error);
-    }
+    });
 }
-function modalhtml(event, tags) {
-
+async function getfileId(id) {
+    if (id === undefined || id === null) {
+        return null;
+    } 
+    if (id === false) {
+        return null;
+    }
+    let converidtonumber = Number(id);
+    let findelement = window.api.getFileById(converidtonumber);
+    // console.log('findelement', findelement,"else----------------", id, "id data -------------------", copyFiles);
+    if (findelement) {
+        return findelement;
+    } else {
+        return null;
+    }
 }
