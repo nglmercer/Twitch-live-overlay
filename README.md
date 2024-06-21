@@ -30,6 +30,11 @@ Aqui le muestro la sintaxis de minecraft :
 
 ## Ejemplo de sintaxis utilizada en la demo
 ESTE ES UN EJEMPLO PARA Minecraft TNT
+
+## 1.0.9
+primera version con overlays sonidos imagenes videos con elementos personalizados en beta
+![image](https://github.com/nglmercer/Twitch-live-overlay/assets/128845117/b07f8a89-2bd5-46f4-a759-e31e5b68d707)
+
 ```
 
 chat:
