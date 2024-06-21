@@ -35,20 +35,20 @@
   <script src="renderer.js"></script>
 </head>
 
-<body class="bg-gray-600">
+<body class="bg-gray-600 p-0">
     <div class="tabs-menu">
       <div class="tab" data-tab="tab1">chat</div>
       <div class="tab" data-tab="tab2">minecraft</div>
-      <div class="tab" data-tab="tab3">actions & events</div>
-      <div class="tab" data-tab="tab4">upload files</div>
-      <div class="tab" data-tab="tab5">settings</div>
+      <div class="tab" data-tab="tab3">upload files</div>
+      <div class="tab" data-tab="tab4">actions & events</div>
+      <div class="tab" data-tab="tab5">settings and test</div>
       <div class="indicator"></div>
   </div>
 
     <div id="tab1" class="tab-content">
 
       <div class="jumbotron">
-        <button id="connect-button" class="btn btn-primary">Connect</button>
+        <!-- <button id="connect-button" class="btn btn-primary">Connect</button> -->
         <!-- <div class="grid float-end right-0">
           <div class="card">
             <a href="https://www.tiktok.com/@melserng" >
@@ -115,7 +115,7 @@
           
     </div>
   </div>
-    <div id="tab2" class="tab-content">
+    <div id="tab2" class="tab-content jumbotron">
       <div class="grid border-2 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
 
       <form id="createBotForm" class="grid w-11/12 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
@@ -206,59 +206,59 @@
             
           </script>
     </div>
-    <div id="tab3" class="tab-content">
-      <h1>Actions & Events      </h1>
-      <p>
-Aquí puede definir sus acciones y eventos personalizados (desencadenantes).Por ejemplo, puede mostrar un video o animación en cierto regalo.
-Para esto primero debe definir la acción y luego el evento.Se requiere la superposición de mis acciones para OBS/Live Studio.
-Mire este video para aprender cómo funciona las acciones y el sistema de eventos.
-      </p>
-      <div class="actions-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
-        <h2>Actions</h2>
+    <div id="tab3" class="tab-content jumbotron">
+      <!-- <div>
+        <h1>Actions & Events      </h1>
         <p>
-¿Qué es lo que desea que suceda?Aquí puede crear nuevas acciones y editar las existentes.
-Puede vincular estas acciones a los eventos a continuación.
+  Aquí puede definir sus acciones y eventos personalizados (desencadenantes).Por ejemplo, puede mostrar un video o animación en cierto regalo.
+  Para esto primero debe definir la acción y luego el evento.Se requiere la superposición de mis acciones para OBS/Live Studio.
+  Mire este video para aprender cómo funciona las acciones y el sistema de eventos.
         </p>
-        <button id="createActionandOpenModal">Crear nueva acción</button>
-        <script>
-          const createActionandOpenModal = document.getElementById('createActionandOpenModal');
-          createActionandOpenModal.addEventListener('click', () => {
-            console.log('createActionandOpenModal');
-          }); 
-          function openactioneventModal() {
-          }
-          function createactioneventmodal() {
-          }
-        </script>
-        <table class="table" id="actions-table">
-          <td>atajos</td>
-          <td>nombre</td>
-          <td>duración</td>
-          <td>imagen</td>
-          <td>video</td>
-          <td>sonido</td>
-        </table>
-        </div>
-      <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
-        <h2>Events</h2>
-        <p>Aquí puede definir qué activará sus acciones.
+        <div class="actions-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
+          <h2>Actions</h2>
+          <p>
+  ¿Qué es lo que desea que suceda?Aquí puede crear nuevas acciones y editar las existentes.
+  Puede vincular estas acciones a los eventos a continuación.
           </p>
-          <button>Crear nuevo evento</button>
-          <table class="table" id="events-table">
+          <button id="createActionandOpenModal">Crear nueva acción</button>
+          <table class="table" id="actions-table">
             <td>atajos</td>
-            <td>activo</td>
-            <td>evento</td>
-            <td>trigger</td>
-            <td>actions</td>
+            <td>nombre</td>
+            <td>duración</td>
+            <td>imagen</td>
+            <td>video</td>
+            <td>sonido</td>
           </table>
-      </div>
-  </div>
-  <div id="tab4" class="tab-content">
+          </div>
+        <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
+          <h2>Events</h2>
+          <p>Aquí puede definir qué activará sus acciones.
+            </p>
+            <button>Crear nuevo evento</button>
+            <table class="table" id="events-table">
+              <td>atajos</td>
+              <td>activo</td>
+              <td>evento</td>
+              <td>trigger</td>
+              <td>actions</td>
+            </table>
+        </div>
+      </div> -->
       <h1>subir archivos</h1>
       <div class="file-container" id="drop-area">
         <ul id="file-list"> </ul>        
 
     </div>
+  </div>
+  <div id="tab4" class="tab-content">
+    <div id="tab5-action"></div>
+    <div class="jumbotron">
+      <button id="openaction" class="btn btn-primary">openaction</button>
+      <button id="closeaction" class="btn btn-primary">closeaction</button>
+      <div id="loadrowactionsevents"></div>
+
+    </div>
+
 
 
   <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
@@ -289,8 +289,8 @@ Puede vincular estas acciones a los eventos a continuación.
     </div>
   </div>
   </div>
-  <div id="tab5" class="tab-content">
-    <h1>mensajes y eventos</h1>
+  <div id="tab5" class="tab-content jumbotron">
+    <h1>Seccion para test -- > en consola</h1>
     <div class="container" id="main">
       <div id="messages"></div>
     </div>
@@ -303,10 +303,7 @@ Puede vincular estas acciones a los eventos a continuación.
       </div>
 
           <!-- Modulo tab 5 Apartado Modal, tab5 Action -->
-          <div id="tab5-action"></div>
-          <button id="openaction" class="btn btn-primary">openaction</button>
-          <button id="closeaction" class="btn btn-primary">closeaction</button>
-          <div id="loadrowactionsevents"></div>
+
           <div>
               <input type="text" id="action-name" placeholder="action name">
               <button id="testactionevent" class="btn btn-primary">test</button>

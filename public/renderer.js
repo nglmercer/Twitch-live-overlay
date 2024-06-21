@@ -157,15 +157,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadFileList();
-    document.getElementById('connect-button').addEventListener('click', async () => {
-        const result = await window.api.createClientOsc();
+    // document.getElementById('connect-button').addEventListener('click', async () => {
+    //     const result = await window.api.createClientOsc();
 
-        if (result.success) {
-            console.log('OSC Client created successfully');
-        } else {
-            console.error('Failed to create OSC Client');
-        }
-    });
+    //     if (result.success) {
+    //         console.log('OSC Client created successfully');
+    //     } else {
+    //         console.error('Failed to create OSC Client');
+    //     }
+    // });
     document.getElementById('createBotForm').addEventListener('submit', async (event) => {
         event.preventDefault();
         // ipExample = "localhost:25565";

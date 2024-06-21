@@ -50,7 +50,7 @@ function startListening() {
     client.on('message', (wat, tags, message, self) => {
       manageOptions(tags, message);
       handleEvent('chat', tags, message);
-      console.log("message event/ tags wat self y message", message, tags, self,wat);
+      // console.log("message event/ tags wat self y message", message, tags, self,wat);
       // eventmanager("chat", tags);
     });
     client.on('cheer', (wat, tags, message, self) => {
