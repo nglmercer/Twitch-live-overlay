@@ -181,30 +181,29 @@
                             <label for="followRole">Followers</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="isSubscriber" checked>
-                            <label for="isSubscriber">isSubscriber</label>
+                            <input type="checkbox" id="subscriber" checked>
+                            <label for="subscriber">subscriber</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="isModerator" checked>
-                            <label for="isModerator">isModerator</label>
+                            <input type="checkbox" id="mod" checked>
+                            <label for="mod">isModerator</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="isNewGifter" checked>
-                            <label for="isNewGifter">isNewGifter</label>
+                            <input type="checkbox" id="first-msg" checked>
+                            <label for="first-msg">first-msg</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="teamMemberLevel" checked>
-                            <label for="teamMemberLevel">
-                                Team Members <span>Min. Level:</span>
+                            <input type="checkbox" id="bits-leader" checked>
+                            <label for="bits-leader">
+                                Top bits <span>top:</span>
                             </label>
-                            <input type="number" id="teamMemberLevel-value" class="input input-bordered w-12" value="1" min="0">
+                            <input type="number" id="bits-leader-value" class="input input-bordered w-12" value="1" min="0">
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="topGifterRank" checked>
-                            <label for="topGifterRank">
-                                Top Gifters <span>Top:</span>
+                            <input type="checkbox" id="turbo" checked>
+                            <label for="turbo">
+                              turbo 
                             </label>
-                            <input type="number" id="topGifterRank-value" class="input input-bordered w-12" value="3" min="0">
                         </div>
                         <div class="flex items-center">
                             <input type="checkbox" id="allowed-users-list" checked>
@@ -664,52 +663,40 @@
               <td>actions</td>
             </table>
         </div>
-      </div>
-      <h1>subir archivos</h1>
-      <div class="file-container" id="drop-area">
-        <ul id="file-list"> </ul>        
+      </div>  
 
     </div>
-  </div>
+
   <div id="tab4" class="tab-content">
-    <div id="tab5-action"></div>
-    <div class="jumbotron">
-      <button id="openaction" class="btn btn-primary">openaction</button>
-      <button id="closeaction" class="btn btn-primary">closeaction</button>
-      <div id="loadrowactionsevents"></div>
-
-    </div>
-
-
-
-  <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="settingsModalLabel">Browser Source Export</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+    <div class="containerbox">       
+        <div class="center-element">arrastre elementos aquí</div>
+ 
+        <div class="file-container " id="drop-area">
+            <ul id="file-list"> </ul>
         </div>
-        <div class="modal-body">
-          <p>A continuación se muestra una URL que puede colocar como fuente del navegador en OBS. Esta URL aplicará automáticamente el nombre de su canal y comenzará a escuchar mensajes.</p><p>Tenga en cuenta que solo Amazon Polly es compatible como fuente de navegador para OBS y que los usuarios del chat excluidos no funcionan (todavía)..</p>
-          <div class="row">
-            <div class="col-8">
-            <input id="settingsURL" class="form-control" value="" disabled />
-          </div>
-          <div class="col-4">
-            <button class="btn btn-outline-dark" onclick="copyURL()">Copy URL</button>
-          </div>
-         </div>
+            
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+        
+    <div class="containerbox">
+            <div id="tab5-action"></div>
+            <button id="openaction" class="custombutton button-center">Añadir Accion&Eeventos</button>
+            <button id="closeaction" class="deleteButton">Cerrar</button>
+            <div id="loadrowactionsevents"></div>
+            <div>
+                <input type="text" id="action-name" placeholder="action name">
+                <button id="testactionevent" class="btn btn-primary">test</button>
+            </div>
+
+
+        <div class="modalhtml"></div>
+
+        <button id="open" style="display: none;">open</button>
+        <button id="close" style="display: none;">close</button>
+        
+
+        <div id="chatbox"></div>
         </div>
-      </div>
-    </div>
-  </div>
-  </div>
+</div>
   <div id="tab5" class="tab-content jumbotron">
     <h1>Seccion para test -- > en consola</h1>
     <div class="container" id="main">
@@ -791,7 +778,7 @@
 
     </script>
     </div>
-  </div>
+
   <div class="divfooter">
     <audio id="audiotrack"></audio>
     <audio id="audio" controls></audio>

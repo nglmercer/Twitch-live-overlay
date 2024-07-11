@@ -1,4 +1,4 @@
-import { TTS } from './tts.js';
+import { TTS } from './functions/tts.js';
 
 document.getElementById("listenBtn").addEventListener("click", function(event){
   event.preventDefault()
@@ -48,6 +48,7 @@ function startListening() {
     });
 
     client.on('message', (wat, tags, message, self) => {
+      localStorage.setItem('lastMessage',JSON.stringify(tags));
       addChatItem('chat', tags, message, '#007bff');
       // console.log("message event/ tags wat self y message", message, tags, self,wat);
       // addChatItem("chat", tags);
@@ -98,6 +99,14 @@ function startListening() {
     });
   }
 }
+if (localStorage.getItem('lastMessage')) {
+  const lastMessage = JSON.parse(localStorage.getItem('lastMessage'));
+  setTimeout(() => {
+    // const evalbadgesvalue = evalBadge(lastMessage);
+    // console.log('evalbadgesvalue', evalbadgesvalue);  
+    addChatItem("chat", lastMessage, lastMessage.message, "gold");
+  }, 1000);
+}
 function sanitize(text) {
   if (text) { // Verifica si la entrada no es undefined
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -110,6 +119,7 @@ function addChatItem(eventype,tags, message, color) {
   if (container.find('div').length > 500) {
       container.find('div').slice(0, 200).remove();
   }
+  const messageHTML = getMessageHTML(message, tags);
   console.log(eventype, tags, message, color);
   container.find('.temporary').remove();
   // si color color ? es true static si no es false temporary
@@ -117,10 +127,114 @@ function addChatItem(eventype,tags, message, color) {
       <div class=${tags ? 'static' : 'temporary'}>
           <span>
               <b>${tags.username}</b>
-              <span style="color:${color}">${sanitize(message)}</span>
+              <span style="color:${color}">${messageHTML}</span>
           </span>
       </div>
   `);
+  evalBadge(tags);
+}
+function evalBadge(tags) {
+  let userid = tags['user-id'];
+  const checkboxes = document.querySelectorAll('.card-content input[type="checkbox"]');
+  let values = {};
+  let evalresult = false;
+  // Recolectar el estado de los checkboxes y inputs adicionales
+  checkboxes.forEach(checkbox => {
+      const relatedInput = document.getElementById(`${checkbox.id}-value`);
+      if (relatedInput) {
+          values[checkbox.id] = {
+              checked: checkbox.checked,
+              value: relatedInput.value
+          };
+      } else {
+          values[checkbox.id] = checkbox.checked;
+      }
+  });
+  getuserinfo(userid);
+  console.log("values", values);
+  console.log(tags, "data uniqueId evalBadge", values);
+  
+  // Evaluar si el usuario cumple al menos uno de los criterios
+  for (const [key, value] of Object.entries(values)) {
+      if (values.allUsers === true) {
+          console.log("allUsers retornamos true y no hacemos nada", values.allUsers);
+          evalresult = true;
+      }
+
+      // Verificar si la clave es 'badges' y si tiene subpropiedades
+
+          for (const [badgeKey, badgeValue] of Object.entries(tags.badges || {})) {
+              if (badgeKey === key && value.checked) {
+                  if (badgeValue >= value.value) {
+                    console.log(`Condition met for ${key} with value ${badgeValue} and additional value ${value.value}`);
+                    evalresult = true;
+                  }
+                  console.log(badgeValue, value, badgeKey);
+              }
+          }
+      
+
+      if (typeof value === 'object' && tags[key] !== undefined) {
+          // Verificar si el valor es un objeto con un campo "checked" y "value"
+          if (value.checked && ((typeof tags[key] === 'number' && tags[key] > 0) || (typeof tags[key] === 'boolean' && tags[key]))) {
+              console.log(`Condition met for ${key} with value ${tags[key]} and additional value ${value.value}`);
+              evalresult = true;
+          }
+          console.log(tags[key], value);
+      } else if (value === true && ((typeof tags[key] === 'boolean' && tags[key]) || (typeof tags[key] === 'number' && tags[key] > 0))) {
+          console.log(`Condition met for ${key} with value ${tags[key]}`);
+          evalresult = true;
+      }
+  }
+
+  return evalresult;
+}
+function getMessageHTML(message, { emotes }) {
+  if (!emotes) return sanitize(message);
+
+  // store all emote keywords
+  // ! you have to first scan through 
+  // the message string and replace later
+  const stringReplacements = [];
+
+  // iterate of emotes to access ids and positions
+  Object.entries(emotes).forEach(([id, positions]) => {
+    // use only the first position to find out the emote key word
+    const position = positions[0];
+    const [start, end] = position.split("-");
+    const stringToReplace = message.substring(
+      parseInt(start, 10),
+      parseInt(end, 10) + 1
+    );
+
+    stringReplacements.push({
+      stringToReplace: stringToReplace,
+      replacement: `<img src='https://static-cdn.jtvnw.net/emoticons/v2/${id}/animated/dark/1.0' onerror="this.src=src='https://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0'">`,
+    });
+  });
+
+  // generate HTML and replace all emote keywords with image elements
+  const messageHTML = stringReplacements.reduce(
+    (acc, { stringToReplace, replacement }) => {
+      // obs browser doesn't seam to know about replaceAll
+      return acc.split(stringToReplace).join(replacement);
+    },
+    message
+  );
+
+  return messageHTML;
+}
+function getuserinfo(user) {
+  let responseresult = false;
+//   fetch(`https://api.twitch.tv/helix/users/follows?to_id=${user}`, {
+//     headers: new Headers({
+//       Authorization: `Bearer ${this.twitch.$auth.oauth_access_token}`,
+//       "Client-ID": `${this.twitch.$auth.oauth_client_id}`,
+//     })
+// }).then(response => response.json()).then(data => {
+//     responseresult = data;
+// });
+return responseresult;
 }
 const request1 = indexedDB.open("giftlistDatabase", 1);
 // console.log("request",request1);
