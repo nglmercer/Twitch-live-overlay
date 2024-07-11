@@ -388,7 +388,7 @@ button {
                 opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
                 box-shadow 1s cubic-bezier(0.4, 0, 0.2, 1), 
                 translate 1s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: lightblue;
+    /* background-color: lightblue; */
     padding: 20px;
     text-align: center;
   }
@@ -423,4 +423,12 @@ button {
   }
   .card-title {
     color: var(--blue-box-600);
+  }
+  .divfooter {
+    display: flex;
+    position: absolute;
+    background-color: #26355cd0;
+    bottom: 0px;
+    width: 100%;
+    max-height: 120px;
   }

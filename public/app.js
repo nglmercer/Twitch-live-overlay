@@ -1,4 +1,3 @@
-import eventmanager from './index.js';
 import { TTS } from './tts.js';
 
 document.getElementById("listenBtn").addEventListener("click", function(event){
@@ -43,24 +42,22 @@ function startListening() {
     document.getElementById("listenBtn").disabled = true; 
     statusElement.className = "alert alert-success"; 
 
-    client.connect().then(() => {
+    client.connect().then((data) => {
       statusElement.textContent = `Connected to twitch. Listening for messages in ${channel}...`;
+      addChatItem('connect', data, `Connected to twitch ^^`, '#007bff');
     });
 
     client.on('message', (wat, tags, message, self) => {
-      manageOptions(tags, message);
-      handleEvent('chat', tags, message);
+      addChatItem('chat', tags, message, '#007bff');
       // console.log("message event/ tags wat self y message", message, tags, self,wat);
-      // eventmanager("chat", tags);
+      // addChatItem("chat", tags);
     });
     client.on('cheer', (wat, tags, message, self) => {
       console.log("wat:", wat);
       console.log("cheer event/ tags:", tags);
       console.log("message:", message);
       console.log("cheer/ self:", self);
-      manageEvent(tags, message);
-      handleEvent('bits', tags, message);
-      eventmanager("bits", tags);
+      addChatItem("bits", tags);
 
     });
     
@@ -70,7 +67,7 @@ function startListening() {
       console.log("message:", message);
       console.log("self:", self);
       manageEvent('likes', tags);
-      eventmanager("sub", tags);
+      addChatItem("sub", tags);
     });
     
     client.on('resub', (wat, tags, message, self) => {
@@ -79,7 +76,7 @@ function startListening() {
       console.log("message:", message);
       console.log("self:", self);
       manageEvent(tags, message);
-      eventmanager("resub", tags);
+      addChatItem("resub", tags);
     });
     
     client.on("logon", (tags) => {
@@ -96,15 +93,34 @@ function startListening() {
     });
     client.on("follow", (tags) => {
       console.log("follow event/tags:", tags);
-      eventmanager("follow", tags);
+      addChatItem("follow", tags);
 
     });
   }
 }
-
-function manageEvent(tags, message, userstate) {
-  new TTS(message, tags, userstate);
-  console.log('not in lines');
+function sanitize(text) {
+  if (text) { // Verifica si la entrada no es undefined
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  } else {
+      return ''; // Devuelve una cadena vacía si la entrada es undefined
+  }
+}
+function addChatItem(eventype,tags, message, color) {
+  const container = location.href.includes('obs.html') ? $('.eventcontainer') : $('.chatcontainer');
+  if (container.find('div').length > 500) {
+      container.find('div').slice(0, 200).remove();
+  }
+  console.log(eventype, tags, message, color);
+  container.find('.temporary').remove();
+  // si color color ? es true static si no es false temporary
+  container.append(`
+      <div class=${tags ? 'static' : 'temporary'}>
+          <span>
+              <b>${tags.username}</b>
+              <span style="color:${color}">${sanitize(message)}</span>
+          </span>
+      </div>
+  `);
 }
 const request1 = indexedDB.open("giftlistDatabase", 1);
 // console.log("request",request1);
@@ -258,24 +274,8 @@ volumechange.addEventListener('change', function(event){
   event.preventDefault()
   document.getElementById("audiotrack").volume = volumechange.value;
 });
-function volumeChange() {
-  var currentVolume = document.querySelector('#volume').value;
-  document.getElementById("audiotrack").volume = currentVolume;
-}
-/*
-  * Starts stripe checkout
-*/
-function startCheckout() {
-  var tipHandler = new Tip; 
-  tipHandler.startCheckout(); 
-}
-/*
-  * Checks the Tip value
-*/
-function valueCheck() {
-  var tipHandler = new Tip; 
-  tipHandler.valueCheck(); 
-}
+
+
 
 function populateVoiceList() {
   if (typeof speechSynthesis === "undefined") {
@@ -297,21 +297,6 @@ window.speechSynthesis.onvoiceschanged = function() {
   populateVoiceList();
 }
 
-function exportSettings() {
-  var channelName = document.querySelector("#channelname").value;
-  document.getElementById('settingsURL').value = "https://twitchtts.net?channelname="+channelName;
-  if(channelName == "") {
-    alert("You do not have a channel name entered. Please enter a channel name to generate a URL.");
-    document.getElementById('settingsURL').value = "";
-  }
-}
-
-function copyURL() {
-  var copyText = document.getElementById('settingsURL');
-  copyText.select(); 
-  navigator.clipboard.writeText(copyText.value);
-  alert("Copied URL to clipboard.");
-}
 
 function skipMessage() {
   //stops Polly Speech
@@ -339,15 +324,7 @@ window.speechSynthesis.onvoiceschanged = function() {
 /*
    Si la casilla de verificación está seleccionada para excluir a los usuarios del chat, muestre las opciones para ello.
 */
-document.getElementById("exclude-toggle").addEventListener("change", function() {
-  var options = document.getElementById('exclude-options');
-
-});
 
 /*
    Completa la lista de usuarios excluidos del chat con una lista predefinida de robots de moderación conocidos.
 */
-function fillInBots() {
-  var excludedChatters = document.getElementById("excluded-chatters");
-  excludedChatters.value = "Nightbot\nMoobot\nStreamElements\nStreamlabs\nFossabot";
-}

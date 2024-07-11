@@ -1,8 +1,26 @@
+import { TTS, leerMensajes, skipAudio } from './functions/tts.js';
+import { fetchvoicelist } from './utils/select.js';
+let isReading = null;
+var voiceSelect = document.createElement('select');
 
 document.addEventListener('DOMContentLoaded', () => {
     window.api.onShowMessage((event, message) => {
         console.log(message);
     });
+    setTimeout(async () => {
+        var voiceSelectContainer = document.getElementById('voiceSelectContainer');
+        voiceSelectContainer.appendChild(voiceSelect);
+        fetchvoicelist().then(data => {
+
+            Object.keys(data).forEach(function(key) {
+                var option = document.createElement('option');
+                option.text = key;
+                option.value = data[key];
+                voiceSelect.appendChild(option);
+                // console.log(key, data[key]);
+            });
+        });
+      }, 1000);
     const dropArea = document.getElementById('drop-area');
     const fileList = document.getElementById('file-list');
 
@@ -14,6 +32,41 @@ document.addEventListener('DOMContentLoaded', () => {
     dropArea.addEventListener('dragleave', () => {
         dropArea.classList.remove('highlight');
     });
+    document.getElementById("testvoicebtn").addEventListener("click", function() {
+        const messages = document.getElementById("testvoice").value;
+        handleleermensaje(messages);
+    });
+    async function handleleermensaje(text) {
+        const selectedVoice = document.querySelector('input[name="selectvoice"]:checked');
+        const selectedCommentType = document.querySelector('input[name="comment-type"]:checked').value;
+        
+        
+            let shouldRead = false;
+            
+            if (selectedCommentType === 'any-comment') {
+                shouldRead = true;
+            } else if (selectedCommentType === 'dot-comment' && text.startsWith('.')) {
+                shouldRead = true;
+            } else if (selectedCommentType === 'slash-comment' && text.startsWith('/')) {
+                shouldRead = true;
+            } else if (selectedCommentType === 'command-comment') {
+                const commandPrefix = document.getElementById('command').value;
+                if (text.startsWith(commandPrefix)) {
+                    shouldRead = true;
+                    text = text.replace(commandPrefix, '');
+                }
+            }
+
+            if (shouldRead && text && !isReading) {
+             if (selectedVoice.id === 'selectvoice2') {
+                new TTS(text);
+            } else if (selectedVoice.id === 'selectvoice1') {
+                leerMensajes(text);
+            }
+        }
+
+        return true;
+    }
 
     let existingFiles = JSON.parse(localStorage.getItem('existingFiles')) || [];
     dropArea.addEventListener('drop', async (event) => {

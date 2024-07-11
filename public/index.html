@@ -17,9 +17,10 @@
   <meta property="og:title" content="Twitch Chat TTS" />
   <meta property="og:description"
     content="Please enter a channel  text to speech." />
-  <script src="indexdb.js"></script>
+  <script type = "module" src="indexdb.js"></script>
   <script type="module" src="./index.js"></script>
-  <script src="renderer.js"></script>
+  <script type="module" src="./renderer.js"></script>
+  <script src="utils/localstorage.js"></script>
 </head>
 <div class="title-bar">
   <h1>tiktokLiveApp</h1>
@@ -327,97 +328,305 @@
 
 
   </div>
-    <div id="tab2" class="tab-content jumbotron">
-      <div class="grid border-2 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
+  <div id="tab2" class="tab-content">
+    <div class="containerbox">
+        <a href="https://nglmercer.github.io/TikLiveApp/docs/category/minecraftlive" target="_blank">
+            <span class="link link-primary">Leer Tutorial Minecraft</span>
+          </a>
+        <label class="cyberpunk-checkbox-label flex items-center">
+            <input type="checkbox" class="checkbox checkbox-lg" id="MinecraftLive" checked>
+            <span class="ml-2 hover:text-blue-500">MinecraftLive</span> </label>
+            <div class="grid grid-cols-2 gap-4 max-w-xl mx-4">
+                <label>Tu nombre de Minecraft:</label>
+                <input type="text" id="playerNameInput" placeholder="minecraftPlayer">
+                    
+                <label>Comando Inicial de BOT:</label>
+                <input type="text" id="InitcommandInput" placeholder="login">
+                </div>
+            <div class="collapse collapse-arrow bg-base-200 hover:bg-slate-800">
+                <input type="radio" id="acordiondefaultcheck" name="my-accordion-2" checked="checked" />
+                <div class="collapse-title text-xl font-medium">Minecraft bot server</div>
+                <div class="collapse-content">
+                    <form id="createBotForm" class="grid grid-cols-2 gap-4 max-w-xl mx-4">
+                        <label for="keyBOT" class="justify-self-start">Nombre del Bot:</label>
+                        <input type="text" id="keyBOT" name="keyBOT" value="" required>
+                        <label for="keySERVER" class="justify-self-start">IP del Server:</label>
+                        <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
+                        <div class="grid grid-cols-2 gap-2 w-120 ">
+                          <button type="submit" class="custombutton">Conectar Bot</button>
+                          <button id="disconnectButton" class="deleteButton">Desconectar Bot</button>
+                          <div id="botStatus"></div>
+                        </div>
+                      </form>
+                </div>
+              </div>
+              <div class="collapse collapse-arrow bg-base-200 hover:bg-slate-800">
+                <input type="radio" id="acordiondefaultnocheck" name="my-accordion-2" />
+                <div class="collapse-title text-xl font-medium">Minecraft plugin server</div>
+                <div class="collapse-content">
+                    <h1 class="text-xl font-bold mb-4">ServerTap Plugin Configuration</h1>
+                    
+                <div class="grid grid-cols-2 gap-4 max-w-xl mx-4">
+                    <label for="ip" >IP</label>
+                    <input type="text" id="ip" value="127.0.0.1">
+                    <label for="port" >Port</label>
+                    <input type="text" id="port" value="4567">
+                    <label for="password" >Password</label>
+                    <input type="text" id="password" value="change_me">
+                
+                </div>
+                <button class="btn btn-primary" id="testConnection">Connectar</button>
+                </div>
+                
+            </div>
+        <div id="output"></div>
 
-      <form id="createBotForm" class="grid w-11/12 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
-        <label for="keyBOT" class="justify-self-start">MinecraftBOT:</label>
-        <input type="text" id="keyBOT" name="keyBOT" value="" required>
-        <label for="keySERVER" class="justify-self-start">IP del Server:</label>
-        <input type="text" id="keySERVER" name="keySERVER" value="localhost:25565" required>
-        <label for="keyLOGIN" class="justify-self-start">Chat en el servidor:</label>
-        <input type="text" id="keyLOGIN" name="keyLOGIN" value="hola como estan" required>
-        <button type="submit" class="border-4	p-2 m-2 border-slate-600 rounded-md">Conectar Bot</button>
-        <button id="disconnectButton" class="border-4	p-2 m-2 border-slate-600 rounded-md">Desconectar Bot</button>
-      </form>
-          <div id="resultMessage"></div>
 
-          <div class="grid w-11/12 grid-cols-2 border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
-            <label>Tu Minecraft playerName:</label>
-            <input type="text" id="playerNameInput" placeholder="minecraftPlayer" onchange="saveDataminecraft()">
+    <div id="resultMessage"></div>
 
-             <label for="eventType"> test Event Type:</label>
-              <input type="text" id="eventType" placeholder="Event Type" value="gift" onchange="saveDataminecraft()">
-              <label for="data"> test Data :</label> 
-              <input type="text" id="data" placeholder="Data Default" onchange="saveDataminecraft()">
-              <button onclick="testHandleEvent()">Test Handle Event</button> 
-          </div>
-          <script>
-
-            addEventListener('load', () => {
-              const data = localStorage.getItem('dataminecraft');
-              if (data) {
-                const dataObj = JSON.parse(data);
-                document.getElementById('playerNameInput').value = dataObj.playerName;
-                document.getElementById('eventType').value = dataObj.eventType;
-                document.getElementById('data').value = dataObj.data;
-              }
-            });
-            function saveDataminecraft() {
-              const playerName = document.getElementById('playerNameInput').value;
-              const eventType = document.getElementById('eventType').value;
-              const data = document.getElementById('data').value;
-              localStorage.setItem('dataminecraft', JSON.stringify({ playerName, eventType, data }));
-              console.log('Datos guardados en el localStorage', localStorage.getItem('dataminecraft'));
-            }
-          </script>
-          <div class="grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
-            <h1>Gift List</h1>
-            <input type="text" id="gifts-title" placeholder="Gift Title">
-            <textarea id="gifts-description" placeholder="Gift Description"></textarea>
-            <button onclick="addEvent('gifts')">Add Gift</button>
-            <ul id="gifts-list"></ul>
-          <h1>chat List</h1>
-          <input type="text" id="chat-title" placeholder="chat Title">
-          <textarea id="chat-description" placeholder="Comment Description"></textarea>
-          <button onclick="addEvent('chat')">Add chat</button>
-          <ul id="chat-list"></ul>
-        
-          <h1>follows List</h1>
-          <input type="text" id="follows-title" placeholder="follows Title">
-          <textarea id="follows-description" placeholder="follows Description"></textarea>
-          <button onclick="addEvent('follows')">Add follows</button>
-          <ul id="follows-list"></ul>
-        
-          <h1>Subscribe List</h1>
-          <input type="text" id="subscribes-title" placeholder="Subscribe Title">
-          <textarea id="subscribes-description" placeholder="Subscribe Description"></textarea>
-          <button onclick="addEvent('subscribes')">Add Subscribe</button>
-          <ul id="subscribes-list"></ul>
-          </div>
-          </div>
-          <script>
-            if (localStorage.getItem('botFormData')) {
-              const formData = JSON.parse(localStorage.getItem('botFormData'));
-              keyBOTInput = document.getElementById('keyBOT');
-              keySERVERInput = document.getElementById('keySERVER');
-              keyLOGINInput = document.getElementById('keyLOGIN');
-              keyBOTInput.value = formData.keyBOT;
-              keySERVERInput.value = formData.keySERVER;
-              keyLOGINInput.value = formData.keyLOGIN;
-            }
-            const createformData = document.getElementById('createBotForm').addEventListener('change', function(event) {
-              event.preventDefault();
-              const keyBOT = document.getElementById('keyBOT').value.trim();
-              const keySERVER = document.getElementById('keySERVER').value.trim();
-              const keyLOGIN = document.getElementById('keyLOGIN').value.trim();
-              localStorage.setItem('botFormData', JSON.stringify({ keyBOT, keySERVER, keyLOGIN }));
-              console.log('Datos guardados en el localStorage', localStorage.getItem('botFormData'));
-
-            });
-            
-          </script>
     </div>
+    
+    <dialog id="my_modal_2" class="modal">
+        <div class="modal-box">
+          <h3 class="text-lg font-bold" id="modal-title">Title</h3>
+          <p class="py-4" id="modal-content">Content</p>
+        </div>
+        <form method="dialog" class="modal-backdrop bg-transparent">
+          <button>close</button>
+        </form>
+      </dialog>
+    <div class="containerbox">
+
+        
+    Sugerencias y comandos 
+    <div class="dropdown dropdown-end">
+    <div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-xs text-info">
+        <svg
+        tabindex="0"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-4 w-4 stroke-current">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+    </div>
+    <div
+        tabindex="0"
+        class="card compact dropdown-content bg-base-100 rounded-box z-[1] w-64 shadow">
+        <div tabindex="0" class="card-body">
+        <h1>Puedes reemplazar los siguiente por tus valores automaticamente</h1>
+        Playername       por  tu usuario de Minecraft     
+        <br>
+        uniqueId         por  cada USUARIO              
+        <br>
+        nickname         por  cada USUARIO                  
+        <br>
+        comment          por  COMENTARIO                   
+        <br>
+        {milestoneLikes} por  los LIKES                    
+        <br>
+        {likes}          por  los LIKES                   
+        <br>
+        giftName         por  los REGALOS                 
+        <br>
+        repeatCount      por  repeticiones de GIFT      
+        </div>
+    </div>
+    </div>
+
+
+        <!-- <input type="checkbox" id="sugerencia" class="sugerencia">
+        <label for="sugerencia">⁉️ Sugerencias</label>
+
+
+        <div class="sugerencia-content">
+            playername       por  de  TU USUARIO DE MINECRAFT        
+            <br>
+            uniqueId         por  del USUARIO              
+            <br>
+            nickname         por  de  NOMBRE DE USUARIO                  
+            <br>
+            comment          por  del COMENTARIO                   
+            <br>
+            {milestoneLikes} por  de LOS LIKES                    
+            <br>
+            {likes}          por  de LIKES             
+            <br>
+            message          por  de  MENSAJE               
+            <br>
+            giftName         por  de  LOS REGALOS                 
+            <br>
+            repeatCount      por  de   REPETICIONES EN GIFT                 
+        </div> -->
+        <details class="collapse bg-blue-950">
+            <summary class="collapse-title text-xl font-medium">Click Aqui para que puedas editar tus comandos para el chat seguidores cada vez que dan like y comparten
+                tambien son los comandos por defecto de LIKES GIFT Y CHAT si no se encuentra ningun comando personalizado
+            </summary>
+            <div class="collapse-content">
+                <div>
+                    <div id="gift" class="flex justify-center text-cyan-600 text-4xl">Gift</div>
+                    <textarea id="giftcommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                <div>
+                    <div id="chat" class="flex justify-center text-cyan-600 text-4xl">chat</div>
+                    <textarea id="chatcommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="likes" class="flex justify-center text-cyan-600 text-4xl">likes</div>
+                    <textarea id="likescommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="follow" class="flex justify-center text-cyan-600 text-4xl">follow</div>
+                    <textarea id="followcommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="share" class="flex justify-center text-cyan-600 text-4xl">share</div>
+                    <textarea id="sharecommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="welcome" class="flex justify-center text-cyan-600 text-4xl">welcome</div>
+                    <textarea id="welcomecommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="envelope" class="flex justify-center text-cyan-600 text-4xl">envelope</div>
+                    <textarea id="envelopecommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                  </div>
+                  <div>
+                    <div id="subscribe" class="flex justify-center text-cyan-600 text-4xl">subscribe</div>
+                    <textarea id="subscribecommands" class="textarea textarea-info mx-6" rows="4"></textarea>
+                    <div class="tooltip tooltip-right tooltip-info" data-tip=" guarda todos los cambios con Guardar Cambios">
+                    <button class="btn">No olvides ??</button>
+                    <button class="custombutton" id="saveAllChanges">Guardar Cambios</button>
+
+                  </div>
+            </div>
+          </div>
+       
+          </details>
+
+
+        <div class="flex justify-center relative text-cyan-600 text-4xl">gift</div>
+          <div id="eventsContainer"></div>
+          <h1 class="text-2xl font-bold mb-4">Añadir eventos de minecraft Gift List</h1>
+          <input type="number" id="gift-title" class="select select-info w-full">
+          <textarea id="gift-description" class="textarea textarea-info w-full" placeholder="comandos de minecraft"></textarea>
+          <button id="addgift-button" class="custombutton bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">Add Gift</button>
+          <div class="collapse bg-base-200">
+            <input type="radio" name="my-accordion-commandos" checked="checked" />
+            <div class="collapse-title text-xl font-medium">Click ver y editar gift-list</div>
+            <div class="collapse-content">
+                <ul id="gift-list" class="mt-4 list-disc pl-5"></ul>
+            </div>
+          </div>
+
+
+          <h1 class="text-2xl font-bold mt-8 mb-4">Chat List</h1>
+          <input type="text" id="chat-title" class="input input-bordered w-full" placeholder="chat Title">
+          <textarea id="chat-description" class="textarea textarea-info w-full" placeholder="Comment Description"></textarea>
+          <button id="addchat-button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">Add Chat</button>
+          <div class="collapse bg-base-200">
+            <input type="radio" name="my-accordion-commandos" />
+            <div class="collapse-title text-xl font-medium">Click ver y editar chat-list</div>
+            <div class="collapse-content">
+                <ul id="chat-list" class="mt-4 list-disc pl-5"></ul>
+
+            </div>
+          </div>
+          <h1 class="text-2xl font-bold mt-8 mb-4">Likes List</h1>
+          <input type="number" id="likes-title" class="input input-bordered w-full" placeholder="likes Title">
+          <textarea id="likes-description" class="textarea textarea-info w-full" placeholder="likes Description"></textarea>
+          <button id="addlikes-button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">Add Likes</button>
+          
+          <div class="collapse bg-base-200">
+            <input type="radio" name="my-accordion-commandos" />
+            <div class="collapse-title text-xl font-medium">Click ver y editar likes-list</div>
+            <div class="collapse-content">
+                <ul id="likes-list" class="mt-4 list-disc pl-5"></ul>
+            </div>
+          </div>
+          <h2>Aqui puedes agregar comandos de eventos de minecraft con un solo texto</h2>
+
+          <div class="collapse bg-blue-950">
+            <input type="radio" name="my-accordion-commandos" />
+            <div class="collapse-title text-xl font-medium">Parsero de comandos</div>
+            <div class="collapse-content">
+                <input type="text" id="event-store-name" class="input input-bordered w-full" placeholder="titulo">
+                <textarea id="event-data" class="textarea textarea-info w-full" placeholder="Pega aquí los comandos"></textarea>
+                <button class="btn btn-primary mt-4" id="add-event-button">Añadir comandos</button>
+            </div>
+          </div>
+          <div class="flexbox">
+            <label for="eventType" class="text-red-600 font-bold text-4xl"> Test comando:</label><div> 
+              <input type="text" id="eventType" placeholder="Evento a testear" value="gift">
+              <label for="data"></label>
+              <input type="text" id="data" placeholder="Default">
+              <button class="custombutton" id="testHandleevent" >Test comando</button>
+          <div id="lastcomandsended"></div> 
+            </div>
+          </div>
+
+          <div class="container mx-auto p-4">
+            <h1 class="text-2xl font-bold mb-4">Generador de Comandos de Minecraft</h1>
+            
+            <div class="form-group mb-4">
+                <label for="playerName" class="block font-semibold">Nombre del Jugador:</label>
+                <input type="text" id="playerName" class="border p-2 w-full" placeholder="Introduce tu nombre">
+            </div>
+            
+            <div class="form-group mb-4">
+                <label for="action" class="block font-semibold">Acción:</label>
+                <select id="action" class="border p-2 w-full">
+                    <option value="summon">Summon</option>
+                    <option value="give">Give</option>
+                    <option value="title">Title</option>
+                    <option value="subtitle">Subtitle</option>
+                    <option value="tellraw">Tellraw</option>
+                    <option value="actionbar">Actionbar</option>
+                    <option value="setblock">setblock</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-4" id="mobTypeGroup">
+                <label for="mobType" class="block font-semibold">Tipo de Mob:</label>
+                <select id="mobType" class="border p-2 w-full"></select>
+            </div>
+            
+            <div class="form-group mb-4" id="mobOptionsGroup" style="display: none;">
+                <label for="mobOptions" class="block font-semibold">Opciones de Mob:</label>
+                <input type="text" id="mobOptions" class="border p-2 w-full" placeholder="key:value,key:value">
+            </div>
+            
+            <div class="form-group mb-4" id="itemTypeGroup" style="display: none;">
+                <label for="itemType" class="block font-semibold">Tipo de Item:</label>
+                <select id="itemType" class="border p-2 w-full"></select>
+            </div>
+            
+            <div class="form-group mb-4" id="setblockGroup" style="display: none;">
+                <label for="setblock" class="block font-semibold">Tipo de Item:</label>
+                <select id="setblock" class="border p-2 w-full"></select>
+            </div>
+    
+            <div class="form-group mb-4" id="messageGroup" style="display: none;">
+                <label for="message" class="block font-semibold">Mensaje:</label>
+                <input type="text" id="message" class="border p-2 w-full" placeholder="Introduce tu mensaje">
+            </div>
+            
+            <div class="form-group mb-4" id="messageOptionsGroup" style="display: none;">
+                <label for="messageOptions" class="block font-semibold">Opciones de Mensaje:</label>
+                <input type="text" id="messageOptions" class="border p-2 w-full" placeholder="key:value,key:value">
+            </div>
+            
+            <button id="generateCommand" class="btn btn-primary">Generar Comando</button>
+            
+            <div id="outputcommand" class="mt-4"></div>
+        </div>
+        <div id="mine_content"></div>
+</div>
+</div>
     <div id="tab3" class="tab-content jumbotron">
       <div>
         <h1>Actions & Events      </h1>
@@ -582,6 +791,10 @@
 
     </script>
     </div>
+  </div>
+  <div class="divfooter">
+    <audio id="audiotrack"></audio>
+    <audio id="audio" controls></audio>
   </div>
   <script>
     const triggers = [];
