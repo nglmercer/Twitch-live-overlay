@@ -4,12 +4,21 @@ const { app, BrowserWindow, ipcMain, dialog, globalShortcut, ipcRenderer, contex
 const Store = require('electron-store');
 const store = new Store();
 const fileHandler = require('./fileHandler');
-
+require('electron-reload')(__dirname, {
+  electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+  hardResetMethod: 'exit'
+});
 let win;
 function createWindow() {
   win = new BrowserWindow({
       width: 1000,
       height: 800,
+      titleBarStyle: 'hidden',
+      titleBarOverlay: {
+          color: '#2f3241',
+          symbolColor: '#74b1be',
+          height: 60
+      },
       webPreferences: {
           preload: path.join(__dirname, 'preload.js'),
           nodeIntegration: true,

@@ -11,43 +11,71 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js" integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <link href="output.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="style.css" type="text/css">
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Twitch Chat TTS" />
   <meta property="og:description"
     content="Please enter a channel  text to speech." />
-  <script>
-
-  
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-
-    gtag('config', 'G-JT0GEBW5MK');
-  </script>
   <script src="indexdb.js"></script>
   <script type="module" src="./index.js"></script>
   <script src="renderer.js"></script>
 </head>
+<div class="title-bar">
+  <h1>tiktokLiveApp</h1>
+</div>
+<body class=" text-xl mt-10 w-full bg-gray-600 p-0">
+  <div class="parent">
+    <div class="divmenu">
+      <input type="checkbox" id="menu-toggle" >
 
-<body class="bg-gray-600 p-0">
-    <div class="tabs-menu">
-      <div class="tab" data-tab="tab1">chat</div>
-      <div class="tab" data-tab="tab2">minecraft</div>
-      <div class="tab" data-tab="tab3">upload files</div>
-      <div class="tab" data-tab="tab4">actions & events</div>
-      <div class="tab" data-tab="tab5">settings and test</div>
-      <div class="indicator"></div>
+      <div class="tabs-menu">
+          <label for="menu-toggle" class="menu-button">
+              <img src="svg/pinboard.svg" class="icon">
+          </label>
+           <!-- Creamos un Fijador para el menú de tabs -->
+          <div id="stateText"></div>
+          <input type="text" placeholder="tu usuario @uniqueid" id="uniqueIdInput">
+          <input type="button" class="custombutton" id="connectButton" value="Conectar">
+          <div class="tabs" data-tab="tab1">
+              <img src="svg/chat.svg" class="icon">
+              <a>Chat LIVE</a>
+          </div>
+          <div class="tabs" data-tab="tab2">
+              <img src="svg/minecraft.svg" class="icon">
+              <a>Minecraft</a>
+          </div>
+          <div class="tabs" data-tab="tab3">
+              <img src="svg/sounds.svg" class="icon">
+              <a>Sonidos</a>
+          </div>
+          <div class="tabs" data-tab="tab4">
+              <img src="svg/actionsevent.svg" class="icon">
+              <a>Overlay</a>
+          </div>
+          <div class="tabs" data-tab="tab5">
+              <img src="svg/gift.svg" class="icon">
+              <a>Gifnames</a>
+          </div>
+          <div class="tabs" data-tab="tab6">
+              <img src="svg/settings.svg" class="icon">
+              <a>Settings</a>
+          </div>
+          <button class="btn btn-primary" id="Actualizar">Actualizar</button>
+          <div id="Actualizar-status"></div>
+
+          <label class="cyberpunk-checkbox-label">
+              <input type="checkbox" class="cyberpunk-checkbox" id="overlayOff">
+              overlay on/off</label>
+            
+              <label class="cyberpunk-checkbox-label">
+      </div>
+
   </div>
-
+  <div class="divcontent">
     <div id="tab1" class="tab-content">
 
-      <div class="jumbotron">
+
         <!-- <button id="connect-button" class="btn btn-primary">Connect</button> -->
         <!-- <div class="grid float-end right-0">
           <div class="card">
@@ -60,7 +88,7 @@
             </div>
           </div>
         </div> -->
-        <div class="container">
+        <div class="containerbox">
               <h1>TTS de chat de Twitch</h1>
               <p>Ingrese un canal a continuación y luego haga clic en "Comenzar a escuchar" para texto a voz.</p>
                 <form action="#">
@@ -82,38 +110,222 @@
                 <div id="status" class="alert alert-info">
                   Esperando el nombre del canal...
                 </div>
-              <div id="options-container" class="grid grid-cols-2 border-2 gap-2 border-slate-600 rounded-md">
-                  <div id="options-voice" class="grid border-2 p-1  gap-4 mx-2 rounded-md">
-                    
-                    <label for="volume"><small>Speech Volume</small>                    <i class="bi bi-volume-up-fill"></i>
-                      <input id="volume" type="range" min="0" max="1" value="1" step="0.1"></label>
-                    <label for="voiceSelect"><small>select voz</small><select id="voiceSelect" class="form-control w-2/4"></select></label>
-                    
-                    <label for="randomVoice"><small>random voice</small><input id="randomVoice" type="checkbox" /></label>
-                    <label for="randomSpeed"><small>random speed</small><input id="randomSpeed" type="checkbox" />  <input type="number" id="randomSpeedValue" name="randomSpeedValue" value="1" min="0.1" max="2" step="0.1" />   </label>
-                    <label for="randomPitch"><small>random pitch</small><input id="randomPitch" type="checkbox" />                     <input type="number" id="randomPitchValue" name="randomPitchValue" value="1" min="0.1" max="2" step="0.1" />
-                    </label>
-
-                </div>
-                  <div id="options-users" class="grid border-2 p-1 gap-4 mx-2 rounded-md">
-                  <div  >  <label for="modsonly"><small>Limit TTS to Moderators Only</small></label>
-                    <input id="modsonly" type="checkbox" data-option="modsonly" /></div>  <div>  <label for="cheersonly"><small>Limit TTS to Cheers Only</small></label>
-                    <input id="cheersonly" type="checkbox" data-option="cheersonly" /></div>  <div>  <label for="exclude-toggle"><small>Exclude Chatters Listed Below</small></label>
-                    <input id="exclude-toggle" type="checkbox" data-option="exclude-toggle" /></div><div class="row">    <label for="announcechatter"><small>Announce Chatter's Name Before Message</small></label>  
-                  <input id="announcechatter" type="checkbox" data-option="announcechatter" /></div>
-                <div class="col-12">
-                  <textarea name="excluded-chatters" id="excluded-chatters" cols="30" rows="10"></textarea>
-                </div>
-                <div class="row">
-                <audio id="audiotrack"></audio>
-              </div>
-                </div>
-              </div>
+                <div class="inputFields">
+                  <div class="LiveContainer">
+                      <div class="chat1 chatcontainer">Chats</div>
+                      <div class="gift2 giftcontainer">Gifts</div>
+                      <div class="events3 eventscontainer">Events</div>
+                  </div> 
               <!---- # esta es una parte de la tab de eventos -->
 
           </div>
-          
-    </div>
+          <div class="containerbox">
+            <div class="flexbox">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">General Settings</h2>
+                    </div>
+                    <div class="card-content space-y-4">
+                            <input type="checkbox" id="voiceenabled" checked>
+                            <label for="voiceenabled">Enabled</label>
+
+                        <div class="card-subcontent">
+                            <label class="label cursor-pointer" for="selectvoice1">Voz1</label>
+                            <input type="radio" name="selectvoice" id="selectvoice1" class="radio checked:bg-blue-300" checked>
+                            <div id="voiceSelectContainer" class="relative m-3 content-center"></div>
+
+                            <label class="label cursor-pointer" for="selectvoice2">Voz2</label>
+                            <input type="radio" name="selectvoice" id="selectvoice2" class="radio checked:bg-blue-500">
+
+                        <div class="grid">
+                            <select id="voiceSelect" class="select select-info"></select>
+                            <div class="flex">                                <label for="randomVoice">Random Voice</label>
+                                <input type="checkbox" id="randomVoice" checked></div>
+                            <div class="flex">                                <label for="randomSpeed"><small>random speed</small></label>
+                                <input type="checkbox" id="randomSpeed">
+                                <input type="range" class="range range-sm" id="randomSpeedValue" name="randomSpeedValue" value="1" min="0.1" max="2" step="0.1">
+                                </div>
+                            <div class="flex">  <label for="randomPitch"><small>random pitch</small></label>
+                                <input type="checkbox" id="randomPitch">
+                                <input type="range" class="range range-sm" id="randomPitchValue" name="randomPitchValue" value="1" min="0.1" max="2" step="0.1">
+                            </div>
+                            <div class="flex">
+                                <label for="default-speed">Default Speed</label>
+                                <input type="range" id="default-speed" class="range range-sm">                                   </div>
+                            <div class="flex">
+                                <label for="default-pitch">Default Pitch</label>
+                                <input type="range" id="default-pitch" class="range range-sm">                                   </div>
+                            <small>Speech Volume</small>
+                            <label for="volume">
+                                <i class="bi bi-volume-up-fill"></i></label>
+                                <input id="volume" type="range" min="0" max="1" value="1" step="0.1" class="range range-sm">
+                            
+                        </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <audio id="audiotrack"></audio>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Allowed Users</h2>
+                    </div>
+                    <div class="card-content space-y-4 text-lg">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="allUsers" checked>
+                            <label for="allUsers">All Users</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="followRole" checked>
+                            <label for="followRole">Followers</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="isSubscriber" checked>
+                            <label for="isSubscriber">isSubscriber</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="isModerator" checked>
+                            <label for="isModerator">isModerator</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="isNewGifter" checked>
+                            <label for="isNewGifter">isNewGifter</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="teamMemberLevel" checked>
+                            <label for="teamMemberLevel">
+                                Team Members <span>Min. Level:</span>
+                            </label>
+                            <input type="number" id="teamMemberLevel-value" class="input input-bordered w-12" value="1" min="0">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="topGifterRank" checked>
+                            <label for="topGifterRank">
+                                Top Gifters <span>Top:</span>
+                            </label>
+                            <input type="number" id="topGifterRank-value" class="input input-bordered w-12" value="3" min="0">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="allowed-users-list" checked>
+                            <label for="allowed-users-list">
+                                Allowed Users from list <span>Manage List</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button class="custombutton" onclick="getCheckboxValues()">Obtener Valores</button>
+                
+                    <script>
+                        function getCheckboxValues() {
+                            const checkboxes = document.querySelectorAll('.card-content input[type="checkbox"]');
+                            const values = {};
+                            checkboxes.forEach(checkbox => {
+                                values[checkbox.id] = checkbox.checked;
+                            });
+                            console.log(values);
+                        }
+                    </script>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Comment Types</h2>
+                    </div>
+                    <div class="card-content space-y-4">
+                        <label>Read...</label>
+                        <div>
+                            <div class="flex items-center">
+                                <input type="radio" name="comment-type" value="any-comment" id="any-comment" class="radio checked:bg-blue-300" checked>
+                                <label for="any-comment">Any comment</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" name="comment-type" value="dot-comment" id="dot-comment" class="radio checked:bg-blue-300">
+                                <label for="dot-comment">Comments starting with dot (.)</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" name="comment-type" value="slash-comment" id="slash-comment" class="radio checked:bg-blue-300">
+                                <label for="slash-comment">Comments starting with slash (/)</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" name="comment-type" value="command-comment" id="command-comment" class="radio checked:bg-blue-300">
+                                <label for="command-comment">Comments starting with Command:</label>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="command">Command</label>
+                            <input type="text" id="command" placeholder="!speak">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">More Settings</h2>
+
+                    </div>    
+                    <div class="card-content space-y-4">
+                        <label class="cyberpunk-checkbox-label">
+                            leer follower prefijo:
+                            <input type="checkbox" class="cyberpunk-checkbox" id="readUserMessage" checked>
+                            <input type="text" id="prefixuserfollow" value="te sige">
+                        </label>
+                        <label class="cyberpunk-checkbox-label">
+                            leer regalos prefijo:
+                            <input type="checkbox" class="cyberpunk-checkbox" id="readGiftEvent" checked>
+                            <input type="text" id="prefixGiftEvent" value="regalo">
+                        </label>
+                        <label class="cyberpunk-checkbox-label">
+                            leer usuario y mensaje prefijo:
+                            <input type="checkbox" class="cyberpunk-checkbox" id="readUserMessage" checked>
+                            <input type="text" id="prefixusermessage" value="dice">
+                        </label>
+                        <label class="cyberpunk-checkbox-label">solo mensajes =>3
+                            <input type="checkbox" class="cyberpunk-checkbox" id="messagelenght3" checked>
+                            </label>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Filtros</h2>
+                    </div>
+                    <div class="card-content space-y-4">
+                        <p>BlackList: Input de palabras que no aparecerán en el chat</p>
+                        <input type="text" id="filter-words" class="border p-2 mr-2">
+                        <button class="custombutton" id="addfilter-words" >✅word</button>
+                        <button id="load-known-filters" class="custombutton">Añadir filtros conocidos</button>
+                        <div id="containerfilter-words" class="overflow-y-auto max-h-28 space-y-2 mt-2"></div>
+                    </div>
+                
+                    <div class="card-content space-y-4">
+                        <p>WhiteList: Input de usuarios que aparecerán en el chat++</p>
+                        <input type="text" id="filter-users" class="border p-2 mr-2">
+                        <button class="custombutton" id="addfilter-users" >✅user</button>
+                        <div id="containerfilter-users" class="overflow-y-auto max-h-28 space-y-2 mt-2"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    puntos iniciales del canal
+                    <input type="number" id="users-points" value="2" max="99" min="0" class="bg-slate-600 w-20">
+                    <label class="cyberpunk-checkbox-label">sin puntos no lee
+                    <input type="checkbox" class="cyberpunk-checkbox" id="userpointsCheckbox" checked>
+                    </label>
+
+        
+                    <label class="cyberpunk-checkbox-label">añadir puntos x lvl   
+                    <input type="checkbox" class="cyberpunk-checkbox" id="userlevelCheckbox" checked>
+                                 <input type="number" id="users-level" value="20" max="50" min="0" class="bg-slate-600 w-20">
+                </label>
+                </div>
+            </div>
+
+        </div>
+        <div class="containerbox">
+            <input type="text" id="testvoice">
+            <button class="custombutton" id="testvoicebtn">testvoice</button>
+
+                    
+        </div>
+          </div>
+
+
   </div>
     <div id="tab2" class="tab-content jumbotron">
       <div class="grid border-2 font-bold text-gray-900 border-slate-600 mx-2 rounded-md">
@@ -207,7 +419,7 @@
           </script>
     </div>
     <div id="tab3" class="tab-content jumbotron">
-      <!-- <div>
+      <div>
         <h1>Actions & Events      </h1>
         <p>
   Aquí puede definir sus acciones y eventos personalizados (desencadenantes).Por ejemplo, puede mostrar un video o animación en cierto regalo.
@@ -221,13 +433,13 @@
   Puede vincular estas acciones a los eventos a continuación.
           </p>
           <button id="createActionandOpenModal">Crear nueva acción</button>
-          <table class="table" id="actions-table">
-            <td>atajos</td>
+          <table>
             <td>nombre</td>
-            <td>duración</td>
             <td>imagen</td>
             <td>video</td>
             <td>sonido</td>
+            <td>eventos</td>
+            <td>botones</td>
           </table>
           </div>
         <div class="events-container grid w-full border-2	p-2 m-2 border-slate-600 gap-4 mx-2 rounded-md">
@@ -243,7 +455,7 @@
               <td>actions</td>
             </table>
         </div>
-      </div> -->
+      </div>
       <h1>subir archivos</h1>
       <div class="file-container" id="drop-area">
         <ul id="file-list"> </ul>        
@@ -371,8 +583,6 @@
     </script>
     </div>
   </div>
-
-  </div>
   <script>
     const triggers = [];
     function selectTrigger(trigger) {
@@ -385,10 +595,10 @@
 
   <!-- gestor de pestañas [tabs] -->
   <script>
+
     document.addEventListener('DOMContentLoaded', () => {
-      const tabs = document.querySelectorAll('.tab');
+      const tabs = document.querySelectorAll('.tabs');
       const tabContents = document.querySelectorAll('.tab-content');
-      const indicator = document.querySelector('.indicator');
   
       function activateTab(tab) {
           const tabId = tab.getAttribute('data-tab');
@@ -402,10 +612,6 @@
           tab.classList.add('active');
           content.classList.add('active');
   
-          // Update indicator position and width
-          indicator.style.left = `${tab.offsetLeft}px`;
-          indicator.style.width = `${tab.offsetWidth}px`;
-  
           // Store the last active tab in localStorage
           localStorage.setItem('activeTab', tabId);
       }
@@ -418,7 +624,7 @@
       // Check for the last active tab in localStorage
       const lastActiveTab = localStorage.getItem('activeTab');
       if (lastActiveTab) {
-          const tab = document.querySelector(`.tab[data-tab="${lastActiveTab}"]`);
+          const tab = document.querySelector(`.tabs[data-tab="${lastActiveTab}"]`);
           if (tab) {
               activateTab(tab);
           } else {
@@ -430,7 +636,7 @@
   });
   
   </script>
-
+</div>
 </body>
 <script src="tmi.min.js"></script>
 <script src="app.js" type="module"></script>

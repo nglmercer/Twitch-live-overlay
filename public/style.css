@@ -1,12 +1,209 @@
-body{
-    font-size: large;
-    padding-bottom:120px;
-    min-width: 600px;
-}
-
-#main {
-    color:#000000;
-}
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 1.5em;
+    cursor: auto;
+    width: 99%;
+    height: 95% !important;
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+  :root {
+    --primary-color: rgb(204, 204, 204);
+    --secondary-color: rgb(139, 139, 139);
+    --accent-color: rgb(154, 0, 108);
+    --button-padding: 14px 16px;
+    --button-font-size: 18px; 
+    --blue-box-900: #2e4c79;
+    --blue-box-600: #5a8cd6;
+    --blue-box-400: #7fdcf8;
+    --blue-box-200: #b9daff;
+    --graycolor: rgba(17, 24, 39, 0.795);
+  } 
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Personalizar el pulgar */
+  ::-webkit-scrollbar-thumb {
+    width: 10px;
+    background-color: #007bff;
+    border-radius: 10px;
+  }
+.title-bar {
+    background: linear-gradient(to right, #ffffff, #cfd4ff);
+    position: fixed;
+    -webkit-app-region: drag;
+    height: 25px;
+    left: 0px;
+    top: 1px;
+    width: 100%;
+    h2 {
+      font-size: 10px;
+    }
+    h1 {
+      color: #030238;
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      font-weight: bold;
+      margin: 0;
+    }
+  }
+  .parent {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Menú ocupa auto, contenido ocupa el espacio restante */
+    grid-template-rows: repeat(6, 1fr); /* Seis filas */
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 99vw;
+    height: 100vh;
+    grid-template-areas: 
+      "menu content"
+      "menu content"
+      "menu content"
+      "menu content"
+      "menu content"
+      "menu content"; /* Define explícitamente las áreas */
+  }
+  
+  .divmenu {
+    position: relative;
+    height: 90%;
+    grid-area: menu; /* Asignar área 'menu' */
+    /* background-color: rgb(230, 0, 0); */
+    transition: width 0.3s; /* Transición suave para el cambio de ancho */
+    .tabs{
+        background-color: rgba(245, 245, 245, 0.253);
+        position: relative;
+        height: 4rem;
+        border: 1px solid #ccc;
+        border-radius: 0.3rem;
+        align-items: center;
+        margin-block: 0.4rem;
+        padding-inline: 0.2rem;
+        transition: background 0.3s;
+        box-shadow: #525252 0px 0px 10px;
+        .icon {
+          height: 4rem;
+          width: 4rem;
+        }
+        .text {
+          display: none;
+        }
+        a {
+          color: rgb(110, 110, 110);
+          font-size: medium;
+          position: absolute;
+          text-justify: auto;
+        }
+      }
+      .tabs:hover {
+        background: #dddddd8c;
+        transition: all 0.9s;
+        display: flex;
+        .text {
+          display: inline-block;
+        }
+        .icon {
+          display: flex;
+        }
+        a {
+          position: relative;
+          color: rgb(255, 255, 255);
+          font-size: large;
+        }
+      }
+    .tabs-menu {
+        width: 5rem;
+        overflow-x: hidden;
+        height: 100%;
+      
+      
+        transition: all 1s; /* Animación suave para el cambio de ancho */
+      }
+      .tabs-menu:hover{
+        width: 11rem;
+        .menu-button {
+          display: block;
+        }
+      
+      
+      }
+            
+  }
+  #menu-toggle {
+    display: none;
+  }
+  
+  .menu-button {
+    display: none;
+    color: transparent;
+    width: 2rem;
+    height: 2rem;
+    background-image: url("svg/pinboard.svg");
+    z-index: 110;
+    position: absolute; 
+    top: 0%;
+    left: 75%;
+  }
+  
+  #menu-toggle:checked ~ .tabs-menu {
+    width: 11rem;
+    .menu-button {
+      filter: invert(50%) sepia(100%) saturate(500%) hue-rotate(180deg);
+    }
+  }
+  .divmenu:hover ~ .menu-button{
+    display: block;
+  }
+  .divcontent {
+    grid-area: content; /* Asignar área 'content' */
+    width: 100%;
+    .containerbox {
+        box-sizing: content-box;
+        padding: 0.5rem;
+        overflow-x: auto;
+        position: relative;
+        border: 1px solid rgba(88, 88, 255, 0.123);
+        border-radius: 0.5rem;
+        background-color: #212121;
+        margin: 0.5rem;
+        min-width: 90%;
+        min-height: 100%;
+      }
+      
+      .containerbox-child {
+        border: 1px solid rgba(88, 88, 255, 0.123);
+        background-color: #1a1919;
+        min-height: 200px;
+        margin-right: 10%;
+      }
+      .containerbox:hover {
+        border: 1px solid var(--blue-box-900);
+      }
+      .containerbox.\.1 {
+        padding: 20px;
+        width: 200px;
+        align-items: end;
+        margin: 20px;
+        
+      }
+    /* background-color: rgb(87, 0, 109); */
+  }
+  .LiveContainer {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    }
+    
+    .chat1 { grid-area: 1 / 1 / 5 / 4; }
+    .gift2 { grid-area: 1 / 4 / 5 / 7; }
+    .events3 { grid-area: 5 / 1 / 7 / 7; }
+    .static,.event {
+      display: flex;
+    }
 .container {
     overflow-y: auto;
 }
@@ -177,4 +374,53 @@ button {
     min-width: 90%;
     min-height: 90%;
     margin-right: 5%;
+  }
+  .flexbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 20rem));
+    gap: 1rem;
+    padding: 0.5rem;
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .flexbox > * {
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                translate 1s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: lightblue;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .card {
+    width: 100%;
+    max-width: 21rem;
+    font-size: smaller;
+    overflow: hidden; /* Oculta el desbordamiento del contenido */
+    text-overflow: ellipsis; /* Añade puntos suspensivos (...) */
+    background-color: #1c1c1c;
+    padding: 0.5rem;
+    border-radius: 8px;
+    span {
+      font-size: 0.75rem;
+    }
+    span {
+      color: var(--blue-box-200);
+    }
+  }
+  .card-content input[type="checkbox"],
+  .card input[type="checkbox"]{
+    width: 20px;
+    height: 20px;
+  }
+  .flex.items-center {
+    display: flex;
+    align-items: center;
+  }
+  .card-header {
+    margin-bottom: 16px;
+  }
+  .card-title {
+    color: var(--blue-box-600);
   }
