@@ -21,7 +21,6 @@ const api = {
     onOverlayEvent: (callback) => ipcRenderer.on('overlay-event', callback),
     onShowMessage: (callback) => ipcRenderer.on('show-message', callback),
     sendlibraryData: (callback) => ipcRenderer.invoke('send-library-data', { eventType, data }),
-
     createBot: (options) => ipcRenderer.invoke('create-bot', options),
     sendChatMessage: (message) => ipcRenderer.invoke('send-chat-message', message),
     onBotEvent: (callback) => ipcRenderer.on('bot-event', callback),

@@ -2,23 +2,27 @@ import {
     databases,
     saveDataToIndexedDB,
     updateDataInIndexedDB,
-} from '../indexedDB.js';
-
+} from '../functions/indexedDB.js';
+import createErrorComponent from '../htmlcomponents/errorComponent.js';
+async function createModalElement() {
+    let modal = document.createElement('div');
+    modal.className = 'modalElement';
+    modal.id = `ModalElement${Math.floor(Math.random() * 1000)}`;
+    modal.innerHTML = await (await fetch('./tab5-action/tab5-action.html')).text();
+    return modal;
+}
+ 
 export default async function tab5Action({
     elementContainer,
-    files = [],
+    filesdata = [],
+    optionsgift = [],
     onCancel = () => {},
-    onSave = () => {},
-    saveData = () => {},
     separator = "_"
 }) {
-    let ModalElement = document.createElement('div');
-    const idModal = `ModalElement${Math.floor(Math.random() * 1000)}`;
+    let ModalElement = await createModalElement();
+    const idModal = ModalElement.id;
     const cacheAssign = {};
 
-    ModalElement.className = 'modalElement';
-    ModalElement.id = idModal;
-    ModalElement.innerHTML = await (await fetch('./tab5-action/tab5-action.html')).text();
     elementContainer.parentNode.insertBefore(ModalElement, elementContainer.nextSibling);
     elementContainer.remove();
 
@@ -28,41 +32,41 @@ export default async function tab5Action({
     const form = elementModal.querySelector('.tab5-action');
     form.addEventListener('submit', event => event.preventDefault());
 
-    let errorMessage = createErrorMessage();
-    ModalElement.appendChild(errorMessage);
 
-    setTimeout(() => errorMessage.style.display = 'none', 5000);
+    let copyFiles123 = [];
 
-    function createErrorMessage() {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        errorDiv.style.color = 'red';
-        errorDiv.style.display = 'none';
-        errorDiv.style.zIndex = '100';
-        errorDiv.textContent = 'El nombre es obligatorio.';
-        return errorDiv;
+    async function getFiles123() {
+        try {
+            const files = await window.api.getFilesInFolder();
+            copyFiles123 = [...files];
+            return files;
+        } catch (error) {
+            console.error('Error fetching files:', error);
+            return [];
+        }
     }
 
     function validateForm() {
         const nombre = form.elements.namedItem('accionevento_nombre');
         if (!nombre || !nombre.value.trim()) {
-            errorMessage.style.display = 'block';
-            errorMessage.style.position = 'absolute';
-            errorMessage.style.top = '26%';
-            errorMessage.style.left = '40%';
-            return false;
+            const errorMessage = createErrorComponent('El nombre es obligatorio.');
+            errorMessage.style.display = 'block'; // Mostrar el mensaje de error
+            errorMessage.style.position = 'fixed'; // Posición fija del mensaje de error
+            errorMessage.style.top = '1%'; // Ajusta según la distancia deseada desde la parte superior
+            errorMessage.style.right = '1%'; // Ajusta según la distancia deseada desde la parte derecha
+            ModalElement.appendChild(errorMessage);
+
+            return false;   
         }
-        errorMessage.style.display = 'none';
         return true;
     }
 
     function obtenerDatos() {
         const datosFormulario = {};
         const nameFilter = {};
-    
+
         for (const elemento of form.elements) {
             if (elemento.name) {
-
                 if (elemento.type === 'checkbox') {
                     const numberElement = form.elements.namedItem(`${elemento.name}_number`);
                     datosFormulario[elemento.name] = {
@@ -74,29 +78,26 @@ export default async function tab5Action({
                 } else {
                     datosFormulario[elemento.name] = elemento.value;
                 }
-    
+
                 const [prefix] = elemento.name.split(separator);
                 if (!nameFilter[prefix]) {
                     nameFilter[prefix] = {};
                 }
-    
+
                 const [, suffix] = elemento.name.split(separator);
                 if (suffix) {
                     nameFilter[prefix][suffix] = elemento.type === 'checkbox' ? elemento.checked : elemento.value;
                 }
             }
         }
-    
+
         const idValue = form.elements.namedItem('id').value;
         nameFilter.id = !isNaN(idValue) ? idValue : null;
-    
+
         return nameFilter;
     }
-    
-    
 
-    const fillForm = (datos = {}) => {
-        const booleanElements = {};
+    function fillForm(datos = {}) {
         for (const elemento of form.elements) {
             const { name, type } = elemento;
             let value = null;
@@ -107,27 +108,15 @@ export default async function tab5Action({
                     value = datos[prefix] && datos[prefix][suffix] ? datos[prefix][suffix].check : null;
 
                     if (type === 'checkbox') {
-                        // console.log('elemento.name', elemento.name, elemento.checked, elemento.value,"---------------------elemento",elemento);
-                        // elemento.checked = elemento.value === 'false' ? false : true;
                         const checkElement = form.elements.namedItem(`${name}`);
-                        const checkdataproperity = datos.hasOwnProperty(name)
-
-                        if (checkElement){ 
-                        Object.entries(datos).forEach(([clave, valor]) => {
-                            const checkvalue = `${clave}_check`;
-                            if (checkvalue === name) {
-                                console.log('${clave}_check', checkvalue,"clave---------nombre",name,"valor--------",valor,"----------------------");
-                                elemento.checked = valor.check;
-                                return true;
-                            } else if (checkvalue === `eventos_check`) {
-                                console.log('eventos_check', checkvalue,"clave---------nombre",name,"valor--------",valor,valor[name]);
-                            }
-                            
-                        });
-                            // console.log('checkElement', checkElement,"datos",datos[name],"datacheck",datos[name]);
-                            // elemento.checked = value === 'false' ? false : true;
-                            }
-                        // console.log('checkElement', checkElement,`${name}_check`);
+                        if (checkElement) {
+                            Object.entries(datos).forEach(([clave, valor]) => {
+                                const checkvalue = `${clave}_check`;
+                                if (checkvalue === name) {
+                                    elemento.checked = valor.check;
+                                }
+                            });
+                        }
                         const numberElement = form.elements.namedItem(`${name}_number`);
                         if (numberElement) {
                             numberElement.value = datos[prefix] && datos[prefix][suffix] ? datos[prefix][suffix].number || '' : '';
@@ -153,139 +142,117 @@ export default async function tab5Action({
                     }
                 }
             }
-            if (value !== null && typeof value === 'boolean') {
-                booleanElements[name] = value;
-            }
         }
-        console.log('Boolean elements found:', booleanElements);
-    };
-    
+    }
 
-    const resetForm = () => {
+    function resetForm() {
         for (const elemento of form.elements) {
             if (elemento.name) {
                 if (elemento.type === 'checkbox') {
                     elemento.checked = false;
                     const numberElement = form.querySelector(`#${elemento.name}_number`);
                     if (numberElement) {
-                        numberElement.value = ''; // Asegúrate de manejar el valor del campo de número correctamente
+                        numberElement.value = 5;
                     }
                 } else if (elemento.type === 'select-one') {
                     elemento.selectedIndex = 0;
                 } else if (elemento.type === 'range') {
                     elemento.value = elemento.defaultValue;
+                } else if (elemento.type === 'number') {
+                    elemento.value = 5;
                 } else {
                     elemento.value = '';
                 }
             }
         }
-    };
-    
-    
-    elementModal.querySelector('.modalActionAdd').addEventListener('click', async () => {
-        if (!validateForm()) return;
-        const nameFilter = obtenerDatos();
-        onSave();
-        saveData();
-        if (nameFilter.id) {
-            
-            await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
-        } else {
-            await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
-        }
-        elementModal.style.display = 'none';
-    });
-
-    elementModal.querySelector('.modalActionClose').addEventListener('click', () => {
-        elementModal.style.display = 'none';
-        onCancel();
-    });
-
-    elementModal.querySelector('.modalActionSave').addEventListener('click', async () => {
-        if (!validateForm()) return;
-        const nameFilter = obtenerDatos();
-        elementModal.style.display = 'none';
-        onSave();
-        saveData();
-        if (nameFilter.id) {
-            await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
-        } else {
-            await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
-        }
-    });
-// Limpiar los elementos select correspondientes
-const selectVideo = form.elements.namedItem('type-video_select');
-const selectImage = form.elements.namedItem('type-imagen_select');
-const selectAudio = form.elements.namedItem('type-audio_select');
-
-if (selectVideo) selectVideo.innerHTML = '';
-if (selectImage) selectImage.innerHTML = '';
-if (selectAudio) selectAudio.innerHTML = '';
-
-// Banderas para comprobar si se añadieron elementos
-let hasVideo = false;
-let hasImage = false;
-let hasAudio = false;
-
-// Iterar sobre los archivos y agregar opciones a los selects correspondientes
-files.forEach(file => {
-    // Creamos el elemento option
-    const optionElement = document.createElement('option');
-    optionElement.textContent = file.name;
-    optionElement.value = file.index;
-
-    // Seleccionamos el select correspondiente según el tipo de archivo
-    let selectElement = null;
-    if (file.type.startsWith('video')) {
-        selectElement = selectVideo;
-        hasVideo = true;
-    } else if (file.type.startsWith('image')) {
-        selectElement = selectImage;
-        hasImage = true;
-    } else if (file.type.startsWith('audio')) {
-        selectElement = selectAudio;
-        hasAudio = true;
-    } else {
-        console.log('No se ha encontrado el tipo de archivo');
     }
 
-    // Si encontramos el select correspondiente, hacemos el append
-    if (selectElement) {
-        selectElement.appendChild(optionElement);
+    function setupFormActions() {
+        elementModal.querySelector('.modalActionAdd').addEventListener('click', async () => {
+            if (!validateForm()) return;
+            const nameFilter = obtenerDatos();
+            if (nameFilter.id) {
+                await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            } else {
+                await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            }
+            elementModal.style.display = 'none';
+        });
+
+        elementModal.querySelector('.modalActionClose').addEventListener('click', () => {
+            elementModal.style.display = 'none';
+            onCancel();
+        });
+
+        elementModal.querySelector('.modalActionSave').addEventListener('click', async () => {
+            if (!validateForm()) return;
+            const nameFilter = obtenerDatos();
+            elementModal.style.display = 'none';
+            if (nameFilter.id) {
+                await updateDataInIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            } else {
+                await saveDataToIndexedDB(databases.MyDatabaseActionevent, nameFilter);
+            }
+        });
     }
 
-    console.log('selectname', selectElement, file);
-    cacheAssign[file.path] = file;
-});
+    async function filesform() {
+        let files = await getFiles123();
 
-// Añadir una opción "Sin elementos" si no se añadió ninguna opción
-if (!hasVideo && selectVideo) {
-    const optionElement = document.createElement('option');
-    optionElement.textContent = 'Sin elementos';
-    optionElement.value = 'false';
-    selectVideo.appendChild(optionElement);
-}
+        const selectVideo = form.elements.namedItem('type-video_select');
+        const selectImage = form.elements.namedItem('type-imagen_select');
+        const selectAudio = form.elements.namedItem('type-audio_select');
 
-if (!hasImage && selectImage) {
-    const optionElement = document.createElement('option');
-    optionElement.textContent = 'Sin elementos';
-    optionElement.value = 'false';
-    selectImage.appendChild(optionElement);
-}
+        if (selectVideo) selectVideo.innerHTML = '';
+        if (selectImage) selectImage.innerHTML = '';
+        if (selectAudio) selectAudio.innerHTML = '';
 
-if (!hasAudio && selectAudio) {
-    const optionElement = document.createElement('option');
-    optionElement.textContent = 'Sin elementos';
-    optionElement.value = 'false';
-    selectAudio.appendChild(optionElement);
-}
+        let hasVideo = false;
+        let hasImage = false;
+        let hasAudio = false;
 
-    
+        files.forEach(file => {
+            const optionElement = document.createElement('option');
+            optionElement.textContent = file.name;
+            optionElement.value = file.index;
+
+            let selectElement = null;
+            if (file.type.startsWith('video')) {
+                selectElement = selectVideo;
+                hasVideo = true;
+            } else if (file.type.startsWith('image')) {
+                selectElement = selectImage;
+                hasImage = true;
+            } else if (file.type.startsWith('audio')) {
+                selectElement = selectAudio;
+                hasAudio = true;
+            }
+
+            if (selectElement) {
+                selectElement.appendChild(optionElement);
+            }
+
+            cacheAssign[file.path] = file;
+        });
+
+        addNoElementsOption(selectVideo, hasVideo);
+        addNoElementsOption(selectImage, hasImage);
+        addNoElementsOption(selectAudio, hasAudio);
+    }
+
+    function addNoElementsOption(selectElement, hasElements) {
+        if (!hasElements && selectElement) {
+            const optionElement = document.createElement('option');
+            optionElement.textContent = 'Sin elementos';
+            optionElement.value = 'false';
+            selectElement.appendChild(optionElement);
+        }
+    }
+
 
     const exportFormData = () => {
         const formData = obtenerDatos();
-        const jsonData = JSON.stringify(formData, null, 2);
-        return jsonData;
+        return JSON.stringify(formData, null, 2);
     };
 
     const importFormData = (importedData) => {
@@ -298,20 +265,26 @@ if (!hasAudio && selectAudio) {
         }
     };
 
+    setupFormActions();
+    filesform();
+
     return {
         element: ModalElement,
         form: form,
         close: () => {
+            filesform();
             elementModal.style.display = 'none';
             ModalElement = null;
         },
         open: (newFiles = null) => {
             resetForm();
+            filesform();
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'inline-block';
             elementModal.querySelector('.modalActionSave').style.display = 'none';
         },
         onUpdate: (datos) => {
+            filesform();
             fillForm(datos);
             elementModal.style.display = 'flex';
             elementModal.querySelector('.modalActionAdd').style.display = 'none';
